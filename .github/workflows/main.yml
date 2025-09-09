@@ -8,27 +8,27 @@ on:
     branches:
       - main
 
-  jobs:
-    tests:
-      run-ons: ubuntu-latest
+jobs:
+  test:
+    runs-on: ubuntu-latest
 
-      steps:
-        - name: Checkout repository 
-          uses: actions/checkout@v5
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
 
-        - name: Set up Node.js
-          uses: actions/setup-node@v5
-          with:
-            node-version: '24'
+      - name: Set up Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: '24'
 
-        - name: Install dependencies
-          run: npm install
+      - name: Install dependencies
+        run: npm install
 
-        - name: Install client dependencies
-          run: |
-            cd client
-            npm install
+      - name: Install client dependencies
+        run: |
+          cd client
+          npm install
 
-        - name: Run Jest tests
-          run: npm run test:frontend
+      - name: Run Jest tests
+        run: npm run test:frontend
 
