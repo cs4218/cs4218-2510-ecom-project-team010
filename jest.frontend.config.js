@@ -21,7 +21,8 @@ export default {
 
   // only run these tests
   testMatch: [
-    "<rootDir>/client/src/pages/**/*.test.js"
+    "<rootDir>/client/src/pages/**/*.test.js",
+    "<rootDir>/client/src/context/**/*.test.js",
   ],
 
   // jest code coverage
@@ -29,6 +30,7 @@ export default {
   collectCoverageFrom: [
     "client/src/pages/Auth/**",
     "client/src/pages/Search.js",
+    "client/src/context/search.js",
   ],
   coverageThreshold: {
     global: {
