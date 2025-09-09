@@ -2,10 +2,6 @@ import React from "react";
 import { render, screen } from "@testing-library/react";
 import Search from "../pages/Search";
 
-jest.mock("../components/Layout", () => ({ children }) => (
-  <div data-testid="layout">{children}</div>
-));
-
 jest.mock("../components/Layout", () => {
   return {
     __esModule: true, 
@@ -33,7 +29,7 @@ describe("Given that multiple products are available in the Home Page", () => {
     expect(screen.getByText("No Products Found")).toBeInTheDocument();
   });
 
-  test("When a single results is present", () => {
+  test("When a single search result is present", () => {
     const mockProduct = [{ _id: "1", name: "Product A", description: "Desc", price: 10 }];
     useSearch.mockReturnValue([{ results: mockProduct }, jest.fn()]);
 
@@ -43,7 +39,7 @@ describe("Given that multiple products are available in the Home Page", () => {
     expect(screen.getByText("Product A")).toBeInTheDocument();
     });
 
-  test("When multiple results are present", () => {
+  test("When multiple search results are present", () => {
     const mockProducts = [
       { _id: "1", name: "Product A", description: "Mock description of product A", price: 10 },
       { _id: "2", name: "Product B", description: "Mock description of product B", price: 20 },
