@@ -30,7 +30,7 @@ describe("Given that multiple products are available in the Home Page", () => {
   });
 
   test("When a single search result is present", () => {
-    const mockProduct = [{ _id: "1", name: "Product A", description: "Desc", price: 10 }];
+    const mockProduct = [{ _id: "1", name: "Product A", description: "Mock description of product A", price: 10 }];
     useSearch.mockReturnValue([{ results: mockProduct }, jest.fn()]);
 
     render(<Search />);
