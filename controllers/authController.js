@@ -49,14 +49,14 @@ export const registerController = async (req, res) => {
 
     res.status(201).send({
       success: true,
-      message: "User Register Successfully",
+      message: "User Registered Successfully",
       user,
     });
   } catch (error) {
     console.log(error);
     res.status(500).send({
       success: false,
-      message: "Errro in Registeration",
+      message: "Error in Registration",
       error,
     });
   }
@@ -121,10 +121,10 @@ export const forgotPasswordController = async (req, res) => {
   try {
     const { email, answer, newPassword } = req.body;
     if (!email) {
-      res.status(400).send({ message: "Emai is required" });
+      res.status(400).send({ message: "Email is required" });
     }
     if (!answer) {
-      res.status(400).send({ message: "answer is required" });
+      res.status(400).send({ message: "Answer is required" });
     }
     if (!newPassword) {
       res.status(400).send({ message: "New Password is required" });
@@ -164,7 +164,7 @@ export const testController = (req, res) => {
   }
 };
 
-//update prfole
+//update profile
 export const updateProfileController = async (req, res) => {
   try {
     const { name, email, password, address, phone } = req.body;
