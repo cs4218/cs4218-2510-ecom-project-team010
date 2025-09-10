@@ -1,6 +1,7 @@
 import React from "react";
 import { render, screen } from "@testing-library/react";
 import Search from "../pages/Search";
+import { useSearch } from "../context/search";
 
 jest.mock("../components/Layout", () => {
     return {
@@ -12,8 +13,6 @@ jest.mock("../components/Layout", () => {
 jest.mock("../context/search", () => ({
     useSearch: jest.fn(),
 }));
-
-import { useSearch } from "../context/search";
 
 describe("Given that multiple products are available in the Home Page", () => {
     afterEach(() => {
