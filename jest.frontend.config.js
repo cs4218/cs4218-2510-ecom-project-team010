@@ -30,8 +30,9 @@ export default {
   collectCoverageFrom: [
     "client/src/pages/Auth/**",
     "client/src/pages/Search.js",
-    "client/src/context/search.js",
+    "client/src/context/**",
   ],
+
   coverageThreshold: {
     global: {
       lines: 100,
