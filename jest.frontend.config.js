@@ -23,6 +23,7 @@ export default {
   testMatch: [
     "<rootDir>/client/src/pages/**/*.test.js",
     "<rootDir>/client/src/context/**/*.test.js",
+    "<rootDir>/client/src/components/**/*.test.js",
   ],
 
   // jest code coverage
@@ -31,6 +32,7 @@ export default {
     "client/src/pages/Auth/**",
     "client/src/pages/Search.js",
     "client/src/context/**",
+    "client/src/components/Form/**",
   ],
 
   coverageThreshold: {
