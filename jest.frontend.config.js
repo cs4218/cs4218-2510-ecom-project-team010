@@ -31,6 +31,7 @@ export default {
   collectCoverageFrom: [
     "client/src/pages/Auth/**",
     "client/src/pages/Search.js",
+    "client/src/pages/Categories.js",
     "client/src/context/**",
     "client/src/components/Form/**",
   ],
