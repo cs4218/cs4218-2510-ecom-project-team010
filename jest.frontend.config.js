@@ -24,6 +24,8 @@ export default {
     "<rootDir>/client/src/pages/**/*.test.js",
     "<rootDir>/client/src/context/**/*.test.js",
     "<rootDir>/client/src/components/**/*.test.js",
+    "<rootDir>/client/src/components/*.test.js",
+    "<rootDir>/client/src/pages/admin/*.test.js",
     "<rootDir>/client/src/hooks/**/*.test.js",
   ],
 
@@ -38,7 +40,9 @@ export default {
     "client/src/components/Form/**",
     "client/src/pages/Policy.js",
     "client/src/context/cart.js",
-    "client/src/pages/admin/Products.js"
+    "client/src/pages/admin/Products.js",
+    "client/src/components/AdminMenu.js",
+    "client/src/pages/admin/AdminDashboard.js"
   ],
 
   coverageThreshold: {
