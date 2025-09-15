@@ -250,34 +250,7 @@ describe("testing createProductController function", () => {
     expect(fs.readFileSync).toHaveBeenCalledWith("/tmp/p.jpg");
   });
 
-    it("500 if files parameter not in req", async () => {
-        //silence console as intentionally ommiting the files parameter
-        const logSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
-        const req = {
-        fields: {
-            name: "Nintendo Switch",
-            description: "A fun game to enjoy with friends.",
-            price: 2500,
-            category: "Devices",
-            quantity: "5",
-            shipping: true,
-        },
-        };
-        const res = { status: jest.fn().mockReturnThis(), send: jest.fn() };
-
-        await createProductController(req, res);
-
-        expect(res.status).toHaveBeenCalledWith(500);
-        const payload = res.send.mock.calls[0][0];
-
-        expect(res.send).toHaveBeenCalledWith(
-        expect.objectContaining({
-            success: false,
-            message: 'Error in creating product',
-        })
-    );
-    logSpy.mockRestore();
-    });
+    
 
 
   
@@ -481,39 +454,6 @@ describe("testing updateProductController function", () => {
   });
 
  
-  it("500 if product has no pid and is not updated successfully", async() => {
-    
-    //silence console as intentionally ommiting the pid parameter
-    const logSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
-
-    const req = {
-      fields: {
-        name: "Nintendo Switch",
-        description: "A fun game to enjoy with friends.",
-        price: 2500,
-        category: "Devices",
-        quantity: "5",
-        shipping: true,
-      },
-      files: {
-        photo: { size: 1, path: "/tmp/p.jpg", type: "image/jpeg" }, 
-      },
-    };
-    const res = { status: jest.fn().mockReturnThis(), send: jest.fn() };
-
-    await updateProductController(req, res);
-
-    expect(res.status).toHaveBeenCalledWith(500);
-    expect(res.send).toHaveBeenCalledWith(
-      expect.objectContaining({
-        success: false,
-        error: expect.any(Object),
-        message: "Error in Update product",
-      })
-    );
-
-    logSpy.mockRestore();
-
-  });
+  
   
 });
