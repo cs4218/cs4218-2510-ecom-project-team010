@@ -8,11 +8,11 @@ jest.mock("../../context/auth", () => ({
 }));
 
 jest.mock("../../components/AdminMenu", () => () => (
-    <div data-testid="admin-menu">Mocked AdminMenu</div>
+    <div data-testid="mock-admin-menu">Mocked AdminMenu</div>
 ));
 
 jest.mock("../../components/Layout", () => ({ children }) => (
-    <div data-testid="layout">{children}</div>
+    <div data-testid="mock-layout">{children}</div>
 ));
 
 describe("AdminDashboard Page", () => {
@@ -38,8 +38,8 @@ describe("AdminDashboard Page", () => {
             </MemoryRouter>
         );
 
-        expect(screen.getByTestId("layout")).toBeInTheDocument();
-        expect(screen.getByTestId("admin-menu")).toBeInTheDocument();
+        expect(screen.getByTestId("mock-layout")).toBeInTheDocument();
+        expect(screen.getByTestId("mock-admin-menu")).toBeInTheDocument();
 
         expect(screen.getByText(/Admin Name : John Doe/i)).toBeInTheDocument();
         expect(screen.getByText(/Admin Email : john@example.com/i)).toBeInTheDocument();
