@@ -17,12 +17,14 @@ var gateway = new braintree.BraintreeGateway({
   privateKey: process.env.BRAINTREE_PRIVATE_KEY,
 });
 
+//janna
 export const createProductController = async (req, res) => {
   try {
+    // am i supposed to add shipping validation?
     const { name, description, price, category, quantity, shipping } =
       req.fields;
     const { photo } = req.files;
-    //alidation
+    //validation
     switch (true) {
       case !name:
         return res.status(500).send({ error: "Name is Required" });
@@ -56,7 +58,7 @@ export const createProductController = async (req, res) => {
     res.status(500).send({
       success: false,
       error,
-      message: "Error in crearing product",
+      message: "Error in creating product",
     });
   }
 };
@@ -125,6 +127,7 @@ export const productPhotoController = async (req, res) => {
   }
 };
 
+//janna
 //delete controller
 export const deleteProductController = async (req, res) => {
   try {
@@ -143,6 +146,7 @@ export const deleteProductController = async (req, res) => {
   }
 };
 
+//janna
 //upate producta
 export const updateProductController = async (req, res) => {
   try {
@@ -187,7 +191,7 @@ export const updateProductController = async (req, res) => {
     res.status(500).send({
       success: false,
       error,
-      message: "Error in Updte product",
+      message: "Error in Update product",
     });
   }
 };
