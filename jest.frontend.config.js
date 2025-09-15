@@ -24,6 +24,7 @@ export default {
     "<rootDir>/client/src/pages/**/*.test.js",
     "<rootDir>/client/src/context/**/*.test.js",
     "<rootDir>/client/src/components/**/*.test.js",
+    "<rootDir>/client/src/hooks/**/*.test.js",
   ],
 
   // jest code coverage
@@ -31,7 +32,9 @@ export default {
   collectCoverageFrom: [
     "client/src/pages/Auth/**",
     "client/src/pages/Search.js",
+    "client/src/pages/Categories.js",
     "client/src/context/**",
+    "client/src/hooks/**",
     "client/src/components/Form/**",
   ],
 

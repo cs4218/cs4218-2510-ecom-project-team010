@@ -144,3 +144,7 @@ To begin unit testing with Jest in your project, follow these steps:
      ```bash
      npm run test
      ```
+
+
+## CI Run URL (Milestone 1)
+Github Workflow Submission: [URL](https://github.com/cs4218/cs4218-2510-ecom-project-team010/actions)
