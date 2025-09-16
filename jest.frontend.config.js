@@ -43,10 +43,11 @@ export default {
     "client/src/components/UserMenu.js",
     "client/src/pages/Policy.js",
     "client/src/pages/user/Dashboard.js",
-    "client/src/context/cart.js",
     "client/src/pages/admin/Products.js",
+    "client/src/pages/admin/AdminDashboard.js",
+    "client/src/pages/admin/Users.js",
+    "client/src/context/cart.js",
     "client/src/components/AdminMenu.js",
-    "client/src/pages/admin/AdminDashboard.js"
   ],
 
   coverageThreshold: {
