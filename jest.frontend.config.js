@@ -36,6 +36,7 @@ export default {
     "client/src/context/**",
     "client/src/hooks/**",
     "client/src/components/Form/**",
+    "client/src/components/Routes/Private.js",
     "client/src/pages/Policy.js",
     "client/src/context/cart.js",
     "client/src/pages/admin/Products.js"
