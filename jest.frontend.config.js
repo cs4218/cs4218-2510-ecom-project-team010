@@ -27,6 +27,7 @@ export default {
     "<rootDir>/client/src/components/*.test.js",
     "<rootDir>/client/src/pages/admin/*.test.js",
     "<rootDir>/client/src/pages/user/*.test.js",
+    "<rootDir>/client/src/pages/*.test.js",
     "<rootDir>/client/src/hooks/**/*.test.js",
   ],
 
@@ -42,6 +43,8 @@ export default {
     "client/src/components/Routes/Private.js",
     "client/src/components/UserMenu.js",
     "client/src/pages/Policy.js",
+    "client/src/pages/Contact.js",
+    "client/src/pages/HomePage.js",
     "client/src/pages/user/Dashboard.js",
     "client/src/pages/admin/Products.js",
     "client/src/pages/admin/AdminDashboard.js",
