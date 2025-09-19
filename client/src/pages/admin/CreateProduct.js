@@ -27,7 +27,7 @@ const CreateProduct = () => {
       }
     } catch (error) {
       console.log(error);
-      toast.error("Something wwent wrong in getting catgeory");
+      toast.error("Something wwent wrong in getting category");
     }
   };
 
@@ -42,23 +42,26 @@ const CreateProduct = () => {
       const productData = new FormData();
       productData.append("name", name);
       productData.append("description", description);
-      productData.append("price", price);
-      productData.append("quantity", quantity);
+      // productData.append("price", price);
+      // productData.append("quantity", quantity);
+      productData.append("price", Number(price));
+      productData.append("quantity", Number(quantity));
       productData.append("photo", photo);
       productData.append("category", category);
-      const { data } = axios.post(
+      productData.append("shipping", shipping);
+      const { data } = await axios.post(
         "/api/v1/product/create-product",
         productData
       );
       if (data?.success) {
-        toast.error(data?.message);
-      } else {
         toast.success("Product Created Successfully");
         navigate("/dashboard/admin/products");
+      } else {
+        toast.error(data?.message || "Failed to create new product");
       }
     } catch (error) {
       console.log(error);
-      toast.error("something went wrong");
+      toast.error("Something went wrong in creating new product");
     }
   };
 
@@ -116,7 +119,7 @@ const CreateProduct = () => {
                 <input
                   type="text"
                   value={name}
-                  placeholder="write a name"
+                  placeholder="Product Name"
                   className="form-control"
                   onChange={(e) => setName(e.target.value)}
                 />
@@ -125,7 +128,7 @@ const CreateProduct = () => {
                 <textarea
                   type="text"
                   value={description}
-                  placeholder="write a description"
+                  placeholder="Product Description"
                   className="form-control"
                   onChange={(e) => setDescription(e.target.value)}
                 />
@@ -135,7 +138,7 @@ const CreateProduct = () => {
                 <input
                   type="number"
                   value={price}
-                  placeholder="write a Price"
+                  placeholder="Product Price"
                   className="form-control"
                   onChange={(e) => setPrice(e.target.value)}
                 />
@@ -144,7 +147,7 @@ const CreateProduct = () => {
                 <input
                   type="number"
                   value={quantity}
-                  placeholder="write a quantity"
+                  placeholder="Product Quantity"
                   className="form-control"
                   onChange={(e) => setQuantity(e.target.value)}
                 />
