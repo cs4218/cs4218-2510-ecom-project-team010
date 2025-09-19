@@ -14,14 +14,14 @@ describe("Given that the CategoryForm accepts an input", () => {
         setValue = jest.fn();
     });
 
-    test("When navigating to the form", () => {
+    test("When the user navigates to the form", () => {
         render(<CategoryForm handleSubmit={mockHandleSubmit} value={value} setValue={setValue} />);
         
         expect(screen.getByPlaceholderText("Enter new category")).toBeInTheDocument();
         expect(screen.getByRole("button", { name: /submit/i })).toBeInTheDocument();
     });
 
-    test("When user enters a new category input", () => {
+    test("When the user enters a new category input", () => {
         render(<CategoryForm handleSubmit={mockHandleSubmit} value={value} setValue={setValue} />);
         
         const input = screen.getByPlaceholderText("Enter new category");
@@ -31,7 +31,7 @@ describe("Given that the CategoryForm accepts an input", () => {
         expect(setValue).toHaveBeenCalledWith("New Category");
     });
 
-    test("Wen the user clicks the submit button", () => {
+    test("When the user clicks the submit button", () => {
         render(<CategoryForm handleSubmit={mockHandleSubmit} value={value} setValue={setValue} />);
         
         const button = screen.getByRole("button", { name: /submit/i });
@@ -41,7 +41,7 @@ describe("Given that the CategoryForm accepts an input", () => {
         expect(mockHandleSubmit).toHaveBeenCalled();
     });
 
-    test("When the new category has been submitted", () => {
+    test("When the user submits a new category", () => {
         const longValue = "a".repeat(256); 
         render(<CategoryForm handleSubmit={mockHandleSubmit} value={longValue} setValue={setValue} />);
         
