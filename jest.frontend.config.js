@@ -44,6 +44,7 @@ export default {
     "client/src/pages/Policy.js",
     "client/src/pages/user/Dashboard.js",
     "client/src/pages/admin/Products.js",
+    "client/src/pages/admin/CreateCategory.js",
     "client/src/pages/admin/AdminDashboard.js",
     "client/src/pages/admin/Users.js",
     "client/src/context/cart.js",
