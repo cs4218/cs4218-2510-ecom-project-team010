@@ -42,8 +42,6 @@ const CreateProduct = () => {
       const productData = new FormData();
       productData.append("name", name);
       productData.append("description", description);
-      // productData.append("price", price);
-      // productData.append("quantity", quantity);
       productData.append("price", Number(price));
       productData.append("quantity", Number(quantity));
       productData.append("photo", photo);
