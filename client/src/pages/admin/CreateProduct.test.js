@@ -74,8 +74,8 @@ describe("Given some products to be updated", () => {
 
     test("When the user navigates to the create product page", async () => {
         await act(async () => {
-        render(<CreateProduct />, { wrapper: Wrapper });
-    });
+            render(<CreateProduct />, { wrapper: Wrapper });
+        });
 
 
         expect(screen.getByText("Create Product")).toBeInTheDocument();
@@ -89,8 +89,8 @@ describe("Given some products to be updated", () => {
 
     test("When the page mountx", async () => {
         await act(async () => {
-        render(<CreateProduct />, { wrapper: Wrapper });
-    });
+            render(<CreateProduct />, { wrapper: Wrapper });
+        });
 
 
         await waitFor(() => {
@@ -100,8 +100,8 @@ describe("Given some products to be updated", () => {
 
     test("When the user edits the product name input", async () => {
         await act(async () => {
-        render(<CreateProduct />, { wrapper: Wrapper });
-    });
+            render(<CreateProduct />, { wrapper: Wrapper });
+        });
 
 
         const nameInput = screen.getByPlaceholderText("Product Name");
@@ -112,8 +112,8 @@ describe("Given some products to be updated", () => {
 
     test("When the user edits the product description input", async () => {
         await act(async () => {
-        render(<CreateProduct />, { wrapper: Wrapper });
-    });
+            render(<CreateProduct />, { wrapper: Wrapper });
+        });
 
 
         const descriptionInput = screen.getByPlaceholderText("Product Description");
@@ -138,8 +138,8 @@ describe("Given some products to be updated", () => {
 
     test("When the user edits the product quantity input", async () => {
         await act(async () => {
-        render(<CreateProduct />, { wrapper: Wrapper });
-    });
+            render(<CreateProduct />, { wrapper: Wrapper });
+        });
 
 
         const quantityInput = screen.getByPlaceholderText("Product Quantity");
@@ -150,8 +150,8 @@ describe("Given some products to be updated", () => {
 
     test("When the user selects a category", async () => {
         await act(async () => {
-        render(<CreateProduct />, { wrapper: Wrapper });
-    });
+            render(<CreateProduct />, { wrapper: Wrapper });
+        });
 
 
         await waitFor(() => {
@@ -167,8 +167,8 @@ describe("Given some products to be updated", () => {
 
     test("When the user selects the shipping", async () => {
         await act(async () => {
-        render(<CreateProduct />, { wrapper: Wrapper });
-    });
+            render(<CreateProduct />, { wrapper: Wrapper });
+        });
 
 
         const shippingSelect = screen.getByTestId("shipping-select");
@@ -179,8 +179,8 @@ describe("Given some products to be updated", () => {
 
     test("When the user adds a product image", async () => {
         await act(async () => {
-        render(<CreateProduct />, { wrapper: Wrapper });
-    });
+            render(<CreateProduct />, { wrapper: Wrapper });
+        });
 
 
         const file = new File(["test"], "test.jpg", { type: "image/jpeg" });
@@ -195,8 +195,8 @@ describe("Given some products to be updated", () => {
 
     test("When the user finished uploading a new product image", async () => {
         await act(async () => {
-        render(<CreateProduct />, { wrapper: Wrapper });
-    });
+            render(<CreateProduct />, { wrapper: Wrapper });
+        });
 
 
         const file = new File(["test"], "test.jpg", { type: "image/jpeg" });
