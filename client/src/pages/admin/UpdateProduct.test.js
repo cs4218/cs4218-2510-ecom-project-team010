@@ -103,7 +103,7 @@ describe('When updating products', () => {
     });
 
     describe('Data Fetching', () => {
-        it('When fetching product data on mount', async () => {
+        test('When fetching product data on mount', async () => {
             renderWithRouter(<UpdateProduct />);
 
             await waitFor(() => {
@@ -123,7 +123,7 @@ describe('When updating products', () => {
             });
         });
 
-        it('When encountering error while fetching product data', async () => {
+        test('When encountering error while fetching product data', async () => {
             axios.get.mockRejectedValueOnce(new Error('Network error'));
             const consoleSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
 
@@ -136,7 +136,7 @@ describe('When updating products', () => {
             consoleSpy.mockRestore();
         });
 
-        it('When handling the error during fetching categories', async () => {
+        test('When handling the error during fetching categories', async () => {
             axios.get.mockImplementation((url) => {
                 if (url.includes('/api/v1/product/get-product/')) {
                     return Promise.resolve({ data: { product: mockProduct } });
