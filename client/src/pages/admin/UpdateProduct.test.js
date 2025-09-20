@@ -42,13 +42,7 @@ const mockProduct = {
   category: { _id: 'cat1', name: 'Electronics' },
 };
 
-const renderComponent = () => {
-  return render(
-    <BrowserRouter>
-      <UpdateProduct />
-    </BrowserRouter>
-  );
-};
+const renderWithRouter = (ui) => render(<BrowserRouter>{ui}</BrowserRouter>);
 
 describe('UpdateProduct Component', () => {
   beforeEach(() => {
@@ -84,7 +78,7 @@ describe('UpdateProduct Component', () => {
 
   describe('Component Rendering', () => {
     it('renders the component with correct title and layout', async () => {
-      renderComponent();
+      renderWithRouter(<UpdateProduct />);
       
       expect(screen.getByTestId('layout')).toHaveAttribute(
         'title',
@@ -95,7 +89,7 @@ describe('UpdateProduct Component', () => {
     });
 
     it('renders all form fields', async () => {
-      renderComponent();
+      renderWithRouter(<UpdateProduct />);
 
       // Wait for data to load first
       await waitFor(() => {
@@ -114,7 +108,7 @@ describe('UpdateProduct Component', () => {
 
   describe('Data Fetching', () => {
     it('fetches and populates product data on mount', async () => {
-      renderComponent();
+      renderWithRouter(<UpdateProduct />);
 
       await waitFor(() => {
         expect(axios.get).toHaveBeenCalledWith(
@@ -137,7 +131,7 @@ describe('UpdateProduct Component', () => {
       axios.get.mockRejectedValueOnce(new Error('Network error'));
       const consoleSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
 
-      renderComponent();
+      renderWithRouter(<UpdateProduct />);
 
       await waitFor(() => {
         expect(consoleSpy).toHaveBeenCalledWith(expect.any(Error));
@@ -158,7 +152,7 @@ describe('UpdateProduct Component', () => {
       });
 
       const consoleSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
-      renderComponent();
+      renderWithRouter(<UpdateProduct />);
 
       await waitFor(() => {
         expect(toast.error).toHaveBeenCalledWith(
@@ -172,7 +166,7 @@ describe('UpdateProduct Component', () => {
 
   describe('Form Interactions', () => {
     it('updates form fields when user types', async () => {
-      renderComponent();
+      renderWithRouter(<UpdateProduct />);
 
       await waitFor(() => {
         expect(screen.getByDisplayValue('Test Product')).toBeInTheDocument();
@@ -184,11 +178,11 @@ describe('UpdateProduct Component', () => {
 
       const priceInput = screen.getByDisplayValue('100');
       fireEvent.change(priceInput, { target: { value: '150' } });
-      expect(priceInput).toHaveValue('150');
+      expect(priceInput).toHaveValue(150);
     });
 
     it('handles file upload', async () => {
-      renderComponent();
+      renderWithRouter(<UpdateProduct />);
       
       // Wait for component to load
       await waitFor(() => {
@@ -208,37 +202,37 @@ describe('UpdateProduct Component', () => {
 
   describe('Product Update', () => {
     it('successfully updates product', async () => {
-      axios.put.mockResolvedValueOnce({
-        data: { success: true },
-      });
+  axios.put.mockResolvedValueOnce({
+    data: { success: true },
+  });
 
-      renderComponent();
+  renderWithRouter(<UpdateProduct />);
 
-      await waitFor(() => {
-        expect(screen.getByText('UPDATE PRODUCT')).toBeInTheDocument();
-      });
+  await waitFor(() => {
+    expect(screen.getByDisplayValue('Test Product')).toBeInTheDocument();
+  });
 
-      const updateButton = screen.getByText('UPDATE PRODUCT');
-      fireEvent.click(updateButton);
+  const updateButton = screen.getByText('UPDATE PRODUCT');
+  fireEvent.click(updateButton);
 
-      await waitFor(() => {
-        expect(axios.put).toHaveBeenCalledWith(
-          '/api/v1/product/update-product/prod1',
-          expect.any(FormData)
-        );
-        expect(toast.success).toHaveBeenCalledWith(
-          'Product Updated Successfully'
-        );
-        expect(mockNavigate).toHaveBeenCalledWith('/dashboard/admin/products');
-      });
-    });
+  await waitFor(() => {
+    expect(axios.put).toHaveBeenCalledWith(
+      '/api/v1/product/update-product/prod1',
+      expect.any(FormData)
+    );
+    expect(toast.success).toHaveBeenCalledWith(
+      'Product Updated Successfully'
+    );
+    expect(mockNavigate).toHaveBeenCalledWith('/dashboard/admin/products');
+  });
+});
 
     it('handles update failure', async () => {
       axios.put.mockResolvedValueOnce({
         data: { success: false, message: 'Update failed' },
       });
 
-      renderComponent();
+      renderWithRouter(<UpdateProduct />);
 
       await waitFor(() => {
         expect(screen.getByText('UPDATE PRODUCT')).toBeInTheDocument();
@@ -256,7 +250,7 @@ describe('UpdateProduct Component', () => {
       axios.put.mockRejectedValueOnce(new Error('Network error'));
       const consoleSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
 
-      renderComponent();
+      renderWithRouter(<UpdateProduct />);
 
       await waitFor(() => {
         expect(screen.getByText('UPDATE PRODUCT')).toBeInTheDocument();
@@ -280,10 +274,11 @@ describe('UpdateProduct Component', () => {
         data: { success: true },
       });
 
-      renderComponent();
+      renderWithRouter(<UpdateProduct />);
 
+      // Wait for product data to load first (ensuring id is set)
       await waitFor(() => {
-        expect(screen.getByText('DELETE PRODUCT')).toBeInTheDocument();
+        expect(screen.getByDisplayValue('Test Product')).toBeInTheDocument();
       });
 
       const deleteButton = screen.getByText('DELETE PRODUCT');
@@ -306,7 +301,7 @@ describe('UpdateProduct Component', () => {
     it('cancels deletion when user clicks cancel', async () => {
       global.confirm = jest.fn().mockReturnValue(false);
 
-      renderComponent();
+      renderWithRouter(<UpdateProduct />);
 
       await waitFor(() => {
         expect(screen.getByText('DELETE PRODUCT')).toBeInTheDocument();
@@ -326,7 +321,7 @@ describe('UpdateProduct Component', () => {
       axios.delete.mockRejectedValueOnce(new Error('Delete error'));
       const consoleSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
 
-      renderComponent();
+      renderWithRouter(<UpdateProduct />);
 
       await waitFor(() => {
         expect(screen.getByText('DELETE PRODUCT')).toBeInTheDocument();
@@ -347,7 +342,7 @@ describe('UpdateProduct Component', () => {
 
   describe('Image Display', () => {
     it('shows existing product image when no new photo is selected', async () => {
-      renderComponent();
+      renderWithRouter(<UpdateProduct />);
 
       await waitFor(() => {
         const img = screen.getByAltText('product_photo');
@@ -356,7 +351,7 @@ describe('UpdateProduct Component', () => {
     });
 
     it('shows preview of new photo when selected', async () => {
-      renderComponent();
+      renderWithRouter(<UpdateProduct />);
 
       // Wait for component to load
       await waitFor(() => {
