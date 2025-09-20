@@ -1,5 +1,5 @@
 import React from "react";
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import { render, screen, fireEvent, waitFor, act } from "@testing-library/react";
 import { BrowserRouter } from "react-router-dom";
 import axios from "axios";
 import CreateProduct from "./CreateProduct";
@@ -73,7 +73,10 @@ describe("Given some products to be updated", () => {
     });
 
     test("When the user navigates to the create product page", async () => {
+        await act(async () => {
         render(<CreateProduct />, { wrapper: Wrapper });
+    });
+
 
         expect(screen.getByText("Create Product")).toBeInTheDocument();
         expect(screen.getByTestId("layout")).toBeInTheDocument();
@@ -85,7 +88,10 @@ describe("Given some products to be updated", () => {
     });
 
     test("When the page mountx", async () => {
+        await act(async () => {
         render(<CreateProduct />, { wrapper: Wrapper });
+    });
+
 
         await waitFor(() => {
             expect(axios.get).toHaveBeenCalledWith("/api/v1/category/get-category");
@@ -93,7 +99,10 @@ describe("Given some products to be updated", () => {
     });
 
     test("When the user edits the product name input", async () => {
+        await act(async () => {
         render(<CreateProduct />, { wrapper: Wrapper });
+    });
+
 
         const nameInput = screen.getByPlaceholderText("Product Name");
         fireEvent.change(nameInput, { target: { value: "Test Product" } });
@@ -102,7 +111,10 @@ describe("Given some products to be updated", () => {
     });
 
     test("When the user edits the product description input", async () => {
+        await act(async () => {
         render(<CreateProduct />, { wrapper: Wrapper });
+    });
+
 
         const descriptionInput = screen.getByPlaceholderText("Product Description");
         fireEvent.change(descriptionInput, {
@@ -113,7 +125,10 @@ describe("Given some products to be updated", () => {
     });
 
     test("When the user edits the product price input", async () => {
+        await act(async () => {
         render(<CreateProduct />, { wrapper: Wrapper });
+    });
+
 
         const priceInput = screen.getByPlaceholderText("Product Price");
         fireEvent.change(priceInput, { target: { value: "100" } });
@@ -122,7 +137,10 @@ describe("Given some products to be updated", () => {
     });
 
     test("When the user edits the product quantity input", async () => {
+        await act(async () => {
         render(<CreateProduct />, { wrapper: Wrapper });
+    });
+
 
         const quantityInput = screen.getByPlaceholderText("Product Quantity");
         fireEvent.change(quantityInput, { target: { value: "50" } });
@@ -131,7 +149,10 @@ describe("Given some products to be updated", () => {
     });
 
     test("When the user selects a category", async () => {
+        await act(async () => {
         render(<CreateProduct />, { wrapper: Wrapper });
+    });
+
 
         await waitFor(() => {
             const categorySelect = screen.getByTestId("category-select");
@@ -145,7 +166,10 @@ describe("Given some products to be updated", () => {
     });
 
     test("When the user selects the shipping", async () => {
+        await act(async () => {
         render(<CreateProduct />, { wrapper: Wrapper });
+    });
+
 
         const shippingSelect = screen.getByTestId("shipping-select");
         fireEvent.change(shippingSelect, { target: { value: "1" } });
@@ -154,7 +178,10 @@ describe("Given some products to be updated", () => {
     });
 
     test("When the user adds a product image", async () => {
+        await act(async () => {
         render(<CreateProduct />, { wrapper: Wrapper });
+    });
+
 
         const file = new File(["test"], "test.jpg", { type: "image/jpeg" });
         const fileInput = screen.getByText("Upload Photo").querySelector("input[type='file']");
@@ -167,7 +194,10 @@ describe("Given some products to be updated", () => {
     });
 
     test("When the user finished uploading a new product image", async () => {
+        await act(async () => {
         render(<CreateProduct />, { wrapper: Wrapper });
+    });
+
 
         const file = new File(["test"], "test.jpg", { type: "image/jpeg" });
         const fileInput = screen.getByText("Upload Photo").querySelector("input[type='file']");

@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
 import axios from 'axios';
 import toast from 'react-hot-toast';
@@ -42,7 +42,11 @@ const mockProduct = {
   category: { _id: 'cat1', name: 'Electronics' },
 };
 
-const renderWithRouter = (ui) => render(<BrowserRouter>{ui}</BrowserRouter>);
+const renderWithRouter = (ui) => {
+    act(() => {
+        render(<BrowserRouter>{ui}</BrowserRouter>);
+    });
+};
 
 describe('UpdateProduct Component', () => {
   beforeEach(() => {
@@ -80,10 +84,12 @@ describe('UpdateProduct Component', () => {
     it('renders the component with correct title and layout', async () => {
       renderWithRouter(<UpdateProduct />);
       
-      expect(screen.getByTestId('layout')).toHaveAttribute(
-        'title',
-        'Dashboard - Create Product'
-      );
+      await waitFor(() => {
+        expect(screen.getByTestId('layout')).toHaveAttribute(
+            'title',
+            'Dashboard - Create Product'
+        );
+    });
       expect(screen.getByTestId('admin-menu')).toBeInTheDocument();
       expect(screen.getByText('Update Product')).toBeInTheDocument();
     });
