@@ -46,6 +46,7 @@ export default {
     "client/src/pages/admin/**",
     "client/src/context/cart.js",
     "client/src/components/AdminMenu.js",
+    "client/src/pages/CartPage.js",
   ],
 
   coverageThreshold: {

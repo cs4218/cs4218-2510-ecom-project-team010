@@ -87,7 +87,7 @@ describe("Given some products to be updated", () => {
         });
     });
 
-    test("When the page mountx", async () => {
+    test("When the page mounts", async () => {
         await act(async () => {
             render(<CreateProduct />, { wrapper: Wrapper });
         });
