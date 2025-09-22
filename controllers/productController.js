@@ -22,21 +22,21 @@ export const createProductController = async (req, res) => {
     const { name, description, price, category, quantity, shipping } =
       req.fields;
     const { photo } = req.files;
-    //alidation
+    //validation
     switch (true) {
       case !name:
-        return res.status(500).send({ error: "Name is Required" });
+        return res.status(400).send({ error: "Name is Required" });
       case !description:
-        return res.status(500).send({ error: "Description is Required" });
+        return res.status(400).send({ error: "Description is Required" });
       case !price:
-        return res.status(500).send({ error: "Price is Required" });
+        return res.status(400).send({ error: "Price is Required" });
       case !category:
-        return res.status(500).send({ error: "Category is Required" });
+        return res.status(400).send({ error: "Category is Required" });
       case !quantity:
-        return res.status(500).send({ error: "Quantity is Required" });
+        return res.status(400).send({ error: "Quantity is Required" });
       case photo && photo.size > 1000000:
         return res
-          .status(500)
+          .status(400)
           .send({ error: "photo is Required and should be less then 1mb" });
     }
 
@@ -53,10 +53,10 @@ export const createProductController = async (req, res) => {
     });
   } catch (error) {
     console.log(error);
-    res.status(500).send({
+    res.status(400).send({
       success: false,
       error,
-      message: "Error in crearing product",
+      message: "Error in creating product", 
     });
   }
 };
@@ -135,7 +135,7 @@ export const deleteProductController = async (req, res) => {
     });
   } catch (error) {
     console.log(error);
-    res.status(500).send({
+    res.status(400).send({
       success: false,
       message: "Error while deleting product",
       error,
@@ -143,7 +143,7 @@ export const deleteProductController = async (req, res) => {
   }
 };
 
-//upate producta
+//update products
 export const updateProductController = async (req, res) => {
   try {
     const { name, description, price, category, quantity, shipping } =
@@ -152,18 +152,18 @@ export const updateProductController = async (req, res) => {
     //alidation
     switch (true) {
       case !name:
-        return res.status(500).send({ error: "Name is Required" });
+        return res.status(400).send({ error: "Name is Required" });
       case !description:
-        return res.status(500).send({ error: "Description is Required" });
+        return res.status(400).send({ error: "Description is Required" });
       case !price:
-        return res.status(500).send({ error: "Price is Required" });
+        return res.status(400).send({ error: "Price is Required" });
       case !category:
-        return res.status(500).send({ error: "Category is Required" });
+        return res.status(400).send({ error: "Category is Required" });
       case !quantity:
-        return res.status(500).send({ error: "Quantity is Required" });
+        return res.status(400).send({ error: "Quantity is Required" });
       case photo && photo.size > 1000000:
         return res
-          .status(500)
+          .status(400)
           .send({ error: "photo is Required and should be less then 1mb" });
     }
 
@@ -184,10 +184,10 @@ export const updateProductController = async (req, res) => {
     });
   } catch (error) {
     console.log(error);
-    res.status(500).send({
+    res.status(400).send({
       success: false,
       error,
-      message: "Error in Updte product",
+      message: "Error in Update product",
     });
   }
 };
@@ -339,6 +339,7 @@ export const braintreeTokenController = async (req, res) => {
     });
   } catch (error) {
     console.log(error);
+    return res.status(500).send({ error: "Unexpected error generating client token" });
   }
 };
 
@@ -348,9 +349,12 @@ export const brainTreePaymentController = async (req, res) => {
     const { nonce, cart } = req.body;
     let total = 0;
     cart.map((i) => {
-      total += i.price;
+      // error here, add number
+      total += Number(i.price);
     });
-    let newTransaction = gateway.transaction.sale(
+    // error
+    // let newTransaction = . removed this because variabel is never used
+    gateway.transaction.sale(
       {
         amount: total,
         paymentMethodNonce: nonce,
@@ -373,5 +377,7 @@ export const brainTreePaymentController = async (req, res) => {
     );
   } catch (error) {
     console.log(error);
+    // error as did not return status
+    return res.status(500).send({ error: 'Unexpected error during payment' });
   }
 };

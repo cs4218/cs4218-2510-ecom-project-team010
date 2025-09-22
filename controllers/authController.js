@@ -216,6 +216,7 @@ export const getOrdersController = async (req, res) => {
     });
   }
 };
+
 //orders
 export const getAllOrdersController = async (req, res) => {
   try {
@@ -234,6 +235,8 @@ export const getAllOrdersController = async (req, res) => {
     });
   }
 };
+
+
 
 //order status
 export const orderStatusController = async (req, res) => {
