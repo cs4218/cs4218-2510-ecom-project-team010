@@ -244,6 +244,7 @@ describe('When updating products', () => {
         });
 
         test('When encountering network error during product update', async () => {
+            // Arrange
             axios.put.mockRejectedValueOnce(new Error('Network error'));
             const consoleSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
 
@@ -252,12 +253,14 @@ describe('When updating products', () => {
             await waitFor(() => {
                 expect(screen.getByText('UPDATE PRODUCT')).toBeInTheDocument();
             });
-
+            
+            // Act
             const updateButton = screen.getByText('UPDATE PRODUCT');
             fireEvent.click(updateButton);
 
+            // Assert
             await waitFor(() => {
-                expect(toast.error).toHaveBeenCalledWith('something went wrong');
+                expect(toast.error).toHaveBeenCalledWith('Something went wrong in updating the product');
             });
 
             consoleSpy.mockRestore();
@@ -266,6 +269,7 @@ describe('When updating products', () => {
 
     describe('Given that a user triggered a product deletion', () => {
         test('When the product is deleted successfully', async () => {
+            // Arrange
             global.confirm = jest.fn().mockReturnValue(true);
             axios.delete.mockResolvedValueOnce({
                 data: { success: true },
@@ -277,9 +281,11 @@ describe('When updating products', () => {
                 expect(screen.getByDisplayValue('Test Product')).toBeInTheDocument();
             });
 
+            // Act
             const deleteButton = screen.getByText('DELETE PRODUCT');
             fireEvent.click(deleteButton);
 
+            // Assert
             await waitFor(() => {
                 expect(global.confirm).toHaveBeenCalledWith(
                     'Are you sure you want to delete this product?'
@@ -295,6 +301,7 @@ describe('When updating products', () => {
         });
 
         test('When the product deletion is cancelled', async () => {
+            // Arrange
             global.confirm = jest.fn().mockReturnValue(false);
 
             renderWithRouter(<UpdateProduct />);
@@ -303,9 +310,11 @@ describe('When updating products', () => {
                 expect(screen.getByText('DELETE PRODUCT')).toBeInTheDocument();
             });
 
+            // Act
             const deleteButton = screen.getByText('DELETE PRODUCT');
             fireEvent.click(deleteButton);
 
+            // Assert
             expect(global.confirm).toHaveBeenCalledWith(
                 'Are you sure you want to delete this product?'
             );
@@ -313,6 +322,7 @@ describe('When updating products', () => {
         });
 
         test('When an error is encountered during deletion', async () => {
+            // Arrange
             global.confirm = jest.fn().mockReturnValue(true);
             axios.delete.mockRejectedValueOnce(new Error('Delete error'));
             const consoleSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
@@ -323,9 +333,11 @@ describe('When updating products', () => {
                 expect(screen.getByText('DELETE PRODUCT')).toBeInTheDocument();
             });
 
+            // Act
             const deleteButton = screen.getByText('DELETE PRODUCT');
             fireEvent.click(deleteButton);
 
+            // Assert
             await waitFor(() => {
                 expect(toast.error).toHaveBeenCalledWith(
                     'Something went wrong when deleting product'
@@ -347,6 +359,7 @@ describe('When updating products', () => {
         });
 
         test('When new photo is selected', async () => {
+            // Arrange
             renderWithRouter(<UpdateProduct />);
 
             await waitFor(() => {
@@ -356,8 +369,10 @@ describe('When updating products', () => {
             const file = new File(['test'], 'test.jpg', { type: 'image/jpeg' });
             const fileInput = screen.getByText('Upload Photo').parentElement.querySelector('input[type="file"]');
             
+            // Act
             fireEvent.change(fileInput, { target: { files: [file] } });
 
+            // Assert
             await waitFor(() => {
                 const img = screen.getByAltText('product_photo');
                 expect(img).toHaveAttribute('src', 'blob:mock-url');
