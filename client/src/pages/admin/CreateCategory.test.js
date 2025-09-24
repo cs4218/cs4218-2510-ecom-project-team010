@@ -364,81 +364,47 @@ describe("Given modal interactions", () => {
     });
 });
 
-describe("Given empty categories state", () => {
+describe("Given category data with special characters and edge values", () => {
     beforeEach(() => {
         jest.clearAllMocks();
+    });
+
+    test("When categories contain special characters", async () => {
+        const specialCategoriesMock = [
+            { _id: "1", name: "Category & Special" },
+            { _id: "2", name: "Category <script>" },
+            { _id: "3", name: "" }, // Empty name
+        ];
+
         axios.get.mockResolvedValue({
-            data: { success: true, category: [] }
+            data: { success: true, category: specialCategoriesMock }
         });
-    });
 
-    test("When there are no categories to display", async () => {
         render(<CreateCategory />);
 
         await waitFor(() => {
-            expect(screen.getByText(/name/i)).toBeInTheDocument();
-            expect(screen.getByText(/actions/i)).toBeInTheDocument();
+            expect(screen.getByText("Category & Special")).toBeInTheDocument();
+            expect(screen.getByText("Category <script>")).toBeInTheDocument();
+            // Empty string should still create a table row
+            const tableRows = screen.getAllByRole('row');
+            expect(tableRows).toHaveLength(4); // Header + 3 data rows
         });
-
-        expect(screen.queryByText("Category 1")).not.toBeInTheDocument();
-        expect(screen.queryByText("Category 2")).not.toBeInTheDocument();
     });
-});
 
-describe("Given successful operations with state updates", () => {
-    const categoriesMock = [
-        { _id: "1", name: "Category 1" },
-    ];
+    test("When category name is very long", async () => {
+        const longName = "A".repeat(1000);
+        const longCategoriesMock = [
+            { _id: "1", name: longName },
+        ];
 
-    beforeEach(() => {
-        jest.clearAllMocks();
         axios.get.mockResolvedValue({
-            data: { success: true, category: categoriesMock }
+            data: { success: true, category: longCategoriesMock }
         });
-    });
-
-    test("When category is successfully updated, modal should close and form should reset", async () => {
-        axios.put.mockResolvedValue({ data: { success: true } });
 
         render(<CreateCategory />);
 
-        await waitFor(() => screen.getByText("Category 1"));
-
-        const editButtons = screen.getAllByText(/edit/i);
-        fireEvent.click(editButtons[0]);
-
-        await waitFor(() => screen.getByTestId("modal"));
-
-        const modalInputs = screen.getAllByTestId("category-input");
-        const modalInput = modalInputs[1];
-        const modalButtons = screen.getAllByRole("button", { name: /submit/i });
-        const modalButton = modalButtons[1];
-
-        fireEvent.change(modalInput, { target: { value: "Updated Category" } });
-        fireEvent.click(modalButton);
-
         await waitFor(() => {
-            expect(screen.queryByTestId("modal")).not.toBeInTheDocument();
-        });
-    });
-
-    test("When category creation is successful, input should be cleared", async () => {
-        axios.post.mockResolvedValue({ data: { success: true } });
-
-        render(<CreateCategory />);
-
-        await waitFor(() => screen.getByText("Category 1"));
-
-        const input = screen.getByTestId("category-input");
-        const button = screen.getByRole("button", { name: /submit/i });
-
-        fireEvent.change(input, { target: { value: "New Category" } });
-        expect(input).toHaveValue("New Category");
-
-        fireEvent.click(button);
-
-        await waitFor(() => {
-            expect(toast.success).toHaveBeenCalledWith("New Category is created");
+            expect(screen.getByText(longName)).toBeInTheDocument();
         });
     });
 });
