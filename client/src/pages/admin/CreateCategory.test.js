@@ -385,9 +385,8 @@ describe("Given category data with special characters and edge values", () => {
         await waitFor(() => {
             expect(screen.getByText("Category & Special")).toBeInTheDocument();
             expect(screen.getByText("Category <script>")).toBeInTheDocument();
-            // Empty string should still create a table row
             const tableRows = screen.getAllByRole('row');
-            expect(tableRows).toHaveLength(4); // Header + 3 data rows
+            expect(tableRows).toHaveLength(4); 
         });
     });
 
