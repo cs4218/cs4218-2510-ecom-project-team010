@@ -532,7 +532,7 @@ describe('When updating products', () => {
             });
         });
 
-        test('When submitting form with invalid price format', async () => {
+        test('When submitting form with price format', async () => {
             // Arrange
             renderWithRouter(<UpdateProduct />);
 
@@ -548,7 +548,7 @@ describe('When updating products', () => {
             expect(priceInput).toHaveValue(-10);
         });
 
-        test('When submitting form with invalid quantity format', async () => {
+        test('When submitting form with quantity format', async () => {
             // Arrange
             renderWithRouter(<UpdateProduct />);
 
