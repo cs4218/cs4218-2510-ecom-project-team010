@@ -126,11 +126,14 @@ describe('When updating products', () => {
         });
 
         test('When encountering error while fetching product data', async () => {
+            // Arrange
             axios.get.mockRejectedValueOnce(new Error('Network error'));
             const consoleSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
 
+            // Assert
             renderWithRouter(<UpdateProduct />);
 
+            // Act
             await waitFor(() => {
                 expect(consoleSpy).toHaveBeenCalledWith(expect.any(Error));
             });
@@ -139,6 +142,7 @@ describe('When updating products', () => {
         });
 
         test('When handling the error during fetching categories', async () => {
+            // Arrange
             axios.get.mockImplementation((url) => {
                 if (url.includes('/api/v1/product/get-product/')) {
                     return Promise.resolve({ data: { product: mockProduct } });
@@ -150,8 +154,11 @@ describe('When updating products', () => {
             });
 
             const consoleSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
+            
+            // Act
             renderWithRouter(<UpdateProduct />);
 
+            // Assert
             await waitFor(() => {
                 expect(toast.error).toHaveBeenCalledWith(
                     'Something went wrong in getting category'
@@ -163,34 +170,51 @@ describe('When updating products', () => {
     });
 
     describe('Given that user has a new product update', () => {
-        test('When the user enters input to the form fields', async () => {
+        test('When the user enters new price to the form fields', async () => {
+            // Arrange
             renderWithRouter(<UpdateProduct />);
 
+            // Act
             await waitFor(() => {
                 expect(screen.getByDisplayValue('Test Product')).toBeInTheDocument();
             });
 
-            const nameInput = screen.getByDisplayValue('Test Product');
-            fireEvent.change(nameInput, { target: { value: 'Updated Product' } });
-            expect(nameInput).toHaveValue('Updated Product');
-
+            // Assert
             const priceInput = screen.getByDisplayValue('100');
             fireEvent.change(priceInput, { target: { value: '150' } });
             expect(priceInput).toHaveValue(150);
         });
 
+        test('When the user enters new name to the form fields', async () => {
+            // Arrange
+            renderWithRouter(<UpdateProduct />);
+
+            // Act
+            await waitFor(() => {
+                expect(screen.getByDisplayValue('Test Product')).toBeInTheDocument();
+            });
+
+            // Assert
+            const nameInput = screen.getByDisplayValue('Test Product');
+            fireEvent.change(nameInput, { target: { value: 'Updated Product' } });
+            expect(nameInput).toHaveValue('Updated Product');
+        });
+
         test('When the user uploads a file', async () => {
+            // Arrange
             renderWithRouter(<UpdateProduct />);
             
             await waitFor(() => {
                 expect(screen.getByText('Upload Photo')).toBeInTheDocument();
             });
         
+            // Act
             const file = new File(['test'], 'test.jpg', { type: 'image/jpeg' });
             const fileInput = screen.getByText('Upload Photo').parentElement.querySelector('input[type="file"]');
             
             fireEvent.change(fileInput, { target: { files: [file] } });
             
+            // Assert
             await waitFor(() => {
                 expect(screen.getByText('test.jpg')).toBeInTheDocument();
             });
@@ -199,6 +223,7 @@ describe('When updating products', () => {
 
     describe('Given that a user triggered a product update', () => {
         test('When product is updated successfully', async () => {
+            // Arrange
             axios.put.mockResolvedValueOnce({
                 data: { success: true },
             });
@@ -209,9 +234,11 @@ describe('When updating products', () => {
                 expect(screen.getByDisplayValue('Test Product')).toBeInTheDocument();
             });
 
+            // Act
             const updateButton = screen.getByText('UPDATE PRODUCT');
             fireEvent.click(updateButton);
 
+            // Assert
             await waitFor(() => {
                 expect(axios.put).toHaveBeenCalledWith(
                     '/api/v1/product/update-product/prod1',
@@ -225,6 +252,7 @@ describe('When updating products', () => {
         });
 
         test('When product update is unsuccessful', async () => {
+            // Arrange 
             axios.put.mockResolvedValueOnce({
                 data: { success: false, message: 'Update failed' },
             });
@@ -235,9 +263,11 @@ describe('When updating products', () => {
                 expect(screen.getByText('UPDATE PRODUCT')).toBeInTheDocument();
             });
 
+            // Act
             const updateButton = screen.getByText('UPDATE PRODUCT');
             fireEvent.click(updateButton);
 
+            // Assert
             await waitFor(() => {
                 expect(toast.error).toHaveBeenCalledWith('Update failed');
             });
