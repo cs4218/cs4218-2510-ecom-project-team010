@@ -482,7 +482,7 @@ describe('When updating products', () => {
     });
 
     describe('When submitting changes in form fields', () => {
-        test('When submitting form with empty required fields', async () => {
+        test('When submitting form with empty name field', async () => {
             // Arrange
             axios.put.mockResolvedValueOnce({
                 data: { success: false, message: 'Name is required' },
@@ -494,7 +494,7 @@ describe('When updating products', () => {
                 expect(screen.getByDisplayValue('Test Product')).toBeInTheDocument();
             });
 
-            // Act - Clear the name field
+            // Act
             const nameInput = screen.getByDisplayValue('Test Product');
             fireEvent.change(nameInput, { target: { value: '' } });
 
@@ -504,6 +504,31 @@ describe('When updating products', () => {
             // Assert
             await waitFor(() => {
                 expect(toast.error).toHaveBeenCalledWith('Name is required');
+            });
+        });
+
+        test('When submitting form with empty price field', async () => {
+            // Arrange
+            axios.put.mockResolvedValueOnce({
+                data: { success: false, message: 'Price is required' },
+            });
+
+            renderWithRouter(<UpdateProduct />);
+
+            await waitFor(() => {
+                expect(screen.getByDisplayValue('100')).toBeInTheDocument();
+            });
+
+            // Act
+            const priceInput = screen.getByDisplayValue('100');
+            fireEvent.change(priceInput, { target: { value: '' } });
+
+            const updateButton = screen.getByText('UPDATE PRODUCT');
+            fireEvent.click(updateButton);
+
+            // Assert
+            await waitFor(() => {
+                expect(toast.error).toHaveBeenCalledWith('Price is required');
             });
         });
 
