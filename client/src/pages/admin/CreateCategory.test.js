@@ -4,6 +4,8 @@ import CreateCategory from "./CreateCategory";
 import axios from "axios";
 import toast from "react-hot-toast";
 
+// Note: Some of these test cases are generated with the help of AI
+
 jest.mock("axios");
 jest.mock("react-hot-toast");
 
