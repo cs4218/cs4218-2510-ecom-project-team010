@@ -4,6 +4,8 @@ import { BrowserRouter } from "react-router-dom";
 import axios from "axios";
 import CreateProduct from "./CreateProduct";
 
+// Note: Some of these test cases are generated with the help of AI
+
 jest.mock("axios");
 jest.mock("react-hot-toast");
 
