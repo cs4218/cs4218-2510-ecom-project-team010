@@ -409,4 +409,307 @@ describe('When updating products', () => {
             });
         });
     });
+
+    describe('When updating form fields', () => {
+        test('When the user enters new description to the form fields', async () => {
+            // Arrange
+            renderWithRouter(<UpdateProduct />);
+
+            // Act
+            await waitFor(() => {
+                expect(screen.getByDisplayValue('Test Description')).toBeInTheDocument();
+            });
+
+            // Assert
+            const descriptionInput = screen.getByDisplayValue('Test Description');
+            fireEvent.change(descriptionInput, { target: { value: 'Updated Description' } });
+            expect(descriptionInput).toHaveValue('Updated Description');
+        });
+
+        test('When the user enters new quantity to the form fields', async () => {
+            // Arrange
+            renderWithRouter(<UpdateProduct />);
+
+            // Act
+            await waitFor(() => {
+                expect(screen.getByDisplayValue('10')).toBeInTheDocument();
+            });
+
+            // Assert
+            const quantityInput = screen.getByDisplayValue('10');
+            fireEvent.change(quantityInput, { target: { value: '20' } });
+            expect(quantityInput).toHaveValue(20);
+        });
+
+        test('When the user changes category selection', async () => {
+            // Arrange
+            renderWithRouter(<UpdateProduct />);
+
+            await waitFor(() => {
+                expect(screen.getByDisplayValue('Test Product')).toBeInTheDocument();
+            });
+
+            // Act & Assert
+            const categorySelect = document.querySelector('.ant-select-selector');
+            expect(categorySelect).toBeInTheDocument();
+            
+            // Simulate category change
+            fireEvent.mouseDown(categorySelect);
+            await waitFor(() => {
+                const option = screen.getByText('Clothing');
+                fireEvent.click(option);
+            });
+        });
+
+        test('When the user changes shipping selection', async () => {
+            // Arrange
+            renderWithRouter(<UpdateProduct />);
+
+            await waitFor(() => {
+                expect(screen.getByDisplayValue('Test Product')).toBeInTheDocument();
+            });
+
+            // Act & Assert
+            const shippingSelectors = document.querySelectorAll('.ant-select-selector');
+            const shippingSelect = shippingSelectors[1]; // Second selector is shipping
+            
+            fireEvent.mouseDown(shippingSelect);
+            await waitFor(() => {
+                const option = screen.getByText('No');
+                fireEvent.click(option);
+            });
+        });
+    });
+
+    describe('When submitting changes in form fields', () => {
+        test('When submitting form with empty required fields', async () => {
+            // Arrange
+            axios.put.mockResolvedValueOnce({
+                data: { success: false, message: 'Name is required' },
+            });
+
+            renderWithRouter(<UpdateProduct />);
+
+            await waitFor(() => {
+                expect(screen.getByDisplayValue('Test Product')).toBeInTheDocument();
+            });
+
+            // Act - Clear the name field
+            const nameInput = screen.getByDisplayValue('Test Product');
+            fireEvent.change(nameInput, { target: { value: '' } });
+
+            const updateButton = screen.getByText('UPDATE PRODUCT');
+            fireEvent.click(updateButton);
+
+            // Assert
+            await waitFor(() => {
+                expect(toast.error).toHaveBeenCalledWith('Name is required');
+            });
+        });
+
+        test('When submitting form with invalid price format', async () => {
+            // Arrange
+            renderWithRouter(<UpdateProduct />);
+
+            await waitFor(() => {
+                expect(screen.getByDisplayValue('100')).toBeInTheDocument();
+            });
+
+            // Act
+            const priceInput = screen.getByDisplayValue('100');
+            fireEvent.change(priceInput, { target: { value: '-10' } });
+
+            // Assert
+            expect(priceInput).toHaveValue(-10);
+        });
+
+        test('When submitting form with invalid quantity format', async () => {
+            // Arrange
+            renderWithRouter(<UpdateProduct />);
+
+            await waitFor(() => {
+                expect(screen.getByDisplayValue('10')).toBeInTheDocument();
+            });
+
+            // Act
+            const quantityInput = screen.getByDisplayValue('10');
+            fireEvent.change(quantityInput, { target: { value: '-5' } });
+
+            // Assert
+            expect(quantityInput).toHaveValue(-5);
+        });
+
+        test('When photo upload fails during form submission', async () => {
+            // Arrange
+            axios.put.mockResolvedValueOnce({
+                data: { success: false, message: 'Photo upload failed' },
+            });
+
+            renderWithRouter(<UpdateProduct />);
+
+            await waitFor(() => {
+                expect(screen.getByText('Upload Photo')).toBeInTheDocument();
+            });
+
+            const file = new File(['test'], 'test.jpg', { type: 'image/jpeg' });
+            const fileInput = screen.getByText('Upload Photo').parentElement.querySelector('input[type="file"]');
+            
+            // Act
+            fireEvent.change(fileInput, { target: { files: [file] } });
+
+            const updateButton = screen.getByText('UPDATE PRODUCT');
+            fireEvent.click(updateButton);
+
+            // Assert
+            await waitFor(() => {
+                expect(toast.error).toHaveBeenCalledWith('Photo upload failed');
+            });
+        });
+
+        test('When updating product with photo attached', async () => {
+            // Arrange
+            axios.put.mockResolvedValueOnce({
+                data: { success: true },
+            });
+
+            renderWithRouter(<UpdateProduct />);
+
+            await waitFor(() => {
+                expect(screen.getByText('Upload Photo')).toBeInTheDocument();
+            });
+
+            const file = new File(['test'], 'test.jpg', { type: 'image/jpeg' });
+            const fileInput = screen.getByText('Upload Photo').parentElement.querySelector('input[type="file"]');
+            
+            // Act
+            fireEvent.change(fileInput, { target: { files: [file] } });
+            
+            const updateButton = screen.getByText('UPDATE PRODUCT');
+            fireEvent.click(updateButton);
+
+            // Assert
+            await waitFor(() => {
+                expect(axios.put).toHaveBeenCalledWith(
+                    '/api/v1/product/update-product/prod1',
+                    expect.any(FormData)
+                );
+                
+                // Verify FormData contains the photo
+                const formDataCall = axios.put.mock.calls[0][1];
+                expect(formDataCall instanceof FormData).toBe(true);
+            });
+        });
+    });
+
+    describe('When uploading a product photo', () => {
+        test('When uploading unsupported file type', async () => {
+            // Arrange
+            renderWithRouter(<UpdateProduct />);
+
+            await waitFor(() => {
+                expect(screen.getByText('Upload Photo')).toBeInTheDocument();
+            });
+
+            // Act
+            const file = new File(['test'], 'test.txt', { type: 'text/plain' });
+            const fileInput = screen.getByText('Upload Photo').parentElement.querySelector('input[type="file"]');
+            
+            fireEvent.change(fileInput, { target: { files: [file] } });
+
+            // Assert
+            await waitFor(() => {
+                expect(screen.getByText('test.txt')).toBeInTheDocument();
+            });
+        });
+
+        test('When clearing file selection', async () => {
+            // Arrange
+            renderWithRouter(<UpdateProduct />);
+
+            await waitFor(() => {
+                expect(screen.getByText('Upload Photo')).toBeInTheDocument();
+            });
+
+            const file = new File(['test'], 'test.jpg', { type: 'image/jpeg' });
+            const fileInput = screen.getByText('Upload Photo').parentElement.querySelector('input[type="file"]');
+            
+            // Act
+            fireEvent.change(fileInput, { target: { files: [file] } });
+
+            // Assert
+            await waitFor(() => {
+                expect(screen.getByText('test.jpg')).toBeInTheDocument();
+            });
+        });
+    });
+
+    describe('When using network calls', () => {
+        test('When both product and category API calls fail', async () => {
+            // Arrange
+            axios.get.mockRejectedValue(new Error('Network failure'));
+            const consoleSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
+
+            // Act
+            renderWithRouter(<UpdateProduct />);
+
+            // Assert
+            await waitFor(() => {
+                expect(consoleSpy).toHaveBeenCalledWith(expect.any(Error));
+                expect(toast.error).toHaveBeenCalledWith(
+                    'Something went wrong in getting category'
+                );
+            });
+
+            consoleSpy.mockRestore();
+        });
+
+        test('When API returns data in unexpected format', async () => {
+            // Arrange
+            axios.get.mockImplementation((url) => {
+                if (url.includes('/api/v1/product/get-product/')) {
+                    return Promise.resolve({ data: null });
+                }
+                if (url.includes('/api/v1/category/get-category')) {
+                    return Promise.resolve({
+                        data: { success: false }, 
+                    });
+                }
+                return Promise.reject(new Error('Unknown URL'));
+            });
+
+            const consoleSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
+
+            // Act
+            renderWithRouter(<UpdateProduct />);
+
+            // Assert
+            await waitFor(() => {
+                expect(consoleSpy).toHaveBeenCalled();
+            });
+
+            consoleSpy.mockRestore();
+        });
+
+        test('When update API returns data without success field', async () => {
+            // Arrange
+            axios.put.mockResolvedValueOnce({
+                data: { message: 'Some message' }, 
+            });
+
+            renderWithRouter(<UpdateProduct />);
+
+            await waitFor(() => {
+                expect(screen.getByText('UPDATE PRODUCT')).toBeInTheDocument();
+            });
+
+            // Act
+            const updateButton = screen.getByText('UPDATE PRODUCT');
+            fireEvent.click(updateButton);
+
+            // Assert
+            await waitFor(() => {
+                expect(toast.error).toHaveBeenCalledWith('Some message');
+            });
+        });
+    });
 });
