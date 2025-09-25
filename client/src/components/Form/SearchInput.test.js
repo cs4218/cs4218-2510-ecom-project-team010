@@ -14,7 +14,6 @@ const defaultSearchState = { keyword: '', results: [] };
 const mockSetValues = jest.fn();
 const mockNavigate = jest.fn();
 
-
 describe("Given that a user types into the search input", () => {
     beforeEach(() => {
         jest.clearAllMocks();
@@ -23,6 +22,7 @@ describe("Given that a user types into the search input", () => {
     });
 
     test("When user enters a keyword and clicks on the search button", async () => {
+        // Arrange 
         const mockData = { data: [{ id: 1, name: 'Test Search' }] };
         axios.get.mockResolvedValueOnce(mockData);
 
@@ -31,9 +31,11 @@ describe("Given that a user types into the search input", () => {
         
         const { getByRole, getByPlaceholderText } = render(<SearchInput />);
         
+        // Act
         fireEvent.change(getByPlaceholderText('Search'), { target: { value: 'test' } });
         fireEvent.click(getByRole('button', { name: /search/i }));
 
+        // Assert 
         await waitFor(() => {
             expect(axios.get).toHaveBeenCalledWith('/api/v1/product/search/test');
         });
@@ -51,6 +53,7 @@ describe("Given that a user types into the search input", () => {
     });
 
     test("When user removes keyword and clicks on the search button", async () => {
+        // Arrange
         axios.get.mockResolvedValueOnce({ data: [] });
         
         render(<SearchInput />);
@@ -58,18 +61,23 @@ describe("Given that a user types into the search input", () => {
         const input = screen.getByPlaceholderText('Search');
         const searchButton = screen.getByRole('button', { name: /search/i });
         
+        // Act
         fireEvent.change(input, { target: { value: '' } });
         fireEvent.click(searchButton);
 
+        // Assert
         expect(axios.get).toHaveBeenCalledWith('/api/v1/product/search/');
     });
 
-    test("When input value changes", () => {
+    test("When user updates keyword", () => {
+        // Arrange
         render(<SearchInput />);
-        
         const input = screen.getByPlaceholderText('Search');
+
+        // Act
         fireEvent.change(input, { target: { value: 'new search' } });
 
+        // Assert
         expect(mockSetValues).toHaveBeenCalledWith({
             ...defaultSearchState,
             keyword: 'new search'
