@@ -314,7 +314,7 @@ describe("Testing updateProductController function.", () => {
     slugify.mockReturnValue("mock-slug");
   });
 
-  it("400 if no name field", async () => {
+  it("400 if no name field.", async () => {
     // arrange
     const req = {
       fields: {
@@ -340,7 +340,7 @@ describe("Testing updateProductController function.", () => {
     });
   });
 
-  it("400 if photo > 1MB", async () => {
+  it("400 if photo > 1MB.", async () => {
     // arrange
     const req = {
       fields: {
@@ -367,7 +367,7 @@ describe("Testing updateProductController function.", () => {
     });
   });
 
-  it("400 if no description field", async () => {
+  it("400 if no description field.", async () => {
     // arrange
     const req = {
       fields: {
@@ -393,7 +393,7 @@ describe("Testing updateProductController function.", () => {
     });
   });
 
-  it("400 if no price field", async () => {
+  it("400 if no price field.", async () => {
     // arrange
     const req = {
       fields: {
@@ -419,7 +419,7 @@ describe("Testing updateProductController function.", () => {
     });
   });
 
-  it("400 if no category field", async () => {
+  it("400 if no category field.", async () => {
     // arrange
     const req = {
       fields: {
@@ -445,7 +445,7 @@ describe("Testing updateProductController function.", () => {
     });
   });
 
-  it("400 if no quantity field", async () => {
+  it("400 if no quantity field.", async () => {
     // arrange
     const req = {
       fields: {
@@ -471,7 +471,7 @@ describe("Testing updateProductController function.", () => {
     });
   });
 
-  it("201 if product is updated successfully", async () => {
+  it("201 if product is updated successfully.", async () => {
     // arange
     const req = {
       params: { pid: "123" },
@@ -504,7 +504,7 @@ describe("Testing updateProductController function.", () => {
     );
   });
 
-  it("400 with error payload if DB update fails", async () => {
+  it("400 with error payload if DB update fails.", async () => {
     // arrange
     const logSpy = jest.spyOn(console, "log").mockImplementation(() => {});
     productModel.findByIdAndUpdate.mockRejectedValueOnce(
@@ -553,7 +553,7 @@ describe("Testing deleteProductController function.", () => {
     jest.clearAllMocks();
   });
 
-  it("200 if product is deleted successfully", async () => {
+  it("200 if product is deleted successfully.", async () => {
     // arrange
     productModel.findByIdAndDelete.mockReturnValueOnce({
       select: jest.fn().mockResolvedValue({}),
@@ -574,7 +574,7 @@ describe("Testing deleteProductController function.", () => {
     });
   });
 
-  it("400 if DB delete/select rejects", async () => {
+  it("400 if DB delete/select rejects.", async () => {
     // arrange
     logSpy = jest.spyOn(console, "log").mockImplementation(() => {});
     productModel.findByIdAndDelete.mockReturnValueOnce({

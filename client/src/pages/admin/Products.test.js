@@ -34,7 +34,7 @@ describe("Testing products page.", () => {
     jest.clearAllMocks();
   });
 
-  it('Fetches and renders multiple product cards.', async () => {
+  it('fetches and renders multiple product cards.', async () => {
   // Arrange
   axios.get.mockResolvedValueOnce({
     data: {
@@ -72,7 +72,7 @@ describe("Testing products page.", () => {
 });
 
 
-  it("Shows an error toast when the fetch fails.", async () => {
+  it("shows an error toast when the fetch fails.", async () => {
     // arrange
     const logSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
     axios.get.mockRejectedValueOnce(new Error("Network down"));

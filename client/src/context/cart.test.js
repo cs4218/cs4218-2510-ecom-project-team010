@@ -42,7 +42,7 @@ window.matchMedia =
     };
   };
 
-describe("Testing cart component", () => {
+describe("Testing cart component.", () => {
   //arrange
   beforeEach(() => {
     jest.clearAllMocks();
@@ -62,7 +62,7 @@ describe("Testing cart component", () => {
     });
   });
 
-  it("Cart is initalised correctly and calls LocalStorage.", async () => {
+  it("cart is initalised correctly and calls LocalStorage.", async () => {
     // act
     render(
       <CartProvider>
@@ -74,7 +74,7 @@ describe("Testing cart component", () => {
     expect(window.localStorage.getItem).toHaveBeenCalledWith("cart");
   });
 
-  it("Child component accesses no items from an empty cart.", async () => {
+  it("child component accesses no items from an empty cart.", async () => {
     // act
     render(
       <CartProvider>
@@ -87,7 +87,7 @@ describe("Testing cart component", () => {
     expect(parsed).toEqual([]);
   });
 
-  it("Child component accesses correct items from a non-empty cart.", async () => {
+  it("child component accesses correct items from a non-empty cart.", async () => {
     // arrange
     const stored_items = [
       { id: 1, name: "book", price: 10 },
@@ -109,7 +109,7 @@ describe("Testing cart component", () => {
     expect(parsed[1]).toMatchObject({ name: "mouse", price: 20 });
   });
 
-  it("Child component can add an item to cart.", async () => {
+  it("child component can add an item to cart.", async () => {
     // arrange
     const stored_items = [
       { id: 1, name: "book", price: 10 },
@@ -135,7 +135,7 @@ describe("Testing cart component", () => {
     ]);
   });
 
-  it("Child component can clear the cart.", async () => {
+  it("child component can clear the cart.", async () => {
     // arrange
     const stored_items = [
       { id: 1, name: "book", price: 10 },

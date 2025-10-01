@@ -9,7 +9,6 @@ import { Select } from "antd";
 const { Option } = Select;
 
 const AdminOrders = () => {
-  // typo and grammatical errors
   const [status, setStatus] = useState([
     "Not Processed",
     "Processing",
@@ -18,7 +17,6 @@ const AdminOrders = () => {
     "Cancelled",
   ]);
 
-  // typo : changed to setChangeStatus from setCHangeStatus
   const [changeStatus, setChangeStatus] = useState("");
   const [orders, setOrders] = useState([]);
   const [auth, setAuth] = useAuth();
@@ -44,7 +42,7 @@ const AdminOrders = () => {
       });
       getOrders();
     } catch (error) {
-      console.log(error); // should send status here in case of error?
+      console.log(error);
     }
   };
   return (
@@ -64,7 +62,6 @@ const AdminOrders = () => {
                       <th scope="col">#</th>
                       <th scope="col">Status</th>
                       <th scope="col">Buyer</th>
-                      {/* typo: <th scope="col"> date</th> */}
                       <th scope="col"> Date</th>
                       <th scope="col">Payment</th>
                       <th scope="col">Quantity</th>
@@ -106,7 +103,6 @@ const AdminOrders = () => {
                         />
                       </div>
                       <div className="col-md-8">
-                        {/* added labels to name and description */}
                         <p>Name: {p.name}</p>
                         <p>Description: {p.description.substring(0, 30)}</p>
                         <p>Price : {p.price}</p>

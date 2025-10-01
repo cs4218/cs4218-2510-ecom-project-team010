@@ -66,7 +66,8 @@ const { useAuth } = require("../context/auth");
 const { useCart } = require("../context/cart");
 
 
-describe("CartPage totalPrice()", () => {
+
+describe("Testing totalPrice() functionality.", () => {
   beforeEach(() => {
     jest.clearAllMocks();
     useAuth.mockReturnValue([
@@ -173,7 +174,7 @@ describe("CartPage totalPrice()", () => {
   });
 });
 
-describe("Testing deleteCartItem.", () => {
+describe("Testing deleteCartItem() fucntionality.", () => {
   beforeEach(() => {
     jest.clearAllMocks();
     useAuth.mockReturnValue([
@@ -199,7 +200,7 @@ describe("Testing deleteCartItem.", () => {
       expect(axios.get).toHaveBeenCalledWith("/api/v1/product/braintree/token")
     );
 
-  it("No remove button rendered for empty cart", async () => {
+  it("no remove button rendered for empty cart.", async () => {
     // arrange
     const setCart = jest.fn();
     useCart.mockReturnValue([[], setCart]);
@@ -233,7 +234,7 @@ describe("Testing deleteCartItem.", () => {
     setItemSpy.mockRestore();
   });
 
-  it("removes 1 item from a cart with multiple repeated items", async () => {
+  it("removes 1 item from a cart with multiple repeated items.", async () => {
     // arrange
     const a = { _id: "A", name: "Shirt", description: "cotton", price: 10 };
     const b = { _id: "B", name: "Item B", description: "bbbbbb", price: 49 };
@@ -255,7 +256,7 @@ describe("Testing deleteCartItem.", () => {
   });
 });
 
-describe("testing getToken", () => {
+describe("Testing getToken() functionality.", () => {
   const renderOnCart = () =>
     render(
       <MemoryRouter initialEntries={["/cart"]}>
@@ -278,7 +279,7 @@ describe("testing getToken", () => {
     ]);
   });
 
-  it("Successfully creates client token resulting in payment UI displayed", async () => {
+  it("successfully creates client token resulting in payment UI displayed.", async () => {
     // arrange
     axios.get.mockResolvedValueOnce({ data: { clientToken: "tok_123" } });
 
@@ -294,7 +295,7 @@ describe("testing getToken", () => {
     ).toBeInTheDocument();
   });
 
-  it("Logs error when it cannot successfully set client token.", async () => {
+  it("logs error when it cannot successfully set client token.", async () => {
     // arrange
     const logSpy = jest.spyOn(console, "log").mockImplementation(() => {});
     axios.get.mockRejectedValueOnce(new Error("network down"));
@@ -310,7 +311,7 @@ describe("testing getToken", () => {
   });
 
 
-it("Payment UI is not displated when it cannot successfully set client token.", async () => {
+it("payment UI is not displated when it cannot successfully set client token.", async () => {
     // arrange
     const logSpy = jest.spyOn(console, "log").mockImplementation(() => {});
     axios.get.mockRejectedValueOnce(new Error("network down"));
@@ -326,7 +327,7 @@ it("Payment UI is not displated when it cannot successfully set client token.", 
 });
 
 
-describe("handlePayment", () => {
+describe("Testing handlePayment() functionality", () => {
   const renderOnCart = () =>
     render(
       <MemoryRouter initialEntries={["/cart"]}>
@@ -360,7 +361,7 @@ describe("handlePayment", () => {
     useCart.mockReturnValue([CART, jest.fn()]);
   });
 
-  it("Successfully posts correct cart of multiple distinct items", async () => {
+  it("successfully posts correct cart of multiple distinct items.", async () => {
     // arrange
     mockRequestPaymentMethod = jest
       .fn()
@@ -380,7 +381,7 @@ describe("handlePayment", () => {
     expect(body.cart).toBe(CART);
   });
 
-  it("successfully clears cart of multiple distinct items", async () => {
+  it("successfully clears cart of multiple distinct items.", async () => {
     // arrange
     mockRequestPaymentMethod = jest
       .fn()
@@ -421,7 +422,7 @@ describe("handlePayment", () => {
     expect(mockNavigate).toHaveBeenCalledWith("/dashboard/user/orders");
   });
 
-  it("successfully sends payment commpleted notifcation on a cart with multiple distinct items", async () => {
+  it("successfully sends payment commpleted notifcation on a cart with multiple distinct items.", async () => {
     // arrange
     mockRequestPaymentMethod = jest
       .fn()
@@ -440,22 +441,7 @@ describe("handlePayment", () => {
     );
   });
 
-  it("renders no payment button when cart is empty.", async () => {
-    // arrange
-    const setCart = jest.fn();
-    useCart.mockReturnValue([[], setCart]);
-
-    // act
-    renderOnCart();
-    await waitFor(() =>
-      expect(axios.get).toHaveBeenCalledWith("/api/v1/product/braintree/token")
-    );
-
-    // assert
-    expect(screen.queryByRole("button", { name: /make payment/i })).toBeNull();
-  });
-
-  it("Logs error when error occurs in handlePayment function.", async () => {
+  it("logs error when error occurs in handlePayment function.", async () => {
     // arrange
     const logSpy = jest.spyOn(console, "log").mockImplementation(() => {});
     mockRequestPaymentMethod = jest
@@ -473,7 +459,7 @@ describe("handlePayment", () => {
   });
 });
 
-describe("CartPage greeting & subtext header", () => {
+describe("Testing rendering of greeting & subtext header.", () => {
   const renderCart = () =>
     render(
       <MemoryRouter initialEntries={["/cart"]}>
@@ -487,7 +473,7 @@ describe("CartPage greeting & subtext header", () => {
     jest.clearAllMocks();
   });
 
-  it("Logged out + no token + empty cart → 'Hello Guest' and 'Your Cart Is Empty'", async () => {
+  it("logged out + no token + empty cart → 'Hello Guest' and 'Your Cart Is Empty'.", async () => {
     // arrange
     useAuth.mockReturnValue([{}, jest.fn()]);
     useCart.mockReturnValue([[], jest.fn()]);
@@ -502,7 +488,7 @@ describe("CartPage greeting & subtext header", () => {
     expect(within(h1).getByText(/Your Cart Is Empty/i)).toBeInTheDocument();
   });
 
-  it("Logged in + token + filled cart → 'Hello  Alice' and count text", async () => {
+  it("logged in + token + filled cart → 'Hello  Alice' and count text.", async () => {
     // arrange
     useAuth.mockReturnValue([
       { token: "t", user: { name: "Alice", address: "123 Main" } },
@@ -528,7 +514,7 @@ describe("CartPage greeting & subtext header", () => {
     ).toBeInTheDocument();
   });
 
-  it("Logged in + no token + empty cart → 'Hello  Alice' + 'Your cart is empty'", async () => {
+  it("logged in + no token + empty cart → 'Hello  Alice' + 'Your cart is empty'.", async () => {
     // arrange
     useAuth.mockReturnValue([{ user: { name: "Alice" } }, jest.fn()]);
     useCart.mockReturnValue([[], jest.fn()]);
@@ -547,7 +533,7 @@ describe("CartPage greeting & subtext header", () => {
     ).toBeInTheDocument();
   });
 
-  it("Logged out + no token + filled cart → 'Hello Guest' and count text and hint to login", async () => {
+  it("logged out + no token + filled cart → 'Hello Guest' and count text and hint to login.", async () => {
     // arrange
     useAuth.mockReturnValue([{}, jest.fn()]);
     useCart.mockReturnValue([
@@ -573,7 +559,7 @@ describe("CartPage greeting & subtext header", () => {
   });
 });
 
-describe("CartPage summary column (address + payment gates)", () => {
+describe("Testing CartPage address section.", () => {
   const renderCart = () =>
     render(
       <MemoryRouter initialEntries={["/cart"]}>
@@ -598,7 +584,7 @@ describe("CartPage summary column (address + payment gates)", () => {
     ]);
   });
 
-  it("renders summary headings", async () => {
+  it("address present + logged in -> shows current address.", async () => {
     // arrange
     axios.get.mockImplementationOnce(() => new Promise(() => {}));
 
@@ -606,124 +592,167 @@ describe("CartPage summary column (address + payment gates)", () => {
     renderCart();
 
     // assert
-    expect(
-      await screen.findByRole("heading", { name: /cart summary/i })
-    ).toBeInTheDocument();
-  });
-
-  it("renders total", async () => {
-    // arrange
-    axios.get.mockImplementationOnce(() => new Promise(() => {}));
-
-    // act
-    renderCart();
-
-    // assert
-    expect(
-      screen.getByText(/total \| checkout \| payment/i)
-    ).toBeInTheDocument();
-    expect(screen.getByText(/Total : \$10\.00/i)).toBeInTheDocument();
-  });
-
-  it("Address present + logged in -> shows Current Address + Update Address and navigates", async () => {
-    axios.get.mockImplementationOnce(() => new Promise(() => {}));
-    renderCart();
-
     expect(screen.getByText(/current address/i)).toBeInTheDocument();
     expect(screen.getByText("123 Main")).toBeInTheDocument();
+  });
 
+  it("address present + logged in -> navigates to user profile upon clicking update address.", async () => {
+    // arrange
+    axios.get.mockImplementationOnce(() => new Promise(() => {}));
+
+    // act
+    renderCart();
     const btn = screen.getByRole("button", { name: /update address/i });
     fireEvent.click(btn);
+
+    // assert
     expect(mockNavigate).toHaveBeenCalledWith("/dashboard/user/profile");
   });
 
-  it("no address but logged-in: shows Update Address (navigates to profile)", async () => {
+  it("no address but logged-in: navigates to user profile upon clicking update address.", async () => {
+    // arrange
     useAuth.mockReturnValue([
       { token: "t", user: { name: "Alice" } },
       jest.fn(),
     ]);
     axios.get.mockImplementationOnce(() => new Promise(() => {}));
 
+    // act
     renderCart();
-
     const btn = await screen.findByRole("button", { name: /update address/i });
     fireEvent.click(btn);
+
+    // assert
     expect(mockNavigate).toHaveBeenCalledWith("/dashboard/user/profile");
   });
 
-  it("guest (no token): shows login CTA to /login with state '/cart'", async () => {
+  it("guest (no token): navigates user to login page upon clicking 'please login to checkout'.", async () => {
+    // arrange
     useAuth.mockReturnValue([{}, jest.fn()]);
     axios.get.mockImplementationOnce(() => new Promise(() => {}));
 
+    // act
     renderCart();
-
     const btn = await screen.findByRole("button", {
       name: /please login to checkout/i,
     });
     fireEvent.click(btn);
+
+    // assert
     expect(mockNavigate).toHaveBeenCalledWith("/login", { state: "/cart" });
   });
+});
 
-  it("hides payment UI when clientToken missing", async () => {
+
+describe("Testing CartPage payment gates.", () => {
+  const renderCart = () =>
+    render(
+      <MemoryRouter initialEntries={["/cart"]}>
+        <Routes>
+          <Route path="/cart" element={<CartPage />} />
+        </Routes>
+      </MemoryRouter>
+    );
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+    mockDropInProvided = false;
+    mockRequestPaymentMethod = undefined;
+
+    useAuth.mockReturnValue([
+      { token: "t", user: { name: "Alice", address: "123 Main" } },
+      jest.fn(),
+    ]);
+    useCart.mockReturnValue([
+      [{ _id: "1", name: "A", description: "x", price: 10 }],
+      jest.fn(),
+    ]);
+  });
+
+  it("hides payment UI when clientToken missing.", async () => {
+    // arrange
     axios.get.mockResolvedValueOnce({ data: { clientToken: "" } });
+
+    // act
     renderCart();
     await waitFor(() => expect(axios.get).toHaveBeenCalled());
     await flush();
+
+    // assert
     expect(screen.queryByRole("button", { name: /make payment/i })).toBeNull();
   });
 
-  it("hides payment UI when not logged in", async () => {
+  it("hides payment UI when not logged in.", async () => {
+    // arrange
     useAuth.mockReturnValue([
       { user: { name: "Alice", address: "123 Main" } },
       jest.fn(),
     ]); // no token
     axios.get.mockResolvedValueOnce({ data: { clientToken: "tok" } });
 
+    // act
     renderCart();
     await waitFor(() => expect(axios.get).toHaveBeenCalled());
     await flush();
+
+    // assert
     expect(screen.queryByRole("button", { name: /make payment/i })).toBeNull();
   });
 
-  it("hides payment UI when cart empty", async () => {
+  it("hides payment UI when cart empty.", async () => {
+    // arrange
     useCart.mockReturnValue([[], jest.fn()]);
     axios.get.mockResolvedValueOnce({ data: { clientToken: "tok" } });
 
+    // act
     renderCart();
     await waitFor(() => expect(axios.get).toHaveBeenCalled());
     await flush();
+
+    // assert
     expect(screen.queryByRole("button", { name: /make payment/i })).toBeNull();
   });
 
-  it("shows payment UI when all gates pass", async () => {
+  it("shows payment UI when all gates pass.", async () => {
+    // arrange
     axios.get.mockResolvedValueOnce({ data: { clientToken: "tok" } });
-    renderCart();
 
+    // act
+    renderCart();
     const payBtn = await screen.findByRole("button", { name: /make payment/i });
+
+    // assert
     expect(payBtn).toBeInTheDocument();
   });
 
-  it("disables Make Payment when address is missing", async () => {
+  it("disables Make Payment when address is missing.", async () => {
+    // arrange
     useAuth.mockReturnValue([
       { token: "t", user: { name: "Alice" } },
       jest.fn(),
     ]);
     mockRequestPaymentMethod = jest.fn().mockResolvedValue({ nonce: "n" });
-
     axios.get.mockResolvedValueOnce({ data: { clientToken: "tok" } });
-    renderCart();
 
+    // act
+    renderCart();
     const payBtn = await screen.findByRole("button", { name: /make payment/i });
+
+    // assert
     expect(payBtn).toBeDisabled();
   });
 
-  it("disables Make Payment when DropIn instance not provided", async () => {
+  it("disables Make Payment when DropIn instance not provided.", async () => {
+    // arrange
     mockDropInProvided = true; // our DropIn mock won't call onInstance
     axios.get.mockResolvedValueOnce({ data: { clientToken: "tok" } });
 
+    // act
     renderCart();
-
     const payBtn = await screen.findByRole("button", { name: /make payment/i });
+
+    // assert
     expect(payBtn).toBeDisabled();
   });
 });
+

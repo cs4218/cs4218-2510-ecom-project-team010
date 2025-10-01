@@ -1,4 +1,4 @@
-// Note: these test cases are genereated with the help of AI
+// Note: these test cases are generated with the help of AI
 import React from "react";
 import {
   render,
@@ -15,6 +15,7 @@ import toast from "react-hot-toast";
 import { useAuth } from "../../context/auth";
 import AdminOrders from "./AdminOrders";
 
+// arrange
 jest.mock("axios", () => ({
   __esModule: true,
   default: {
@@ -59,10 +60,10 @@ jest.mock("antd", () => {
     defaultValue,
     onChange,
     children,
-    bordered, // dropped
-    size, // dropped
-    showSearch, // dropped
-    optionFilterProp, // dropped
+    bordered, 
+    size, 
+    showSearch, 
+    optionFilterProp,
     ...rest
   }) => (
     <select
@@ -127,7 +128,7 @@ async function renderAndWait(component = <AdminOrders />) {
   await screen.findByText(/All Orders/i);
 }
 
-describe("AdminOrders", () => {
+describe("Testing AdminOrders", () => {
   beforeEach(() => {
     jest.clearAllMocks();
     useAuth.mockReturnValue([{ token: "tok" }, jest.fn()]);
@@ -137,7 +138,7 @@ describe("AdminOrders", () => {
     cleanup();
   });
 
-  it("does not fetch orders if no auth token", async () => {
+  it("does not fetch orders if no auth token.", async () => {
     // arrange
     useAuth.mockReturnValue([{}, jest.fn()]); // no token
     axios.get.mockClear();
@@ -151,7 +152,7 @@ describe("AdminOrders", () => {
     });
   });
 
-  it("fetches and displays orders correctly, rendering key attributes", async () => {
+  it("fetches and displays orders correctly with all key attributes", async () => {
     // arrange
     axios.get.mockResolvedValueOnce({ data: sampleOrders });
 
@@ -184,7 +185,7 @@ describe("AdminOrders", () => {
     expect(imgs[1]).toHaveAttribute("alt", "Safety Vest");
   });
 
-  it("renders correct placeholder values for missing attributes: 0 quantity when products missing", async () => {
+  it("renders correct placeholder values for missing attributes: 0 quantity when products missing.", async () => {
     // arrange
     const orderNoDateNoProducts = {
       _id: "order2",
@@ -202,7 +203,7 @@ describe("AdminOrders", () => {
     expect(screen.getByText("0")).toBeInTheDocument();
   });
 
-  it("renders correct placeholder values for missing attributes: '-' for missing date", async () => {
+  it("renders correct placeholder values for missing attributes: '-' for missing date.", async () => {
     // arrange
     const orderNoDateNoProducts = {
       _id: "order2",
@@ -220,7 +221,7 @@ describe("AdminOrders", () => {
     expect(screen.getByText("-")).toBeInTheDocument();
   });
 
-  it("renders correct placeholder values for missing attributes: shows failed payment", async () => {
+  it("renders correct placeholder values for missing attributes: shows failed payment.", async () => {
     // arrange
     const orderNoDateNoProducts = {
       _id: "order2",
@@ -253,7 +254,7 @@ describe("AdminOrders", () => {
     logSpy.mockRestore();
   });
 
-  it("Updates status of an order correctly", async () => {
+  it("updates status of an order correctly", async () => {
     // arrange
     axios.get.mockResolvedValueOnce({ data: sampleOrders }); // initial fetch
     axios.put.mockResolvedValueOnce({ data: { ok: true } });
@@ -273,7 +274,7 @@ describe("AdminOrders", () => {
     );
   });
 
-  it("Logs error when error occurs when trying to update order status", async () => {
+  it("logs error when error occurs when trying to update order status", async () => {
     // arrange
     axios.get.mockResolvedValueOnce({ data: sampleOrders }); // initial fetch
     const putErr = new Error("PUT failed");

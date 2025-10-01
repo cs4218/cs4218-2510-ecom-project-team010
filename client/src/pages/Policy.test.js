@@ -24,7 +24,7 @@ describe('Testing rendering of policy page components.', () => {
         jest.clearAllMocks();
     });
 
-    it('Renders image.', () => {
+    it('renders image.', () => {
     // act
     render(
       <MemoryRouter initialEntries={['/policy']}>
@@ -40,7 +40,7 @@ describe('Testing rendering of policy page components.', () => {
     expect(img).toHaveAttribute("src", "/images/contactus.jpeg"); // correct image is rendered
     });
 
-    it('Renders text.', () => {
+    it('renders text.', () => {
     // act
     render(
       <MemoryRouter initialEntries={['/policy']}>
