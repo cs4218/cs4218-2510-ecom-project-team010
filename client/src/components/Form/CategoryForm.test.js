@@ -2,6 +2,8 @@ import React from "react";
 import { render, screen, fireEvent } from "@testing-library/react";
 import CategoryForm from "./CategoryForm";
 
+// Note: Some of these test cases are generated with the help of AI
+
 describe("Given that the CategoryForm accepts an input", () => {
 
     let mockHandleSubmit;

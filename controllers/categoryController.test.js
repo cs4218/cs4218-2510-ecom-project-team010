@@ -8,6 +8,8 @@ import {
 import categoryModel from "../models/categoryModel.js";
 import slugify from "slugify";
 
+// Note: Some of these test cases are generated with the help of AI
+
 jest.mock("../models/categoryModel.js");
 
 describe("Category Controllers", () => {
