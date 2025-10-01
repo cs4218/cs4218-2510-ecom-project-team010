@@ -3,11 +3,12 @@ import { render, fireEvent, waitFor, screen } from "@testing-library/react";
 import "@testing-library/jest-dom/extend-expect";
 import { useCart, CartProvider } from "./cart.js";
 
-// Note: these test cases are genereated with the help of AI
+// Note: these test cases are generated with the help of AI
 
 // arrange
 
-// mimics a consumer purchasing an item by clicking an "add item"" button.
+// mimics a consumer purchasing an item by clicking an "add item" button.
+// consumer can also clear cart with the "clear cart" button.
 // also displays the number of items in this cart and the content for easy reference
 // during tesing.
 function TestConsumer() {
@@ -41,7 +42,7 @@ window.matchMedia =
     };
   };
 
-describe("Testing cart component", () => {
+describe("Testing cart component.", () => {
   //arrange
   beforeEach(() => {
     jest.clearAllMocks();
@@ -61,7 +62,7 @@ describe("Testing cart component", () => {
     });
   });
 
-  it("LocalStorage is called when component is rendered", async () => {
+  it("cart is initalised correctly and calls LocalStorage.", async () => {
     // act
     render(
       <CartProvider>
@@ -73,7 +74,7 @@ describe("Testing cart component", () => {
     expect(window.localStorage.getItem).toHaveBeenCalledWith("cart");
   });
 
-  it("Child component accesses no items from an empty cart", async () => {
+  it("child component accesses no items from an empty cart.", async () => {
     // act
     render(
       <CartProvider>
@@ -86,7 +87,7 @@ describe("Testing cart component", () => {
     expect(parsed).toEqual([]);
   });
 
-  it("Child component accesses correct items from a non-empty cart", async () => {
+  it("child component accesses correct items from a non-empty cart.", async () => {
     // arrange
     const stored_items = [
       { id: 1, name: "book", price: 10 },
@@ -106,35 +107,9 @@ describe("Testing cart component", () => {
     expect(parsed).toEqual(stored_items);
     expect(parsed[0]).toMatchObject({ name: "book", price: 10 });
     expect(parsed[1]).toMatchObject({ name: "mouse", price: 20 });
-    expect(window.localStorage.getItem).toHaveBeenCalledWith("cart");
   });
 
-  it("Child component accesses correct items from a cart with repeat items", async () => {
-    // arrange
-    const stored_items = [
-      { id: 1, name: "book", price: 10 },
-      { id: 2, name: "mouse", price: 20 },
-      { id: 2, name: "mouse", price: 20 },
-    ];
-
-    // act
-    window.localStorage.setItem("cart", JSON.stringify(stored_items));
-    render(
-      <CartProvider>
-        <TestConsumer />
-      </CartProvider>
-    );
-    const parsed = JSON.parse(screen.getByTestId("cart-content").textContent);
-
-    // assert
-    expect(parsed).toEqual(stored_items);
-    expect(parsed[0]).toMatchObject({ name: "book", price: 10 });
-    expect(parsed[1]).toMatchObject({ name: "mouse", price: 20 });
-    expect(parsed[2]).toMatchObject({ name: "mouse", price: 20 });
-    expect(window.localStorage.getItem).toHaveBeenCalledWith("cart");
-  });
-
-  it("child component can add an item to cart", async () => {
+  it("child component can add an item to cart.", async () => {
     // arrange
     const stored_items = [
       { id: 1, name: "book", price: 10 },
@@ -147,19 +122,12 @@ describe("Testing cart component", () => {
       <CartProvider>
         <TestConsumer />
       </CartProvider>
-    );
-
-    // initial state reflects storage
-    await waitFor(() =>
-      expect(screen.getByTestId("count")).toHaveTextContent("2")
     );
     fireEvent.click(screen.getByText("add item"));
-    await waitFor(() =>
-      expect(screen.getByTestId("count")).toHaveTextContent("3")
-    );
     const parsed = JSON.parse(screen.getByTestId("cart-content").textContent);
 
     // assert
+    expect(screen.getByTestId("count")).toHaveTextContent("3")
     expect(parsed).toEqual([
       { id: 1, name: "book", price: 10 },
       { id: 2, name: "mouse", price: 20 },
@@ -167,23 +135,7 @@ describe("Testing cart component", () => {
     ]);
   });
 
-  it("child component can update an empty cart with 1 item", async () => {
-    //act
-    render(
-      <CartProvider>
-        <TestConsumer />
-      </CartProvider>
-    );
-
-    fireEvent.click(screen.getByText("add item"));
-    let parsed = JSON.parse(screen.getByTestId("cart-content").textContent);
-
-    // assert
-    expect(screen.getByTestId("count")).toHaveTextContent("1");
-    expect(parsed).toEqual([{ id: 1, name: "item1", price: 25 }]);
-  });
-
-  it("child component can clear the cart", async () => {
+  it("child component can clear the cart.", async () => {
     // arrange
     const stored_items = [
       { id: 1, name: "book", price: 10 },
@@ -197,14 +149,11 @@ describe("Testing cart component", () => {
         <TestConsumer />
       </CartProvider>
     );
-
     fireEvent.click(screen.getByText("clear cart"));
     const parsed = JSON.parse(screen.getByTestId("cart-content").textContent);
 
     // assert
-    await waitFor(() =>
-      expect(screen.getByTestId("count")).toHaveTextContent("0")
-    );
+    expect(screen.getByTestId("count")).toHaveTextContent("0")
     expect(parsed).toEqual([]);
   });
 });

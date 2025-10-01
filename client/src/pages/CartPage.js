@@ -84,10 +84,6 @@ const CartPage = () => {
         <div className="row">
           <div className="col-md-12">
             <h1 className="text-center bg-light p-2 mb-1">
-              {/* error */}
-              {/* {!auth?.user
-                ? "Hello Guest"
-                : `Hello  ${auth?.token && auth?.user?.name}`} */}
               {!auth?.user ? "Hello Guest" : `Hello ${auth?.user?.name ?? ""}`}
               <p className="text-center">
                 {cart?.length
@@ -102,7 +98,6 @@ const CartPage = () => {
         <div className="container ">
           <div className="row ">
             <div className="col-md-7  p-0 m-0">
-              {/* fix remove functionality with repeat objects */}
               {cart?.map((p, idx) => (
                 <div className="row card flex-row" key={`${p._id}-${idx}`}>
                   <div className="col-md-4">
@@ -114,7 +109,6 @@ const CartPage = () => {
                       height={"130px"}
                     />
                   </div>
-                  {/* missing name and description labels */}
                   <div className="col-md-4">
                     <p>Name : {p.name}</p>
                     <p>Description : {p.description.substring(0, 30)}</p>
