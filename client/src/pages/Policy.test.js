@@ -1,10 +1,10 @@
 import React from 'react';
-import { render, fireEvent, waitFor, screen } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import { MemoryRouter, Routes, Route } from 'react-router-dom';
 import '@testing-library/jest-dom/extend-expect';
 import Policy from './Policy';
 
-// Note: these test cases are genereated with the help of AI
+// Note: these test cases are generated with the help of AI
 
 // arrange
 jest.mock("./../components/Layout", () => ({
@@ -18,57 +18,40 @@ jest.mock("./../components/Layout", () => ({
 
 jest.mock('../components/Header', () => () => <div/>);
 
-describe('Testing layout component.', () => {
+describe('Testing rendering of policy page components.', () => {
     // arrange
     beforeEach(() => {
         jest.clearAllMocks();
     });
 
-    it('Renders layout component.', () => {
-      // act
-      render(
-        <MemoryRouter initialEntries={['/policy']}>
-          <Routes>
-            <Route path="/policy" element={<Policy />} />
-          </Routes>
-        </MemoryRouter>
-      );
+    it('Renders image.', () => {
+    // act
+    render(
+      <MemoryRouter initialEntries={['/policy']}>
+        <Routes>
+          <Route path="/policy" element={<Policy />} />
+        </Routes>
+      </MemoryRouter>
+    );
+    const img = screen.getByAltText("contactus");
 
-      // assert
-      expect(screen.getByTestId("layout")).toHaveAttribute(
-        "data-title",
-        "Privacy Policy"
-      );
-      });
+    // assert
+    expect(img).toBeInTheDocument();
+    expect(img).toHaveAttribute("src", "/images/contactus.jpeg"); // correct image is rendered
+    });
 
-      it('Renders image.', () => {
-      // act
-      render(
-        <MemoryRouter initialEntries={['/policy']}>
-          <Routes>
-            <Route path="/policy" element={<Policy />} />
-          </Routes>
-        </MemoryRouter>
-      );
-      const img = screen.getByAltText("contactus");
+    it('Renders text.', () => {
+    // act
+    render(
+      <MemoryRouter initialEntries={['/policy']}>
+        <Routes>
+          <Route path="/policy" element={<Policy />} />
+        </Routes>
+      </MemoryRouter>
+    );
+    const paras = screen.getAllByText("We are commited to selling you products of the highest quality for reasonable prices.");
 
-      // assert
-      expect(img).toBeInTheDocument();
-      expect(img).toHaveAttribute("src", "/images/contactus.jpeg");
-      });
-
-      it('Renders text.', () => {
-      // act
-      render(
-        <MemoryRouter initialEntries={['/policy']}>
-          <Routes>
-            <Route path="/policy" element={<Policy />} />
-          </Routes>
-        </MemoryRouter>
-      );
-      const paras = screen.getAllByText("We are commited to selling you products of the highest quality for reasonable prices.");
-
-      // assert 
-      expect(paras).toHaveLength(1);
-      });
+    // assert 
+    expect(paras).toHaveLength(1); // correct text is rendered once.
+    });
 });

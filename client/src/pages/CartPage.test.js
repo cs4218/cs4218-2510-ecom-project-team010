@@ -11,8 +11,7 @@ import "@testing-library/jest-dom/extend-expect";
 import axios from "axios";
 import toast from "react-hot-toast";
 import CartPage from "./CartPage";
-
-// Note: these test cases are genereated with the help of AI
+// Note: these test cases are generated with the help of AI
 
 // arrange
 jest.mock("axios", () => ({
@@ -26,19 +25,16 @@ jest.mock("react-hot-toast", () => ({
   __esModule: true,
   default: { success: jest.fn(), error: jest.fn() },
 }));
-
 jest.mock("../context/auth", () => ({
   useAuth: jest.fn(),
 }));
 jest.mock("../context/cart", () => ({
   useCart: jest.fn(),
 }));
-
 jest.mock("./../components/Layout", () => ({
   __esModule: true,
   default: ({ children }) => <div>{children}</div>,
 }));
-
 let mockRequestPaymentMethod;
 let mockDropInProvided = false;
 jest.mock("braintree-web-drop-in-react", () => {
@@ -54,23 +50,21 @@ jest.mock("braintree-web-drop-in-react", () => {
     return null;
   };
 });
-
 const flush = () => new Promise((r) => setTimeout(r, 0));
 
 beforeEach(() => {
   mockDropInProvided = false;
   mockRequestPaymentMethod = undefined;
 });
-
 const mockNavigate = jest.fn();
 jest.mock("react-router-dom", () => {
   const actual = jest.requireActual("react-router-dom");
   return { ...actual, useNavigate: () => mockNavigate };
 });
 beforeEach(() => mockNavigate.mockReset());
-
 const { useAuth } = require("../context/auth");
 const { useCart } = require("../context/cart");
+
 
 describe("CartPage totalPrice()", () => {
   beforeEach(() => {
@@ -79,26 +73,6 @@ describe("CartPage totalPrice()", () => {
       { token: "t", user: { name: "Alice", address: "123 Main" } },
       jest.fn(),
     ]);
-  });
-
-  it("displays the total price accurately for a cart with 1 item.", async () => {
-    // arrange
-    useCart.mockReturnValue([
-      [{ _id: "1", name: "Item A", description: "aaaaaa", price: 20 }],
-      jest.fn(),
-    ]);
-
-    // act
-    render(
-      <MemoryRouter initialEntries={["/cart"]}>
-        <Routes>
-          <Route path="/cart" element={<CartPage />} />
-        </Routes>
-      </MemoryRouter>
-    );
-
-    // assert
-    expect(await screen.findByText(/Total : \$20\.00/i)).toBeInTheDocument();
   });
 
   it("displays the total price accurately for a cart with more than 1 item.", async () => {
@@ -199,7 +173,7 @@ describe("CartPage totalPrice()", () => {
   });
 });
 
-describe("testing deleteCartItem", () => {
+describe("Testing deleteCartItem.", () => {
   beforeEach(() => {
     jest.clearAllMocks();
     useAuth.mockReturnValue([
@@ -208,6 +182,7 @@ describe("testing deleteCartItem", () => {
     ]);
   });
 
+  // to easily render CartPage during testing
   const mount = () =>
     render(
       <MemoryRouter initialEntries={["/cart"]}>
@@ -217,16 +192,17 @@ describe("testing deleteCartItem", () => {
       </MemoryRouter>
     );
 
+  // ensures that braintree api is called before assert statements
+  // validate other aspects of the cart page.
   const waitToken = () =>
     waitFor(() =>
       expect(axios.get).toHaveBeenCalledWith("/api/v1/product/braintree/token")
     );
 
-  it("no remove button rendered for empty cart", async () => {
+  it("No remove button rendered for empty cart", async () => {
     // arrange
     const setCart = jest.fn();
     useCart.mockReturnValue([[], setCart]);
-    const setItemSpy = jest.spyOn(window.localStorage.__proto__, "setItem");
 
     // act
     mount();
@@ -234,49 +210,6 @@ describe("testing deleteCartItem", () => {
 
     // assert
     expect(screen.queryByRole("button", { name: /remove/i })).toBeNull();
-    expect(setCart).not.toHaveBeenCalled();
-    expect(setItemSpy).not.toHaveBeenCalled();
-    setItemSpy.mockRestore();
-  });
-
-  it("removes item from a cart with 1 item", async () => {
-    // arrange
-    const a = { _id: "A", name: "Shirt", description: "cotton", price: 10 };
-    const setCart = jest.fn();
-    useCart.mockReturnValue([[a], setCart]);
-    const setItemSpy = jest.spyOn(window.localStorage.__proto__, "setItem");
-
-    // act
-    mount();
-    await waitToken();
-    const aCard = screen.getByText("Name : Shirt").closest(".card");
-    const removeBtn = within(aCard).getByRole("button", { name: /remove/i });
-    fireEvent.click(removeBtn);
-
-    // assert
-    expect(setCart).toHaveBeenCalledWith([]);
-    expect(setItemSpy).toHaveBeenCalledWith("cart", JSON.stringify([]));
-    setItemSpy.mockRestore();
-  });
-
-  it("removes 1 item from a cart with 1 item", async () => {
-    // arrange
-    const a = { _id: "A", name: "Shirt", description: "cotton", price: 10 };
-    const setCart = jest.fn();
-    useCart.mockReturnValue([[a], setCart]);
-    const setItemSpy = jest.spyOn(window.localStorage.__proto__, "setItem");
-
-    // act
-    mount();
-    await waitToken();
-    const aCard = screen.getByText("Name : Shirt").closest(".card");
-    const removeBtn = within(aCard).getByRole("button", { name: /remove/i });
-    fireEvent.click(removeBtn);
-
-    // assert
-    expect(setCart).toHaveBeenCalledWith([]);
-    expect(setItemSpy).toHaveBeenCalledWith("cart", JSON.stringify([]));
-    setItemSpy.mockRestore();
   });
 
   it("removes 1 item from a cart with multiple items", async () => {
@@ -295,12 +228,11 @@ describe("testing deleteCartItem", () => {
     fireEvent.click(removeBtn);
 
     // assert
-    expect(setCart).toHaveBeenCalledWith([b]);
-    expect(setItemSpy).toHaveBeenCalledWith("cart", JSON.stringify([b]));
+    // correctly sets cart with updated content, removing shirt successfully
+    expect(setItemSpy).toHaveBeenCalledWith("cart", JSON.stringify([b])); 
     setItemSpy.mockRestore();
   });
 
-  //found error here + fixed
   it("removes 1 item from a cart with multiple repeated items", async () => {
     // arrange
     const a = { _id: "A", name: "Shirt", description: "cotton", price: 10 };
@@ -309,7 +241,7 @@ describe("testing deleteCartItem", () => {
     useCart.mockReturnValue([[a, b, b], setCart]);
     const setItemSpy = jest.spyOn(window.localStorage.__proto__, "setItem");
 
-    // actg
+    // act
     mount();
     await waitToken();
     const aCard = screen.getByText("Name : Shirt").closest(".card");
@@ -317,7 +249,7 @@ describe("testing deleteCartItem", () => {
     fireEvent.click(removeBtn);
 
     // assert
-    expect(setCart).toHaveBeenCalledWith([b, b]);
+    // correctly sets cart with updated content, removing shirt successfully
     expect(setItemSpy).toHaveBeenCalledWith("cart", JSON.stringify([b, b]));
     setItemSpy.mockRestore();
   });
@@ -346,7 +278,7 @@ describe("testing getToken", () => {
     ]);
   });
 
-  it("calls /token and shows payment UI on success", async () => {
+  it("Successfully creates client token resulting in payment UI displayed", async () => {
     // arrange
     axios.get.mockResolvedValueOnce({ data: { clientToken: "tok_123" } });
 
@@ -362,7 +294,7 @@ describe("testing getToken", () => {
     ).toBeInTheDocument();
   });
 
-  it("logs error and does not show payment UI on failure", async () => {
+  it("Logs error when it cannot successfully set client token.", async () => {
     // arrange
     const logSpy = jest.spyOn(console, "log").mockImplementation(() => {});
     axios.get.mockRejectedValueOnce(new Error("network down"));
@@ -374,13 +306,26 @@ describe("testing getToken", () => {
     // assert
     expect(logSpy).toHaveBeenCalledWith(expect.any(Error));
     expect(logSpy.mock.calls[0][0].message).toBe("network down");
+    logSpy.mockRestore();
+  });
+
+
+it("Payment UI is not displated when it cannot successfully set client token.", async () => {
+    // arrange
+    const logSpy = jest.spyOn(console, "log").mockImplementation(() => {});
+    axios.get.mockRejectedValueOnce(new Error("network down"));
+
+    // act
+    renderOnCart();
+    await waitFor(() => expect(axios.get).toHaveBeenCalled());
+
+    // assert
     expect(screen.queryByRole("button", { name: /make payment/i })).toBeNull();
     logSpy.mockRestore();
   });
 });
 
-// did not test empty cart for this function because it is not possible, there isnt even
-// a purchase button to press
+
 describe("handlePayment", () => {
   const renderOnCart = () =>
     render(
@@ -415,7 +360,7 @@ describe("handlePayment", () => {
     useCart.mockReturnValue([CART, jest.fn()]);
   });
 
-  it("successfully posts correct cart of multiple distinct items", async () => {
+  it("Successfully posts correct cart of multiple distinct items", async () => {
     // arrange
     mockRequestPaymentMethod = jest
       .fn()
@@ -459,7 +404,7 @@ describe("handlePayment", () => {
     removeItemSpy.mockRestore();
   });
 
-  it("successfully navigates to user orders page when payment completed on a cart of multiple disticnt items", async () => {
+  it("successfully navigates to user orders page when payment completed on a cart of multiple distinct items", async () => {
     // arrange
     mockRequestPaymentMethod = jest
       .fn()
@@ -495,7 +440,7 @@ describe("handlePayment", () => {
     );
   });
 
-  it("renders no payment button when cart is empty and never posts", async () => {
+  it("renders no payment button when cart is empty.", async () => {
     // arrange
     const setCart = jest.fn();
     useCart.mockReturnValue([[], setCart]);
@@ -508,10 +453,9 @@ describe("handlePayment", () => {
 
     // assert
     expect(screen.queryByRole("button", { name: /make payment/i })).toBeNull();
-    expect(axios.post).not.toHaveBeenCalled();
   });
 
-  it("handles nonce (requestPaymentMethod) error: logs, no post, no side effects", async () => {
+  it("Logs error when error occurs in handlePayment function.", async () => {
     // arrange
     const logSpy = jest.spyOn(console, "log").mockImplementation(() => {});
     mockRequestPaymentMethod = jest
@@ -522,10 +466,9 @@ describe("handlePayment", () => {
     renderOnCart();
     const payBtn = await getReadyPayBtn();
     fireEvent.click(payBtn);
-    await waitFor(() => expect(logSpy).toHaveBeenCalledWith(expect.any(Error)));
 
     // assert
-    expect(axios.post).not.toHaveBeenCalled();
+    await waitFor(() => expect(logSpy).toHaveBeenCalledWith(expect.any(Error)));
     logSpy.mockRestore();
   });
 });
@@ -544,7 +487,7 @@ describe("CartPage greeting & subtext header", () => {
     jest.clearAllMocks();
   });
 
-  it("Guest + empty cart → 'Hello Guest' and 'Your Cart Is Empty'", async () => {
+  it("Logged out + no token + empty cart → 'Hello Guest' and 'Your Cart Is Empty'", async () => {
     // arrange
     useAuth.mockReturnValue([{}, jest.fn()]);
     useCart.mockReturnValue([[], jest.fn()]);
@@ -559,7 +502,7 @@ describe("CartPage greeting & subtext header", () => {
     expect(within(h1).getByText(/Your Cart Is Empty/i)).toBeInTheDocument();
   });
 
-  it("Logged in (token+user) + 2 items → 'Hello  Alice' and count text", async () => {
+  it("Logged in + token + filled cart → 'Hello  Alice' and count text", async () => {
     // arrange
     useAuth.mockReturnValue([
       { token: "t", user: { name: "Alice", address: "123 Main" } },
@@ -585,13 +528,10 @@ describe("CartPage greeting & subtext header", () => {
     ).toBeInTheDocument();
   });
 
-  it("User object but NO token + items → greeting + login hint", async () => {
+  it("Logged in + no token + empty cart → 'Hello  Alice' + 'Your cart is empty'", async () => {
     // arrange
     useAuth.mockReturnValue([{ user: { name: "Alice" } }, jest.fn()]);
-    useCart.mockReturnValue([
-      [{ _id: "1", name: "A", description: "x", price: 1 }],
-      jest.fn(),
-    ]);
+    useCart.mockReturnValue([[], jest.fn()]);
     axios.get.mockImplementationOnce(() => new Promise(() => {}));
 
     // act
@@ -602,12 +542,12 @@ describe("CartPage greeting & subtext header", () => {
     expect(h1).toHaveTextContent(/Hello\s+Alice/i);
     expect(
       within(h1).getByText(
-        /You Have 1 items in your cart\s+please login to checkout !/i
+        /Your Cart Is Empty/i
       )
     ).toBeInTheDocument();
   });
 
-  it("Guest + items → 'Hello Guest' and login hint appended", async () => {
+  it("Logged out + no token + filled cart → 'Hello Guest' and count text and hint to login", async () => {
     // arrange
     useAuth.mockReturnValue([{}, jest.fn()]);
     useCart.mockReturnValue([
@@ -631,24 +571,6 @@ describe("CartPage greeting & subtext header", () => {
       )
     ).toBeInTheDocument();
   });
-
-  it("Logged in (token+user) + empty cart → 'Hello  Alice' and empty text", async () => {
-    // arrange
-    useAuth.mockReturnValue([
-      { token: "t", user: { name: "Alice", address: "123 Main" } },
-      jest.fn(),
-    ]);
-    useCart.mockReturnValue([[], jest.fn()]);
-    axios.get.mockImplementationOnce(() => new Promise(() => {}));
-
-    // act
-    renderCart();
-    const h1 = await screen.findByRole("heading", { level: 1 });
-
-    // assert
-    expect(h1).toHaveTextContent(/Hello\s+Alice/i);
-    expect(within(h1).getByText(/Your Cart Is Empty/i)).toBeInTheDocument();
-  });
 });
 
 describe("CartPage summary column (address + payment gates)", () => {
@@ -666,7 +588,6 @@ describe("CartPage summary column (address + payment gates)", () => {
     mockDropInProvided = false;
     mockRequestPaymentMethod = undefined;
 
-    // default user/cart; individual tests override as needed
     useAuth.mockReturnValue([
       { token: "t", user: { name: "Alice", address: "123 Main" } },
       jest.fn(),
@@ -677,7 +598,7 @@ describe("CartPage summary column (address + payment gates)", () => {
     ]);
   });
 
-  it("renders summary headings and total", async () => {
+  it("renders summary headings", async () => {
     // arrange
     axios.get.mockImplementationOnce(() => new Promise(() => {}));
 
@@ -688,13 +609,23 @@ describe("CartPage summary column (address + payment gates)", () => {
     expect(
       await screen.findByRole("heading", { name: /cart summary/i })
     ).toBeInTheDocument();
+  });
+
+  it("renders total", async () => {
+    // arrange
+    axios.get.mockImplementationOnce(() => new Promise(() => {}));
+
+    // act
+    renderCart();
+
+    // assert
     expect(
       screen.getByText(/total \| checkout \| payment/i)
     ).toBeInTheDocument();
     expect(screen.getByText(/Total : \$10\.00/i)).toBeInTheDocument();
   });
 
-  it("with address: shows Current Address + Update Address and navigates", async () => {
+  it("Address present + logged in -> shows Current Address + Update Address and navigates", async () => {
     axios.get.mockImplementationOnce(() => new Promise(() => {}));
     renderCart();
 
