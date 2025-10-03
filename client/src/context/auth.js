@@ -9,9 +9,10 @@ const AuthProvider = ({ children }) => {
         token: "",
     });
 
-    //default axios
+    // Set axios default header
     axios.defaults.headers.common["Authorization"] = auth?.token;
 
+    // useEffect to load initial data from localStorage
     useEffect(() => {
        const data = localStorage.getItem("auth");
        if (data) {
@@ -24,6 +25,14 @@ const AuthProvider = ({ children }) => {
        }
        //eslint-disable-next-line
     }, []);
+
+    // useEffect to save data to localStorage whenever auth state changes
+    useEffect(() => {
+        if (auth.token) {
+            localStorage.setItem("auth", JSON.stringify(auth));
+        }
+    }, [auth]);
+
     return (
         <AuthContext.Provider value={[auth, setAuth]}>
             {children}
@@ -34,4 +43,4 @@ const AuthProvider = ({ children }) => {
 // custom hook
 const useAuth = () => useContext(AuthContext);
 
-export {useAuth, AuthProvider};
+export { useAuth, AuthProvider };
