@@ -41,7 +41,7 @@ const CreateCategory = () => {
       }
     } catch (error) {
       console.log(error);
-      toast.error("Something wwent wrong when fetching category");
+      toast.error("Something went wrong when fetching category");
     }
   };
 
