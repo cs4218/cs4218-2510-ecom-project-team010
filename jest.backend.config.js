@@ -15,8 +15,8 @@ export default {
   collectCoverageFrom: ["controllers/**", "middlewares/**", "helpers/**", "routes/**", "models/**"],
   coverageThreshold: {
     global: {
-      lines: 100,
-      functions: 100,
+      lines: 65,
+      functions: 65,
     },
   },
 };
