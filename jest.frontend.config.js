@@ -43,6 +43,7 @@ export default {
     "client/src/components/UserMenu.js",
     "client/src/pages/Policy.js",
     "client/src/pages/user/Dashboard.js",
+    "client/src/pages/user/Orders.js",
     "client/src/pages/admin/**",
     "client/src/context/cart.js",
     "client/src/components/AdminMenu.js",
