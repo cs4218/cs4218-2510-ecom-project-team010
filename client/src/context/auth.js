@@ -12,7 +12,7 @@ const AuthProvider = ({ children }) => {
     // Set axios default header
     axios.defaults.headers.common["Authorization"] = auth?.token;
 
-    // useEffect to load initial data from localStorage
+    // useEffect to load initial data from localStorage on component mount
     useEffect(() => {
        const data = localStorage.getItem("auth");
        if (data) {
@@ -26,10 +26,12 @@ const AuthProvider = ({ children }) => {
        //eslint-disable-next-line
     }, []);
 
-    // useEffect to save data to localStorage whenever auth state changes
+    // useEffect to save or remove data from localStorage whenever auth state changes
     useEffect(() => {
         if (auth.token) {
             localStorage.setItem("auth", JSON.stringify(auth));
+        } else {
+            localStorage.removeItem("auth");
         }
     }, [auth]);
 
