@@ -125,7 +125,7 @@ export const productPhotoController = async (req, res) => {
   }
 };
 
-//delete controller
+// delete controller
 export const deleteProductController = async (req, res) => {
   try {
     await productModel.findByIdAndDelete(req.params.pid).select("-photo");
@@ -143,13 +143,13 @@ export const deleteProductController = async (req, res) => {
   }
 };
 
-//update products
+// update products
 export const updateProductController = async (req, res) => {
   try {
     const { name, description, price, category, quantity, shipping } =
       req.fields;
     const { photo } = req.files;
-    //alidation
+    //validation
     switch (true) {
       case !name:
         return res.status(400).send({ error: "Name is Required" });
@@ -349,11 +349,9 @@ export const brainTreePaymentController = async (req, res) => {
     const { nonce, cart } = req.body;
     let total = 0;
     cart.map((i) => {
-      // error here, add number
       total += Number(i.price);
     });
-    // error
-    // let newTransaction = . removed this because variabel is never used
+
     gateway.transaction.sale(
       {
         amount: total,
@@ -377,7 +375,6 @@ export const brainTreePaymentController = async (req, res) => {
     );
   } catch (error) {
     console.log(error);
-    // error as did not return status
     return res.status(500).send({ error: 'Unexpected error during payment' });
   }
 };

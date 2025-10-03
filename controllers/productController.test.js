@@ -1,10 +1,10 @@
+// Note: these test cases are genereated with the help of AI
+
 import fs from "fs";
 import slugify from "slugify";
 import productModel from "../models/productModel.js";
 
-// Note: these test cases are genereated with the help of AI
 
-// arrange
 jest.mock("../models/productModel.js", () => {
   const productModelMock = jest.fn(() => ({ photo: {}, save: jest.fn() }));
   productModelMock.findByIdAndDelete = jest.fn(() => ({
@@ -51,7 +51,7 @@ jest.mock("dotenv", () => ({
 
 
 describe("Testing createProductController function.", () => {
-  //arrange
+
   let createProductController;
   beforeAll(async () => {
     ({ createProductController } = await import(

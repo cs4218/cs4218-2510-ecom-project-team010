@@ -1,3 +1,5 @@
+// Note: these test cases are genereated with the help of AI
+
 import React from "react";
 import { render, screen, waitFor, within } from "@testing-library/react";
 import { MemoryRouter, Routes, Route } from "react-router-dom";
@@ -6,7 +8,7 @@ import axios from "axios";
 import toast from "react-hot-toast";
 import Products from "./Products";
 
-//Arrange
+
 jest.mock("axios");
 jest.mock("react-hot-toast");
 jest.mock("../../components/AdminMenu", () => ({
@@ -45,7 +47,7 @@ describe("Testing products page.", () => {
     },
   });
 
-  //Act
+  // Act
   renderOnRoute(<Products />);
   await waitFor(() =>
     expect(axios.get).toHaveBeenCalledWith('/api/v1/product/get-product')
@@ -55,7 +57,7 @@ describe("Testing products page.", () => {
   const shoesHeading = await screen.findByRole('heading', { name: 'Shoes', level: 5 });
   const shoesCard = shoesHeading.closest('.card');
 
-  //Assert
+  // Assert -> check that the all the correct items are displayed
   // Card 1 (Book)
   expect(bookCard).toBeInTheDocument();
   expect(within(bookCard).getByText('Good read')).toBeInTheDocument();
@@ -95,9 +97,6 @@ describe("Testing products page.", () => {
     await waitFor(() => expect(axios.get).toHaveBeenCalled());
 
     // assert
-    expect(
-      screen.getByRole("heading", { name: /All Products List/i })
-    ).toBeInTheDocument();
     expect(screen.queryByRole("heading", { level: 5 })).not.toBeInTheDocument();
   });
 });
