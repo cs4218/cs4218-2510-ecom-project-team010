@@ -151,7 +151,7 @@ Github Workflow Submission: [URL](https://github.com/cs4218/cs4218-2510-ecom-pro
 
 ## Members Contributions
 
-### Lee Yi Lin 
+### Lee Yi Lin (test cases were made with the aid of AI)
 1. Admin Actions
 
 - `components/Form/CategoryForm.js`
@@ -173,7 +173,35 @@ Github Workflow Submission: [URL](https://github.com/cs4218/cs4218-2510-ecom-pro
 - `controllers/categoryController.js`
 - `models/categoryModel.js`
 
-### Janna Leong 
+### Janna Leong (test cases were made with the aid of AI)
+1. Admin View Orders
+
+- `pages/admin/AdminOrders.js`
+
+2. Admin View Products
+
+- `pages/admin/Products.js `
+- `controllers/productController.js`
+   - `createProductController`
+   - `deleteProductController`
+   - `updateProductController` 
+
+3. Policy 
+
+- `pages/Policy.js`
+
+4. Cart
+
+- `context/cart.js`
+- `pages/CartPage.js`
+
+5. Payment
+
+- `controllers/productController.js`
+   - `braintreeTokenController`
+   - `brainTreePaymentController`
+
+
 
 ### Althea Chua 
 

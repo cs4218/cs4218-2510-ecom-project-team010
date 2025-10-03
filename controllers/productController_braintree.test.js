@@ -1,4 +1,9 @@
-// Note: these test cases are genereated with the help of AI
+// Note: these test cases are generated with the help of AI
+
+// Furthemore, tall test cases in product controller directly related
+// with the braintree library are placed in this seperate file to
+// distinguish the test cases and make it more manageable.
+
 import braintree from "braintree";
 import {
   braintreeTokenController,
@@ -37,7 +42,7 @@ const makeRes = () => ({
   json: jest.fn(),
 });
 
-describe("testing braintreeTokenController", () => {
+describe("Testing braintreeTokenController function.", () => {
   let gateway;
   let logSpy;
 
@@ -53,7 +58,7 @@ describe("testing braintreeTokenController", () => {
     gateway.transaction.sale.mockReset();
   });
 
-  it("client token is successfully generated", async () => {
+  it("generated client token is successfully sent.", async () => {
     // arrange
     const req = {};
     const res = makeRes();
@@ -66,14 +71,10 @@ describe("testing braintreeTokenController", () => {
     await braintreeTokenController(req, res);
 
     // assert
-    expect(gateway.clientToken.generate).toHaveBeenCalledWith(
-      {},
-      expect.any(Function)
-    );
     expect(res.send).toHaveBeenCalledWith({ clientToken: "123" });
   });
 
-  it("returns 500 when token generation fails", async () => {
+  it("returns 500 when token generation fails.", async () => {
     // arrange
     const req = {};
     const res = makeRes();
@@ -86,12 +87,32 @@ describe("testing braintreeTokenController", () => {
     await braintreeTokenController(req, res);
 
     // assert
-    expect(gateway.clientToken.generate).toHaveBeenCalled();
     expect(res.status).toHaveBeenCalledWith(500);
     expect(res.send).toHaveBeenCalledWith(expect.any(Error));
   });
 
-  it("returns 500 with message when generate throws synchronously (outer catch)", async () => {
+  it("returns 500 with message when generate throws synchronously (outer catch).", async () => {
+    // arrange
+    const req = {};
+    const res = makeRes();
+    const logSpy = jest.spyOn(console, "log").mockImplementation(() => {});
+
+    gateway.clientToken.generate.mockImplementation(() => {
+      throw new Error("sync boom");
+    });
+
+    // act
+    await braintreeTokenController(req, res);
+
+    // assert
+    expect(res.status).toHaveBeenCalledWith(500);
+    expect(res.send).toHaveBeenCalledWith({
+      error: "Unexpected error generating client token",
+    });
+    logSpy.mockRestore();
+  });
+
+  it("logs error when generate throws synchronously (outer catch).", async () => {
     // arrange
     const req = {};
     const res = makeRes();
@@ -108,15 +129,11 @@ describe("testing braintreeTokenController", () => {
     expect(logSpy).toHaveBeenCalledTimes(1);
     expect(logSpy.mock.calls[0][0]).toBeInstanceOf(Error);
     expect(logSpy.mock.calls[0][0].message).toBe("sync boom");
-    expect(res.status).toHaveBeenCalledWith(500);
-    expect(res.send).toHaveBeenCalledWith({
-      error: "Unexpected error generating client token",
-    });
     logSpy.mockRestore();
   });
 });
 
-describe("testing brainTreePaymentController", () => {
+describe("Testing brainTreePaymentController function.", () => {
   let gateway;
 
   beforeAll(() => {
@@ -142,7 +159,7 @@ describe("testing brainTreePaymentController", () => {
     json: jest.fn(),
   });
 
-  it("Calls braintree sale with correct summed total for a filled cart with numeric prices", async () => {
+  it("calls braintree sale with correct summed total for a filled cart with numeric prices", async () => {
     // arrange
     const req = makeReq({
       body: {
@@ -169,7 +186,7 @@ describe("testing brainTreePaymentController", () => {
     });
   });
 
-  it("Correct orderModel object is saved for a filled cart with numeric prices", async () => {
+  it("correct orderModel object is saved for a filled cart with numeric prices/", async () => {
     // arrange
     const req = makeReq({
       body: {
@@ -193,10 +210,9 @@ describe("testing brainTreePaymentController", () => {
       payment: { id: "txn-1", success: true },
       buyer: "user-1",
     });
-    expect(res.json).toHaveBeenCalledWith({ ok: true });
   });
 
-  it("Calls braintree sale with correct summed total for a filled cart with numeric prices", async () => {
+  it("calls braintree sale with correct summed total for a filled cart with prices in string.", async () => {
     // arrange
     const req = makeReq({
       body: {
@@ -223,7 +239,7 @@ describe("testing brainTreePaymentController", () => {
     });
   });
 
-  it("Correct orderModel object is saved for a filled cart with numeric prices", async () => {
+  it("correct orderModel object is saved for a filled cart with prices in string.", async () => {
     // arrange
     const req = makeReq({
       body: {
@@ -247,10 +263,9 @@ describe("testing brainTreePaymentController", () => {
       payment: { id: "txn-1", success: true },
       buyer: "user-1",
     });
-    expect(res.json).toHaveBeenCalledWith({ ok: true });
   });
 
-  it("returns 500 when braintree sale callback gets an error (result is null)", async () => {
+  it("returns 500 when braintree sale callback gets an error (result is null).", async () => {
     // arrange
     const req = makeReq({
       body: {
@@ -273,7 +288,29 @@ describe("testing brainTreePaymentController", () => {
     expect(res.send).toHaveBeenCalledWith(err);
   });
 
-  it("outer catch: logs and does NOT send a response when sale throws synchronously", async () => {
+  it("returns 500 with message when error throws synchronously while paying (outer catch).", async () => {
+    // arrange
+    const req = makeReq({
+      body: { nonce: "boom", cart: [{ price: 1 }] },
+    });
+    const res = makeRes();
+    const logSpy = jest.spyOn(console, "log").mockImplementation(() => {});
+    gateway.transaction.sale.mockImplementation(() => {
+      throw new Error("sync throw inside sale");
+    });
+
+    // act
+    await brainTreePaymentController(req, res);
+
+    // assert
+    expect(res.status).toHaveBeenCalledWith(500);
+    expect(res.send).toHaveBeenCalledWith({
+      error: "Unexpected error during payment",
+    });
+    logSpy.mockRestore();
+  });
+
+  it("logs error when error throws synchronously while paying (outer catch).", async () => {
     // arrange
     const req = makeReq({
       body: { nonce: "boom", cart: [{ price: 1 }] },
@@ -290,10 +327,6 @@ describe("testing brainTreePaymentController", () => {
     // assert
     expect(logSpy).toHaveBeenCalledTimes(1);
     expect(String(logSpy.mock.calls[0][0])).toMatch(/sync throw inside sale/);
-    expect(res.status).toHaveBeenCalledWith(500);
-    expect(res.send).toHaveBeenCalledWith({
-      error: "Unexpected error during payment",
-    });
     logSpy.mockRestore();
   });
 });

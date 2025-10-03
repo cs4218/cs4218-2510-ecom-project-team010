@@ -1,3 +1,5 @@
+// Note: these test cases are generated with the help of AI
+
 import React from "react";
 import {
   render,
@@ -11,9 +13,8 @@ import "@testing-library/jest-dom/extend-expect";
 import axios from "axios";
 import toast from "react-hot-toast";
 import CartPage from "./CartPage";
-// Note: these test cases are generated with the help of AI
 
-// arrange
+
 jest.mock("axios", () => ({
   __esModule: true,
   default: {

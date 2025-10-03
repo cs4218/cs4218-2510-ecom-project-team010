@@ -1,11 +1,10 @@
+// Note: these test cases are generated with the help of AI
+
 import React from "react";
 import { render, fireEvent, waitFor, screen } from "@testing-library/react";
 import "@testing-library/jest-dom/extend-expect";
 import { useCart, CartProvider } from "./cart.js";
 
-// Note: these test cases are generated with the help of AI
-
-// arrange
 
 // mimics a consumer purchasing an item by clicking an "add item" button.
 // consumer can also clear cart with the "clear cart" button.
@@ -43,7 +42,7 @@ window.matchMedia =
   };
 
 describe("Testing cart component.", () => {
-  //arrange
+
   beforeEach(() => {
     jest.clearAllMocks();
 

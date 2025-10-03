@@ -1,4 +1,5 @@
 // Note: these test cases are generated with the help of AI
+
 import React from "react";
 import {
   render,
@@ -15,7 +16,6 @@ import toast from "react-hot-toast";
 import { useAuth } from "../../context/auth";
 import AdminOrders from "./AdminOrders";
 
-// arrange
 jest.mock("axios", () => ({
   __esModule: true,
   default: {
@@ -128,7 +128,7 @@ async function renderAndWait(component = <AdminOrders />) {
   await screen.findByText(/All Orders/i);
 }
 
-describe("Testing AdminOrders", () => {
+describe("Testing AdminOrders.", () => {
   beforeEach(() => {
     jest.clearAllMocks();
     useAuth.mockReturnValue([{ token: "tok" }, jest.fn()]);
