@@ -200,6 +200,7 @@ describe("Given API error scenarios", () => {
 
     test("When category creation API fails with network error", async () => {
         axios.post.mockRejectedValue(new Error("Network Error"));
+        jest.spyOn(console, "log").mockImplementation(() => {}); // suppress logs
 
         render(<CreateCategory />);
 
@@ -218,6 +219,7 @@ describe("Given API error scenarios", () => {
 
     test("When category update API fails with network error", async () => {
         axios.put.mockRejectedValue(new Error("Network Error"));
+        jest.spyOn(console, "log").mockImplementation(() => {}); // suppress logs
 
         render(<CreateCategory />);
 
@@ -262,7 +264,7 @@ describe("Given API error scenarios", () => {
         render(<CreateCategory />);
 
         await waitFor(() => {
-            expect(toast.error).toHaveBeenCalledWith("Something wwent wrong when fetching category");
+            expect(toast.error).toHaveBeenCalledWith("Something went wrong when fetching category");
         });
     });
 

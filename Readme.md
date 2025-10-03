@@ -148,3 +148,35 @@ To begin unit testing with Jest in your project, follow these steps:
 
 ## CI Run URL (Milestone 1)
 Github Workflow Submission: [URL](https://github.com/cs4218/cs4218-2510-ecom-project-team010/actions)
+
+## Members Contributions
+
+### Lee Yi Lin 
+1. Admin Actions
+
+- `components/Form/CategoryForm.js`
+- `pages/admin/CreateCategory.js`
+- `pages/admin/CreateProduct.js`
+- `pages/admin/UpdateProduct.js`
+- `controllers/categoryController.js`
+
+2. Search
+
+- `components/Form/SearchInput.js`
+- `context/search.js`
+- `pages/Search.js`
+
+3. Category
+
+- `hooks/useCategory.js`
+- `pages/Categories.js`
+- `controllers/categoryController.js`
+- `models/categoryModel.js`
+
+### Janna Leong 
+
+### Althea Chua 
+
+### Yuan Jing
+
+### Miguel Foo 
