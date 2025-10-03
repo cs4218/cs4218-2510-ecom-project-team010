@@ -101,6 +101,22 @@ describe("Auth Controllers", () => {
                 });
             });
         });
+
+        describe("Given a database error occurs", () => {
+            it("When a user tries to register, Then a 500 error should be returned", async () => {
+                // Given
+                req.body = { name: "John Doe", email: "john@example.com", password: "password123", phone: "1234567890", address: "123 Main St", answer: "Test" };
+                const dbError = new Error("Database connection failed");
+                userModel.findOne.mockRejectedValue(dbError);
+
+                // When
+                await registerController(req, res);
+
+                // Then
+                expect(res.status).toHaveBeenCalledWith(500);
+                expect(res.send).toHaveBeenCalledWith(expect.objectContaining({ success: false, message: "Error registering user" }));
+            });
+        });
     });
 
     describe("loginController", () => {
@@ -139,6 +155,37 @@ describe("Auth Controllers", () => {
                 expect(res.send).toHaveBeenCalledWith({ success: false, message: "Email is not registerd" });
             });
         });
+
+        describe("Given a user provides an incorrect password", () => {
+            it("When they try to log in, Then an 'Invalid Password' error should be returned", async () => {
+                // Given
+                const user = { _id: "userId123", password: "hashedPassword123" };
+                req.body = { email: "john@example.com", password: "wrongPassword" };
+                userModel.findOne.mockResolvedValue(user);
+                comparePassword.mockResolvedValue(false);
+
+                // When
+                await loginController(req, res);
+
+                // Then
+                expect(res.status).toHaveBeenCalledWith(200);
+                expect(res.send).toHaveBeenCalledWith({ success: false, message: "Invalid Password" });
+            });
+        });
+
+        describe("Given a request is missing email or password", () => {
+            it("When they try to log in, Then a 404 error should be returned", async () => {
+                // Given
+                req.body = { email: "john@example.com" }; // Missing password
+
+                // When
+                await loginController(req, res);
+
+                // Then
+                expect(res.status).toHaveBeenCalledWith(404);
+                expect(res.send).toHaveBeenCalledWith({ success: false, message: "Invalid email or password" });
+            });
+        });
     });
 
     describe("forgotPasswordController", () => {
@@ -162,6 +209,22 @@ describe("Auth Controllers", () => {
                 expect(res.send).toHaveBeenCalledWith({ success: true, message: "Password Reset Successfully" });
             });
         });
+
+
+        describe("Given a user provides an incorrect email or answer", () => {
+            it("When they try to reset the password, Then a 404 error should be returned", async () => {
+                // Given
+                req.body = { email: "wrong@example.com", answer: "Wrong", newPassword: "newPassword123" };
+                userModel.findOne.mockResolvedValue(null);
+
+                // When
+                await forgotPasswordController(req, res);
+
+                // Then
+                expect(res.status).toHaveBeenCalledWith(404);
+                expect(res.send).toHaveBeenCalledWith({ success: false, message: "Wrong Email Or Answer" });
+            });
+        });
     });
 
     describe("updateProfileController", () => {
@@ -181,6 +244,20 @@ describe("Auth Controllers", () => {
                 expect(userModel.findByIdAndUpdate).toHaveBeenCalledWith("userId123", expect.any(Object), { new: true });
                 expect(res.status).toHaveBeenCalledWith(200);
                 expect(res.send).toHaveBeenCalledWith(expect.objectContaining({ success: true, message: "Profile updated successfully" }));
+            });
+        });
+
+        describe("Given a user provides a password shorter than 6 characters", () => {
+            it("When they update their profile, Then an error should be returned", async () => {
+                // Given
+                req.body = { password: "123" };
+                userModel.findById.mockResolvedValue({ _id: "userId123" });
+
+                // When
+                await updateProfileController(req, res);
+
+                // Then
+                expect(res.json).toHaveBeenCalledWith({ error: "Passsword is required and 6 character long" });
             });
         });
     });
@@ -204,5 +281,75 @@ describe("Auth Controllers", () => {
                 expect(res.json).toHaveBeenCalledWith(mockOrders);
             });
         });
+
+        describe("Given a database error occurs", () => {
+            it("When fetching orders, Then a 500 error should be returned", async () => {
+                // Given
+                const dbError = new Error("Database connection failed");
+                const failingQuery = {
+                    populate: jest.fn().mockRejectedValue(dbError),
+                };
+                orderModel.find.mockReturnValue({
+                    populate: jest.fn().mockReturnValue(failingQuery),
+                });
+                
+                // When
+                await getOrdersController(req, res);
+
+                // Then
+                expect(res.status).toHaveBeenCalledWith(500);
+                expect(res.send).toHaveBeenCalledWith(expect.objectContaining({ message: "Error while getting orders" }));
+            });
+        });
+    });
+
+    describe("getAllOrdersController", () => {
+        describe("Given an admin is logged in", () => {
+            it("When they fetch all orders, Then a list of all orders should be returned", async () => {
+                // Given
+                const mockOrders = [{ _id: "order1" }, { _id: "order2" }];
+                const query = { populate: jest.fn().mockReturnThis(), sort: jest.fn().mockResolvedValue(mockOrders) };
+                orderModel.find.mockReturnValue(query);
+
+                // When
+                await getAllOrdersController(req, res);
+
+                // Then
+                expect(orderModel.find).toHaveBeenCalledWith({});
+                expect(res.json).toHaveBeenCalledWith(mockOrders);
+            });
+        });
+    });
+
+    describe("orderStatusController", () => {
+        describe("Given an admin provides a valid order ID and status", () => {
+            it("When they update the order status, Then the updated order should be returned", async () => {
+                // Given
+                req.params.orderId = "orderId123";
+                req.body.status = "Shipped";
+                const updatedOrder = { _id: "orderId123", status: "Shipped" };
+                orderModel.findByIdAndUpdate.mockResolvedValue(updatedOrder);
+
+                // When
+                await orderStatusController(req, res);
+
+                // Then
+                expect(orderModel.findByIdAndUpdate).toHaveBeenCalledWith("orderId123", { status: "Shipped" }, { new: true });
+                expect(res.json).toHaveBeenCalledWith(updatedOrder);
+            });
+        });
+    });
+
+    describe("testController", () => {
+        describe("Given a request to the test route", () => {
+            it("When the controller is called, Then it should send a success message", () => {
+                // When
+                testController(req, res);
+
+                // Then
+                expect(res.send).toHaveBeenCalledWith("Protected Routes");
+            });
+        });
     });
 });
+
