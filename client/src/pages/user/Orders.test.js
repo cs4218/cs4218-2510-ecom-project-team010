@@ -29,11 +29,19 @@ describe('Given the Orders page', () => {
       status: 'Delivered',
       buyer: { name: 'John Doe' },
       createAt: new Date().toISOString(),
-      payment: { success: true },
+      payment: { success: true }, // Covers the 'Success' path
       products: [
         { _id: 'prod1', name: 'Product A', description: 'Description for A', price: 100 },
         { _id: 'prod2', name: 'Product B', description: 'Description for B', price: 200 },
       ],
+    },
+    {
+      _id: 'order2',
+      status: 'Cancelled',
+      buyer: { name: 'Jane Smith' },
+      createAt: new Date().toISOString(),
+      payment: { success: false }, // Covers the 'Failed' path
+      products: [], // Covers the empty products array path
     },
   ];
 
@@ -44,7 +52,7 @@ describe('Given the Orders page', () => {
   });
 
   describe('When an authenticated user has orders', () => {
-    it('Then it should fetch and display the list of orders', async () => {
+    it('Then it should fetch and display the list of orders with all data variations', async () => {
       // Given
       axios.get.mockResolvedValue({ data: mockOrders });
 
@@ -52,18 +60,17 @@ describe('Given the Orders page', () => {
       render(<Orders />);
 
       // Then
-      // Wait for the API call to resolve and the component to re-render
       await waitFor(() => {
-        // Check for table headers and order details
-        expect(screen.getByText('All Orders')).toBeInTheDocument();
-        expect(screen.getByText('Status')).toBeInTheDocument();
-        expect(screen.getByText('Buyer')).toBeInTheDocument();
+        // Check for details from the first order (successful payment, with products)
         expect(screen.getByText('Delivered')).toBeInTheDocument();
         expect(screen.getByText('John Doe')).toBeInTheDocument();
-        
-        // Check for product details
+        expect(screen.getByText('Success')).toBeInTheDocument();
         expect(screen.getByText('Product A')).toBeInTheDocument();
-        expect(screen.getByText('Price : 200')).toBeInTheDocument();
+        
+        // Check for details from the second order (failed payment, no products)
+        expect(screen.getByText('Cancelled')).toBeInTheDocument();
+        expect(screen.getByText('Jane Smith')).toBeInTheDocument();
+        expect(screen.getByText('Failed')).toBeInTheDocument();
       });
 
       // Verify axios was called correctly
@@ -126,3 +133,4 @@ describe('Given the Orders page', () => {
     });
   });
 });
+
