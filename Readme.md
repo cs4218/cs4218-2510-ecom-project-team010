@@ -151,7 +151,7 @@ Github Workflow Submission: [URL](https://github.com/cs4218/cs4218-2510-ecom-pro
 
 ## Members Contributions
 
-### Lee Yi Lin 
+### Lee Yi Lin (test cases were made with the aid of AI)
 1. Admin Actions
 
 - `components/Form/CategoryForm.js`
