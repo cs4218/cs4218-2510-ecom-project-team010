@@ -1,4 +1,4 @@
-// Note: these test cases are genereated with the help of AI
+// Note: these test cases are generated with the help of AI
 
 import React from "react";
 import { render, screen, waitFor, within } from "@testing-library/react";
