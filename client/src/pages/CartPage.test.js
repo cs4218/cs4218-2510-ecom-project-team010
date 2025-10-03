@@ -15,7 +15,6 @@ import toast from "react-hot-toast";
 import CartPage from "./CartPage";
 
 
-// arrange
 jest.mock("axios", () => ({
   __esModule: true,
   default: {
