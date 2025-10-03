@@ -248,7 +248,7 @@ describe("Auth Controllers", () => {
         });
 
         describe("Given a user provides a password shorter than 6 characters", () => {
-            it("When they update their profile, Then an error should be returned", async () => {
+            it("When they update their profile, Then a 400 error should be returned", async () => {
                 // Given
                 req.body = { password: "123" };
                 userModel.findById.mockResolvedValue({ _id: "userId123" });
@@ -257,7 +257,11 @@ describe("Auth Controllers", () => {
                 await updateProfileController(req, res);
 
                 // Then
-                expect(res.json).toHaveBeenCalledWith({ error: "Passsword is required and 6 character long" });
+                expect(res.status).toHaveBeenCalledWith(400);
+                expect(res.send).toHaveBeenCalledWith({
+                    success: false,
+                    message: "Password is required and must be at least 6 characters long",
+                });
             });
         });
     });
