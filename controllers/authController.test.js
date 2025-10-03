@@ -66,7 +66,7 @@ describe("Auth Controllers", () => {
                 expect(res.status).toHaveBeenCalledWith(201);
                 expect(res.send).toHaveBeenCalledWith(expect.objectContaining({
                     success: true,
-                    message: "User Registered Successfully",
+                    message: "User registered successfully",
                 }));
             });
         });
@@ -97,7 +97,7 @@ describe("Auth Controllers", () => {
                 expect(res.status).toHaveBeenCalledWith(200);
                 expect(res.send).toHaveBeenCalledWith({
                     success: false,
-                    message: "Already Register please login",
+                    message: "User with that email already exists, please login",
                 });
             });
         });
@@ -180,7 +180,7 @@ describe("Auth Controllers", () => {
                 expect(userModel.findById).toHaveBeenCalledWith("userId123");
                 expect(userModel.findByIdAndUpdate).toHaveBeenCalledWith("userId123", expect.any(Object), { new: true });
                 expect(res.status).toHaveBeenCalledWith(200);
-                expect(res.send).toHaveBeenCalledWith(expect.objectContaining({ success: true, message: "Profile Updated SUccessfully" }));
+                expect(res.send).toHaveBeenCalledWith(expect.objectContaining({ success: true, message: "Profile updated successfully" }));
             });
         });
     });
