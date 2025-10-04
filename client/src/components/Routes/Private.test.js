@@ -23,6 +23,11 @@ const mockUseAuth = useAuth;
 describe('PrivateRoute', () => {
     beforeEach(() => {
         jest.clearAllMocks();
+        consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+    });
+
+    afterEach(() => {
+        consoleSpy.mockRestore();
     });
 
     const renderPrivateRoute = () => {
@@ -36,6 +41,26 @@ describe('PrivateRoute', () => {
     describe('when user has no token', () => {
         it('should render Spinner when auth token is null', () => {
             mockUseAuth.mockReturnValue([{ token: null }, jest.fn()]);
+
+            renderPrivateRoute();
+
+            expect(screen.getByTestId('spinner')).toBeInTheDocument();
+            expect(screen.queryByTestId('outlet')).not.toBeInTheDocument();
+            expect(mockedAxios.get).not.toHaveBeenCalled();
+        });
+
+        it('should render Spinner when auth token is undefined', () => {
+            mockUseAuth.mockReturnValue([{ token: undefined }, jest.fn()]);
+
+            renderPrivateRoute();
+
+            expect(screen.getByTestId('spinner')).toBeInTheDocument();
+            expect(screen.queryByTestId('outlet')).not.toBeInTheDocument();
+            expect(mockedAxios.get).not.toHaveBeenCalled();
+        });
+
+        it('should render Spinner when auth is empty object', () => {
+            mockUseAuth.mockReturnValue([{}, jest.fn()]);
 
             renderPrivateRoute();
 
@@ -87,6 +112,34 @@ describe('PrivateRoute', () => {
             // Should still show spinner after failed auth
             expect(screen.getByTestId('spinner')).toBeInTheDocument();
             expect(screen.queryByTestId('outlet')).not.toBeInTheDocument();
+        });
+    });
+
+    describe('error handling', () => {
+        it('should render Spinner when API call fails with error', async () => {
+            mockUseAuth.mockReturnValue([{ token: 'valid-token' }, jest.fn()]);
+            const error = new Error('Error');
+            mockedAxios.get.mockRejectedValueOnce(error);
+
+            renderPrivateRoute();
+
+            // Initially shows spinner
+            expect(screen.getByTestId('spinner')).toBeInTheDocument();
+
+            // Wait for API call to fail
+            await waitFor(() => {
+                expect(mockedAxios.get).toHaveBeenCalled();
+            });
+
+            // Should still show spinner after error
+            expect(screen.getByTestId('spinner')).toBeInTheDocument();
+            expect(screen.queryByTestId('outlet')).not.toBeInTheDocument();
+            
+            // Verify error was logged
+            expect(consoleSpy).toHaveBeenCalledWith(
+                'Auth check failed:',
+                error
+            );
         });
     });
 });

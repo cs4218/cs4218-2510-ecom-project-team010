@@ -46,4 +46,9 @@ describe('User Model Test', () => {
         expect(savedUser.createdAt).toBeDefined(); 
         expect(savedUser.updatedAt).toBeDefined();
     });
+
+    it('should have unique constraint on email', () => {
+            const emailPath = User.schema.path('email');
+            expect(emailPath.options.unique).toBe(true);
+        });
 });
