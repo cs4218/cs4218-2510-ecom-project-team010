@@ -317,6 +317,18 @@ describe('Users Component', () => {
     });
 
     describe('Error Handling', () => {
+        it('should not display any data when data.success is false', async () => {
+            mockedAxios.get.mockResolvedValueOnce({
+                data: { success: false}
+            });
+
+            renderUsers();
+
+            await waitFor(() => {
+                expect(screen.getByText('No users found')).toBeInTheDocument();
+            });
+        });
+
         it('should handle API error and show toast', async () => {
             const error = new Error('Network Error');
             mockedAxios.get.mockRejectedValueOnce(error);
