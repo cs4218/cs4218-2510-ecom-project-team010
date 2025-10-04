@@ -216,14 +216,15 @@ export const getOrdersController = async (req, res) => {
     });
   }
 };
+
 //orders
 export const getAllOrdersController = async (req, res) => {
   try {
     const orders = await orderModel
       .find({})
-      .populate("products", "-photo")
       .populate("buyer", "name")
-      .sort({ createdAt: "-1" });
+      .populate("products", "-photo")
+      .sort({ createdAt: -1 });
     res.json(orders);
   } catch (error) {
     console.log(error);
@@ -234,6 +235,8 @@ export const getAllOrdersController = async (req, res) => {
     });
   }
 };
+
+
 
 //order status
 export const orderStatusController = async (req, res) => {

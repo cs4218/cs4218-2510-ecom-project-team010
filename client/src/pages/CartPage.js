@@ -22,7 +22,8 @@ const CartPage = () => {
     try {
       let total = 0;
       cart?.map((item) => {
-        total = total + item.price;
+        // add Number()
+        total = total + Number(item.price);
       });
       return total.toLocaleString("en-US", {
         style: "currency",
@@ -32,7 +33,7 @@ const CartPage = () => {
       console.log(error);
     }
   };
-  //detele item
+  //delete item
   const removeCartItem = (pid) => {
     try {
       let myCart = [...cart];
@@ -83,9 +84,7 @@ const CartPage = () => {
         <div className="row">
           <div className="col-md-12">
             <h1 className="text-center bg-light p-2 mb-1">
-              {!auth?.user
-                ? "Hello Guest"
-                : `Hello  ${auth?.token && auth?.user?.name}`}
+              {!auth?.user ? "Hello Guest" : `Hello ${auth?.user?.name ?? ""}`}
               <p className="text-center">
                 {cart?.length
                   ? `You Have ${cart.length} items in your cart ${
@@ -99,8 +98,8 @@ const CartPage = () => {
         <div className="container ">
           <div className="row ">
             <div className="col-md-7  p-0 m-0">
-              {cart?.map((p) => (
-                <div className="row card flex-row" key={p._id}>
+              {cart?.map((p, idx) => (
+                <div className="row card flex-row" key={`${p._id}-${idx}`}>
                   <div className="col-md-4">
                     <img
                       src={`/api/v1/product/product-photo/${p._id}`}
@@ -111,8 +110,8 @@ const CartPage = () => {
                     />
                   </div>
                   <div className="col-md-4">
-                    <p>{p.name}</p>
-                    <p>{p.description.substring(0, 30)}</p>
+                    <p>Name : {p.name}</p>
+                    <p>Description : {p.description.substring(0, 30)}</p>
                     <p>Price : {p.price}</p>
                   </div>
                   <div className="col-md-4 cart-remove-btn">
@@ -162,7 +161,7 @@ const CartPage = () => {
                         })
                       }
                     >
-                      Plase Login to checkout
+                      Please Login to checkout
                     </button>
                   )}
                 </div>

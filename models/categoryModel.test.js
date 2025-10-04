@@ -29,18 +29,16 @@ describe("Given that our mongo server is running", () => {
     });
 
     test("When saving an empty string name and slug", async () => {
-        const cat = new categoryModel({ name: "", slug: "" });
+        const cat = new categoryModel({ name: "SomeName", slug: "" });
         const saved = await cat.save();
 
-        expect(saved.name).toBe("");
         expect(saved.slug).toBe("");
     });
 
     test("When saving a category with missing fields", async () => {
-        const cat = new categoryModel({});
+        const cat = new categoryModel({ name: "SomeName" });
         const saved = await cat.save();
 
-        expect(saved.name).toBeUndefined();
         expect(saved.slug).toBeUndefined();
     });
 

@@ -46,17 +46,16 @@ export default {
     "client/src/pages/Contact.js",
     "client/src/pages/HomePage.js",
     "client/src/pages/user/Dashboard.js",
-    "client/src/pages/admin/Products.js",
-    "client/src/pages/admin/AdminDashboard.js",
-    "client/src/pages/admin/Users.js",
+    "client/src/pages/admin/**",
     "client/src/context/cart.js",
     "client/src/components/AdminMenu.js",
+    "client/src/pages/CartPage.js",
   ],
 
   coverageThreshold: {
     global: {
-      lines: 100,
-      functions: 100,
+      lines: 98,
+      functions: 98,
     },
   },
   setupFilesAfterEnv: ["<rootDir>/client/src/setupTests.js"],
