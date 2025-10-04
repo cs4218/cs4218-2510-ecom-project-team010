@@ -10,6 +10,7 @@ import {
     getOrdersController,
     getAllOrdersController,
     orderStatusController,
+    getAllUsersController
 } from '../controllers/authController.js';
 
 // Mock the middleware
@@ -25,6 +26,7 @@ jest.mock('../controllers/authController.js', () => ({
     getOrdersController: jest.fn(),
     getAllOrdersController: jest.fn(),
     orderStatusController: jest.fn(),
+    getAllUsersController: jest.fn(),
 }));
 
 // Mock the entire middleware module
@@ -91,6 +93,16 @@ describe('Auth Routes Configuration', () => {
             expect(handlers[0].handle).toBe(requireSignIn);
             expect(handlers[1].handle).toBe(isAdmin);
             expect(typeof handlers[2].handle).toBe('function'); // inline handler
+        });
+
+        it('should register GET /all-users with requireSignIn and isAdmin middleware', () => {
+            const route = findRoute('/all-users', 'get');
+            expect(route).toBeDefined();
+            const handlers = route.route.stack;
+            expect(handlers.length).toBe(3);
+            expect(handlers[0].handle).toBe(requireSignIn);
+            expect(handlers[1].handle).toBe(isAdmin);
+            expect(handlers[2].handle).toBe(getAllUsersController);
         });
     });
 

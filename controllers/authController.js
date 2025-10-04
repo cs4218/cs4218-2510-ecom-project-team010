@@ -154,6 +154,28 @@ export const forgotPasswordController = async (req, res) => {
   }
 };
 
+export const getAllUsersController = async (req, res) => {
+  try {
+    const users = await userModel
+      .find({})
+      .select("-password -answer")
+      .sort({ createdAt: -1 });
+
+    res.status(200).send({
+      success: true,
+      message: "All users retrieved successfully",
+      users,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send({
+      success: false,
+      message: "Error in getting users",
+      error,
+    });
+  }
+};
+
 //test controller
 export const testController = (req, res) => {
   try {
