@@ -26,6 +26,7 @@ describe("AdminMenu Component", () => {
             { text: "Create Product", path: "/dashboard/admin/create-product" },
             { text: "Products", path: "/dashboard/admin/products" },
             { text: "Orders", path: "/dashboard/admin/orders" },
+            { text: "Users", path: "/dashboard/admin/users" },
         ];
 
         links.forEach(({ text, path }) => {
