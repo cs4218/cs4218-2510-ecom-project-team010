@@ -6,7 +6,7 @@ import { useCart } from "../context/cart";
 import axios from "axios";
 import toast from "react-hot-toast";
 import Layout from "./../components/Layout";
-import { AiOutlineReload } from "react-icons/ai";
+// import { AiOutlineReload } from "react-icons/ai";
 import "../styles/Homepages.css";
 
 const HomePage = () => {
@@ -32,11 +32,6 @@ const HomePage = () => {
     }
   };
 
-  useEffect(() => {
-    getAllCategory();
-    getTotal();
-  }, []);
-
   //get products
   const getAllProducts = async () => {
     try {
@@ -50,7 +45,7 @@ const HomePage = () => {
     }
   };
 
-  //getTOtal COunt
+  //getTotal Count
   const getTotal = async () => {
     try {
       const { data } = await axios.get("/api/v1/product/product-count");
@@ -61,10 +56,15 @@ const HomePage = () => {
   };
 
   useEffect(() => {
+    getAllCategory();
+    getTotal();
+  }, []);
+
+  useEffect(() => {
     if (page === 1) return;
     loadMore();
   }, [page]);
-  
+
   //load more
   const loadMore = async () => {
     try {
@@ -79,35 +79,37 @@ const HomePage = () => {
   };
 
   // filter by cat
-  const handleFilter = (value, id) => {
-    let all = [...checked];
-    if (value) {
-      all.push(id);
+  const handleFilter = (isChecked, id) => {
+    let allCheckedCategories = [...checked];
+    if (isChecked) {
+      allCheckedCategories.push(id);
     } else {
-      all = all.filter((c) => c !== id);
+      allCheckedCategories = allCheckedCategories.filter((unchecked) => unchecked !== id);
     }
-    setChecked(all);
+    setChecked(allCheckedCategories);
   };
+
   useEffect(() => {
-    if (!checked.length || !radio.length) getAllProducts();
+    if (!checked.length && !radio.length) getAllProducts();
   }, [checked.length, radio.length]);
 
   useEffect(() => {
     if (checked.length || radio.length) filterProduct();
   }, [checked, radio]);
 
-  //get filterd product
+  // get filtered product
   const filterProduct = async () => {
     try {
       const { data } = await axios.post("/api/v1/product/product-filters", {
-        checked,
-        radio,
+        checked,  
+        radio,    
       });
-      setProducts(data?.products);
+      setProducts(data?.products);  
     } catch (error) {
       console.log(error);
     }
   };
+
   return (
     <Layout title={"ALL Products - Best offers "}>
       {/* banner image */}
@@ -134,7 +136,9 @@ const HomePage = () => {
           {/* price filter */}
           <h4 className="text-center mt-4">Filter By Price</h4>
           <div className="d-flex flex-column">
-            <Radio.Group onChange={(e) => setRadio(e.target.value)}>
+            <Radio.Group onChange={(e) => {
+              setRadio(e.target.value);
+            }}>
               {Prices?.map((p) => (
                 <div key={p._id}>
                   <Radio value={p.array}>{p.name}</Radio>
@@ -145,12 +149,17 @@ const HomePage = () => {
           <div className="d-flex flex-column">
             <button
               className="btn btn-danger"
-              onClick={() => window.location.reload()}
+              onClick={() => {
+                setChecked([]);
+                setRadio([]);
+                window.location.reload();
+              }}
             >
               RESET FILTERS
             </button>
           </div>
         </div>
+
         <div className="col-md-9 ">
           <h1 className="text-center">All Products</h1>
           <div className="d-flex flex-wrap">
@@ -208,14 +217,7 @@ const HomePage = () => {
                   setPage(page + 1);
                 }}
               >
-                {loading ? (
-                  "Loading ..."
-                ) : (
-                  <>
-                    {" "}
-                    Loadmore <AiOutlineReload />
-                  </>
-                )}
+                {loading ? "Loading..." : "Load more"}
               </button>
             )}
           </div>

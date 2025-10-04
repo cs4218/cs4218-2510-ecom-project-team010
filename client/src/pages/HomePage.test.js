@@ -38,10 +38,6 @@ jest.mock('./../components/Layout', () => {
     };
 });
 
-jest.mock('react-icons/ai', () => ({
-    AiOutlineReload: () => <span data-testid="reload-icon">Reload</span>
-}));
-
 // Mock localStorage
 const localStorageMock = {
     getItem: jest.fn(),
@@ -379,8 +375,7 @@ describe('HomePage', () => {
             renderHomePage();
 
             await waitFor(() => {
-                expect(screen.getByText('Loadmore')).toBeInTheDocument();
-                expect(screen.getByTestId('reload-icon')).toBeInTheDocument();
+                expect(screen.getByText('Load more')).toBeInTheDocument();
             });
         });
 
@@ -398,7 +393,7 @@ describe('HomePage', () => {
             renderHomePage();
 
             await waitFor(() => {
-                expect(screen.queryByText('Loadmore')).not.toBeInTheDocument();
+                expect(screen.queryByText('Load more')).not.toBeInTheDocument();
             });
         });
 
@@ -416,7 +411,7 @@ describe('HomePage', () => {
             renderHomePage();
 
             await waitFor(() => {
-                const loadMoreButton = screen.getByText('Loadmore');
+                const loadMoreButton = screen.getByText('Load more');
                 fireEvent.click(loadMoreButton);
             });
 
@@ -429,11 +424,11 @@ describe('HomePage', () => {
             renderHomePage();
 
             await waitFor(() => {
-                const loadMoreButton = screen.getByText('Loadmore');
+                const loadMoreButton = screen.getByText('Load more');
                 fireEvent.click(loadMoreButton);
 
                 // Should show loading state briefly
-                expect(screen.getByText('Loading ...')).toBeInTheDocument();
+                expect(screen.getByText('Loading...')).toBeInTheDocument();
             });
         });
     });
@@ -450,8 +445,17 @@ describe('HomePage', () => {
     });
 
     describe('Error Handling', () => {
+        let consoleSpy;
+
+        beforeEach(() => {
+            consoleSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
+        });
+
+        afterEach(() => {
+            consoleSpy.mockRestore();
+        });
+
         it('should handle products API error', async () => {
-            const consoleSpy = jest.spyOn(console, 'log').mockImplementation(() => { });
             mockedAxios.get.mockImplementation((url) => {
                 if (url.includes('/product/product-list')) {
                     return Promise.reject(new Error('Products API error'));
@@ -470,12 +474,49 @@ describe('HomePage', () => {
             await waitFor(() => {
                 expect(consoleSpy).toHaveBeenCalledWith(expect.any(Error));
             });
+        });
 
-            consoleSpy.mockRestore();
+        it('should handle getTotal API error', async () => {
+            mockedAxios.get.mockImplementation((url) => {
+                if (url.includes('/product/product-count')) {
+                    return Promise.reject(new Error('Product count API error'));
+                }
+                if (url.includes('/category/get-category')) {
+                    return Promise.resolve({ data: { success: true, category: mockCategories } });
+                }
+                if (url.includes('/product/product-list')) {
+                    return Promise.resolve({ data: { products: mockProducts } });
+                }
+                return Promise.reject(new Error('Unknown endpoint'));
+            });
+
+            renderHomePage();
+
+            await waitFor(() => {
+                expect(consoleSpy).toHaveBeenCalledWith(expect.objectContaining({
+                    message: 'Product count API error'
+                }));
+            });
+        });
+
+        it('should set loading to false when getAllProducts fails', async () => {
+            mockedAxios.get.mockImplementation((url) => {
+                if (url.includes('/product/product-list')) {
+                    return Promise.reject(new Error('Products API error'));
+                }
+            });
+
+            renderHomePage();
+
+            await waitFor(() => {
+                expect(consoleSpy).toHaveBeenCalledWith(expect.objectContaining({
+                    message: 'Products API error'
+                }));
+                expect(screen.queryByText('Loading...')).not.toBeInTheDocument();
+            });
         });
 
         it('should handle filter API error', async () => {
-            const consoleSpy = jest.spyOn(console, 'log').mockImplementation(() => { });
             mockedAxios.post.mockRejectedValueOnce(new Error('Filter API error'));
 
             renderHomePage();
@@ -488,8 +529,6 @@ describe('HomePage', () => {
             await waitFor(() => {
                 expect(consoleSpy).toHaveBeenCalledWith(expect.any(Error));
             });
-
-            consoleSpy.mockRestore();
         });
     });
 });
