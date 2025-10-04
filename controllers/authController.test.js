@@ -11,6 +11,7 @@ import {
     getOrdersController,
     getAllOrdersController,
     orderStatusController,
+    getAllUsersController,
 } from "./authController.js";
 
 // Mock dependencies
@@ -266,6 +267,110 @@ describe("Auth Controllers", () => {
         });
     });
 
+    describe("getAllUsersController", () => {
+        it("should get all users successfully", async () => {
+            const mockUsers = [
+                { _id: "user1", name: "John Doe", email: "john@example.com", phone: "1234567890", role: 0, createdAt: "2024-01-15T10:30:00.000Z" },
+                { _id: "user2", name: "Jane Smith", email: "jane@example.com", phone: "0987654321", role: 1, createdAt: "2024-01-10T08:20:00.000Z" }
+            ];
+
+            const sortMock = jest.fn().mockResolvedValue(mockUsers);
+            const selectMock = jest.fn().mockReturnValue({ sort: sortMock });
+            userModel.find.mockReturnValue({ select: selectMock });
+
+            await getAllUsersController(req, res);
+
+            expect(userModel.find).toHaveBeenCalledWith({});
+            expect(selectMock).toHaveBeenCalledWith("-password -answer");
+            expect(sortMock).toHaveBeenCalledWith({ createdAt: -1 });
+            expect(res.status).toHaveBeenCalledWith(200);
+            expect(res.send).toHaveBeenCalledWith({
+                success: true,
+                message: "All users retrieved successfully",
+                users: mockUsers,
+            });
+        });
+
+        it("should return empty array when no users exist", async () => {
+            const sortMock = jest.fn().mockResolvedValue([]);
+            const selectMock = jest.fn().mockReturnValue({ sort: sortMock });
+            userModel.find.mockReturnValue({ select: selectMock });
+
+            await getAllUsersController(req, res);
+
+            expect(userModel.find).toHaveBeenCalledWith({});
+            expect(res.status).toHaveBeenCalledWith(200);
+            expect(res.send).toHaveBeenCalledWith({
+                success: true,
+                message: "All users retrieved successfully",
+                users: [],
+            });
+        });
+
+        it("should exclude password and answer fields from response", async () => {
+            const mockUsers = [
+                { _id: "user1", name: "John Doe", email: "john@example.com" }
+            ];
+
+            const sortMock = jest.fn().mockResolvedValue(mockUsers);
+            const selectMock = jest.fn().mockReturnValue({ sort: sortMock });
+            userModel.find.mockReturnValue({ select: selectMock });
+
+            await getAllUsersController(req, res);
+
+            expect(selectMock).toHaveBeenCalledWith("-password -answer");
+        });
+
+        it("should sort users by createdAt in descending order", async () => {
+            const mockUsers = [
+                { _id: "user1", name: "Recent User", createdAt: "2024-01-20T10:00:00.000Z" },
+                { _id: "user2", name: "Older User", createdAt: "2024-01-10T10:00:00.000Z" }
+            ];
+
+            const sortMock = jest.fn().mockResolvedValue(mockUsers);
+            const selectMock = jest.fn().mockReturnValue({ sort: sortMock });
+            userModel.find.mockReturnValue({ select: selectMock });
+
+            await getAllUsersController(req, res);
+
+            expect(sortMock).toHaveBeenCalledWith({ createdAt: -1 });
+        });
+
+        it("should handle database errors", async () => {
+            const error = new Error("Database connection failed");
+            const selectMock = jest.fn().mockReturnValue({
+                sort: jest.fn().mockRejectedValue(error)
+            });
+            userModel.find.mockReturnValue({ select: selectMock });
+
+            await getAllUsersController(req, res);
+
+            expect(console.error).toHaveBeenCalledWith(error);
+            expect(res.status).toHaveBeenCalledWith(500);
+            expect(res.send).toHaveBeenCalledWith({
+                success: false,
+                message: "Error in getting users",
+                error,
+            });
+        });
+
+        it("should handle errors during query execution", async () => {
+            const error = new Error("Query failed");
+            userModel.find.mockImplementation(() => {
+                throw error;
+            });
+
+            await getAllUsersController(req, res);
+
+            expect(res.status).toHaveBeenCalledWith(500);
+            expect(res.send).toHaveBeenCalledWith({
+                success: false,
+                message: "Error in getting users",
+                error,
+            });
+        });
+    });
+
     describe("getOrdersController", () => {
         describe("Given a user is logged in", () => {
             it("When they fetch their orders, Then a list of their orders should be returned", async () => {
@@ -356,4 +461,3 @@ describe("Auth Controllers", () => {
         });
     });
 });
-
