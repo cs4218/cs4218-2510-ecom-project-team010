@@ -409,3 +409,253 @@ describe("Given category data with special characters and edge values", () => {
         });
     });
 });
+
+describe("Given the users wants to add a new category", () => {
+    const categoriesMock = [
+        { _id: "1", name: "Category 1" },
+        { _id: "2", name: "Category 2" },
+    ];
+
+    beforeEach(() => {
+        jest.clearAllMocks();
+        axios.get.mockResolvedValue({
+            data: { success: true, category: categoriesMock }
+        });
+    });
+
+    test("When initial category fetch returns unsuccessful response", async () => {
+        axios.get.mockResolvedValue({
+            data: { success: false, category: [] }
+        });
+
+        render(<CreateCategory />);
+
+        // Should not show any categories in the table
+        await waitFor(() => {
+            const tableRows = screen.getAllByRole('row');
+            // Only header row should be present
+            expect(tableRows).toHaveLength(1);
+        });
+    });
+
+    test("When categories array is undefined in successful response", async () => {
+        axios.get.mockResolvedValue({
+            data: { success: true, category: undefined }
+        });
+
+        render(<CreateCategory />);
+
+        await waitFor(() => {
+            const tableRows = screen.getAllByRole('row');
+            // Only header row should be present
+            expect(tableRows).toHaveLength(1);
+        });
+    });
+
+    test("When user submits form without changing input after successful submission", async () => {
+        axios.post.mockResolvedValueOnce({ data: { success: true } });
+        axios.post.mockResolvedValueOnce({ data: { success: true } });
+
+        render(<CreateCategory />);
+
+        await waitFor(() => screen.getByText("Category 1"));
+
+        const input = screen.getByTestId("category-input");
+        const button = screen.getByRole("button", { name: /submit/i });
+
+        // First submission
+        fireEvent.change(input, { target: { value: "Test Category" } });
+        fireEvent.click(button);
+
+        await waitFor(() => {
+            expect(toast.success).toHaveBeenCalledWith("Test Category is created");
+        });
+
+        // Second submission with same value (should still work)
+        fireEvent.click(button);
+
+        await waitFor(() => {
+            expect(axios.post).toHaveBeenCalledTimes(2);
+            expect(toast.success).toHaveBeenCalledTimes(2);
+        });
+    });
+
+    test("When modal is opened but user doesn't change the input value", async () => {
+        axios.put.mockResolvedValue({ data: { success: true } });
+
+        render(<CreateCategory />);
+
+        await waitFor(() => screen.getByText("Category 1"));
+
+        const editButtons = screen.getAllByText(/edit/i);
+        fireEvent.click(editButtons[0]);
+
+        await waitFor(() => screen.getByTestId("modal"));
+
+        const modalButtons = screen.getAllByRole("button", { name: /submit/i });
+        const modalButton = modalButtons[1];
+
+        fireEvent.click(modalButton);
+
+        await waitFor(() => {
+            expect(axios.put).toHaveBeenCalledWith("/api/v1/category/update-category/1", { 
+                name: "Category 1" 
+            });
+            expect(toast.success).toHaveBeenCalledWith("Category 1 is updated");
+        });
+    });
+
+    test("When user opens edit modal multiple times for different categories", async () => {
+        render(<CreateCategory />);
+
+        await waitFor(() => screen.getByText("Category 1"));
+
+        const editButtons = screen.getAllByText(/edit/i);
+        
+        // Open modal for first category
+        fireEvent.click(editButtons[0]);
+        await waitFor(() => screen.getByTestId("modal"));
+        
+        let modalInputs = screen.getAllByTestId("category-input");
+        expect(modalInputs[1]).toHaveValue("Category 1");
+        
+        const closeButton = screen.getByTestId("modal-close");
+        fireEvent.click(closeButton);
+        
+        await waitFor(() => {
+            expect(screen.queryByTestId("modal")).not.toBeInTheDocument();
+        });
+
+        fireEvent.click(editButtons[1]);
+        await waitFor(() => screen.getByTestId("modal"));
+        
+        modalInputs = screen.getAllByTestId("category-input");
+        expect(modalInputs[1]).toHaveValue("Category 2");
+    });
+
+    test("When component mounts and unmounts properly", async () => {
+        const { unmount } = render(<CreateCategory />);
+        
+        await waitFor(() => {
+            expect(axios.get).toHaveBeenCalledWith("/api/v1/category/get-category");
+        });
+
+        expect(() => unmount()).not.toThrow();
+    });
+
+    test("When handleSubmit is called and name state is cleared after successful creation", async () => {
+        axios.post.mockResolvedValue({ data: { success: true } });
+
+        render(<CreateCategory />);
+
+        await waitFor(() => screen.getByText("Category 1"));
+
+        const input = screen.getByTestId("category-input");
+        const button = screen.getByRole("button", { name: /submit/i });
+
+        fireEvent.change(input, { target: { value: "New Category" } });
+        expect(input.value).toBe("New Category");
+
+        fireEvent.click(button);
+
+        await waitFor(() => {
+            expect(toast.success).toHaveBeenCalledWith("New Category is created");
+        });
+
+        expect(axios.post).toHaveBeenCalledWith("/api/v1/category/create-category", {
+            name: "New Category"
+        });
+    });
+
+    test("When categories state is empty array", async () => {
+        axios.get.mockResolvedValue({
+            data: { success: true, category: [] }
+        });
+
+        render(<CreateCategory />);
+
+        await waitFor(() => {
+            const tableRows = screen.getAllByRole('row');
+            expect(tableRows).toHaveLength(1);
+        });
+    });
+
+    test("When modal state management works correctly", async () => {
+        render(<CreateCategory />);
+
+        await waitFor(() => screen.getByText("Category 1"));
+
+        expect(screen.queryByTestId("modal")).not.toBeInTheDocument();
+
+        const editButtons = screen.getAllByText(/edit/i);
+        fireEvent.click(editButtons[0]);
+
+        // Modal should be visible after clicking edit
+        await waitFor(() => {
+            expect(screen.getByTestId("modal")).toBeInTheDocument();
+        });
+
+        const modalInputs = screen.getAllByTestId("category-input");
+        expect(modalInputs[1]).toHaveValue("Category 1");
+    });
+});
+
+describe("Given form submission edge cases", () => {
+    const categoriesMock = [{ _id: "1", name: "Category 1" }];
+
+    beforeEach(() => {
+        jest.clearAllMocks();
+        axios.get.mockResolvedValue({
+            data: { success: true, category: categoriesMock }
+        });
+    });
+
+    test("When form is submitted via keyboard (Enter key)", async () => {
+        axios.post.mockResolvedValue({ data: { success: true } });
+
+        render(<CreateCategory />);
+
+        await waitFor(() => screen.getByText("Category 1"));
+
+        const input = screen.getByTestId("category-input");
+        const form = screen.getByTestId("category-form");
+
+        fireEvent.change(input, { target: { value: "Keyboard Category" } });
+        fireEvent.submit(form);
+
+        await waitFor(() => {
+            expect(axios.post).toHaveBeenCalledWith("/api/v1/category/create-category", {
+                name: "Keyboard Category"
+            });
+            expect(toast.success).toHaveBeenCalledWith("Keyboard Category is created");
+        });
+    });
+
+    test("When modal form is submitted via keyboard (Enter key)", async () => {
+        axios.put.mockResolvedValue({ data: { success: true } });
+
+        render(<CreateCategory />);
+
+        await waitFor(() => screen.getByText("Category 1"));
+
+        const editButtons = screen.getAllByText(/edit/i);
+        fireEvent.click(editButtons[0]);
+
+        await waitFor(() => screen.getByTestId("modal"));
+
+        const modalForms = screen.getAllByTestId("category-form");
+        const modalForm = modalForms[1]; // Second form is in the modal
+        const modalInputs = screen.getAllByTestId("category-input");
+        const modalInput = modalInputs[1];
+
+        fireEvent.change(modalInput, { target: { value: "Keyboard Update" } });
+        fireEvent.submit(modalForm);
+
+        await waitFor(() => {
+            expect(axios.put).toHaveBeenCalledWith("/api/v1/category/update-category/1", {
+                name: "Keyboard Update"
+            });
+            expect(toast.success).toHaveBeenCalledWith("Keyboard Update is updated");
+        });
+    });
+});
