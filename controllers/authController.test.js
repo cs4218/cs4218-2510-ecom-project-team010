@@ -11,6 +11,7 @@ import {
     getOrdersController,
     getAllOrdersController,
     orderStatusController,
+    getAllUsersController,
 } from "./authController.js"; // Assuming the controller is in authController.js
 
 // Mock dependencies
@@ -108,13 +109,13 @@ describe("Auth Controllers", () => {
         it("should login an existing user successfully", async () => {
             const user = { _id: "userId123", name: "John Doe", email: "john@example.com", password: "hashedPassword123", phone: "1234567890", address: "123 Main St", role: 0 };
             req.body = { email: "john@example.com", password: "password123" };
-            
+
             userModel.findOne.mockResolvedValue(user);
             comparePassword.mockResolvedValue(true);
             JWT.sign.mockReturnValue("fake-jwt-token");
 
             await loginController(req, res);
-            
+
             expect(userModel.findOne).toHaveBeenCalledWith({ email: "john@example.com" });
             expect(comparePassword).toHaveBeenCalledWith("password123", "hashedPassword123");
             expect(JWT.sign).toHaveBeenCalledWith({ _id: "userId123" }, undefined, { expiresIn: "7d" });
@@ -125,9 +126,9 @@ describe("Auth Controllers", () => {
         it("should return 404 if user is not found", async () => {
             req.body = { email: "nonexistent@example.com", password: "password123" };
             userModel.findOne.mockResolvedValue(null);
-            
+
             await loginController(req, res);
-            
+
             expect(res.status).toHaveBeenCalledWith(404);
             expect(res.send).toHaveBeenCalledWith({ success: false, message: "Email is not registerd" });
         });
@@ -140,7 +141,7 @@ describe("Auth Controllers", () => {
             comparePassword.mockResolvedValue(false);
 
             await loginController(req, res);
-            
+
             expect(res.status).toHaveBeenCalledWith(200);
             expect(res.send).toHaveBeenCalledWith({ success: false, message: "Invalid Password" });
         });
@@ -168,7 +169,7 @@ describe("Auth Controllers", () => {
             userModel.findOne.mockResolvedValue(null);
 
             await forgotPasswordController(req, res);
-            
+
             expect(res.status).toHaveBeenCalledWith(404);
             expect(res.send).toHaveBeenCalledWith({ success: false, message: "Wrong Email Or Answer" });
         });
@@ -178,7 +179,7 @@ describe("Auth Controllers", () => {
         it("should update profile successfully", async () => {
             req.body = { name: "Johnathan Doe", phone: "0987654321" };
             const existingUser = { _id: "userId123", name: "John Doe", phone: "1234567890", address: "123 Main St", password: "oldHashedPassword" };
-            
+
             userModel.findById.mockResolvedValue(existingUser);
             userModel.findByIdAndUpdate.mockResolvedValue({ ...existingUser, ...req.body });
 
@@ -191,10 +192,114 @@ describe("Auth Controllers", () => {
         });
     });
 
+    describe("getAllUsersController", () => {
+        it("should get all users successfully", async () => {
+            const mockUsers = [
+                { _id: "user1", name: "John Doe", email: "john@example.com", phone: "1234567890", role: 0, createdAt: "2024-01-15T10:30:00.000Z" },
+                { _id: "user2", name: "Jane Smith", email: "jane@example.com", phone: "0987654321", role: 1, createdAt: "2024-01-10T08:20:00.000Z" }
+            ];
+
+            const sortMock = jest.fn().mockResolvedValue(mockUsers);
+            const selectMock = jest.fn().mockReturnValue({ sort: sortMock });
+            userModel.find.mockReturnValue({ select: selectMock });
+
+            await getAllUsersController(req, res);
+
+            expect(userModel.find).toHaveBeenCalledWith({});
+            expect(selectMock).toHaveBeenCalledWith("-password -answer");
+            expect(sortMock).toHaveBeenCalledWith({ createdAt: -1 });
+            expect(res.status).toHaveBeenCalledWith(200);
+            expect(res.send).toHaveBeenCalledWith({
+                success: true,
+                message: "All users retrieved successfully",
+                users: mockUsers,
+            });
+        });
+
+        it("should return empty array when no users exist", async () => {
+            const sortMock = jest.fn().mockResolvedValue([]);
+            const selectMock = jest.fn().mockReturnValue({ sort: sortMock });
+            userModel.find.mockReturnValue({ select: selectMock });
+
+            await getAllUsersController(req, res);
+
+            expect(userModel.find).toHaveBeenCalledWith({});
+            expect(res.status).toHaveBeenCalledWith(200);
+            expect(res.send).toHaveBeenCalledWith({
+                success: true,
+                message: "All users retrieved successfully",
+                users: [],
+            });
+        });
+
+        it("should exclude password and answer fields from response", async () => {
+            const mockUsers = [
+                { _id: "user1", name: "John Doe", email: "john@example.com" }
+            ];
+
+            const sortMock = jest.fn().mockResolvedValue(mockUsers);
+            const selectMock = jest.fn().mockReturnValue({ sort: sortMock });
+            userModel.find.mockReturnValue({ select: selectMock });
+
+            await getAllUsersController(req, res);
+
+            expect(selectMock).toHaveBeenCalledWith("-password -answer");
+        });
+
+        it("should sort users by createdAt in descending order", async () => {
+            const mockUsers = [
+                { _id: "user1", name: "Recent User", createdAt: "2024-01-20T10:00:00.000Z" },
+                { _id: "user2", name: "Older User", createdAt: "2024-01-10T10:00:00.000Z" }
+            ];
+
+            const sortMock = jest.fn().mockResolvedValue(mockUsers);
+            const selectMock = jest.fn().mockReturnValue({ sort: sortMock });
+            userModel.find.mockReturnValue({ select: selectMock });
+
+            await getAllUsersController(req, res);
+
+            expect(sortMock).toHaveBeenCalledWith({ createdAt: -1 });
+        });
+
+        it("should handle database errors", async () => {
+            const error = new Error("Database connection failed");
+            const selectMock = jest.fn().mockReturnValue({
+                sort: jest.fn().mockRejectedValue(error)
+            });
+            userModel.find.mockReturnValue({ select: selectMock });
+
+            await getAllUsersController(req, res);
+
+            expect(console.error).toHaveBeenCalledWith(error);
+            expect(res.status).toHaveBeenCalledWith(500);
+            expect(res.send).toHaveBeenCalledWith({
+                success: false,
+                message: "Error in getting users",
+                error,
+            });
+        });
+
+        it("should handle errors during query execution", async () => {
+            const error = new Error("Query failed");
+            userModel.find.mockImplementation(() => {
+                throw error;
+            });
+
+            await getAllUsersController(req, res);
+
+            expect(res.status).toHaveBeenCalledWith(500);
+            expect(res.send).toHaveBeenCalledWith({
+                success: false,
+                message: "Error in getting users",
+                error,
+            });
+        });
+    });
+
     describe("getOrdersController", () => {
         it("should get user orders successfully", async () => {
             const mockOrders = [{ _id: "order1" }, { _id: "order2" }];
-            
+
             // Mock the chained Mongoose query to handle two separate .populate() calls
             // The first .populate() returns an object that has the second .populate()
             // The second .populate() returns the promise that resolves the data
@@ -203,7 +308,7 @@ describe("Auth Controllers", () => {
             orderModel.find.mockReturnValue(initialQuery);
 
             await getOrdersController(req, res);
-            
+
             expect(orderModel.find).toHaveBeenCalledWith({ buyer: "userId123" });
             expect(initialQuery.populate).toHaveBeenCalledWith("products", "-photo");
             expect(finalQuery.populate).toHaveBeenCalledWith("buyer", "name");
@@ -218,9 +323,9 @@ describe("Auth Controllers", () => {
                     populate: jest.fn().mockRejectedValue(error)
                 }))
             }));
-            
+
             await getOrdersController(req, res);
-            
+
             expect(res.status).toHaveBeenCalledWith(500);
             expect(res.send).toHaveBeenCalledWith({
                 success: false,
@@ -229,13 +334,13 @@ describe("Auth Controllers", () => {
             });
         });
     });
-    
+
     describe("getAllOrdersController", () => {
         it("should get all orders for admin successfully", async () => {
             const mockOrders = [{ _id: "order1" }, { _id: "order2" }];
             const query = { populate: jest.fn().mockReturnThis(), sort: jest.fn().mockResolvedValue(mockOrders) };
             orderModel.find.mockReturnValue(query);
-            
+
             await getAllOrdersController(req, res);
 
             expect(orderModel.find).toHaveBeenCalledWith({});
