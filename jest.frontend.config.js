@@ -44,6 +44,7 @@ export default {
     "client/src/components/UserMenu.js",
     "client/src/components/Footer.js",
     "client/src/components/Header.js",
+    "client/src/components/Layout.js",
     "client/src/pages/Policy.js",
     "client/src/pages/Contact.js",
     "client/src/pages/HomePage.js",
