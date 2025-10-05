@@ -13,6 +13,22 @@ import axios from "axios";
 import toast from "react-hot-toast";
 import Profile from "./Profile";
 
+// Mock console.log to suppress error logs during testing
+const originalConsoleLog = console.log;
+const mockConsoleLog = jest.fn();
+
+beforeAll(() => {
+  console.log = mockConsoleLog;
+});
+
+afterAll(() => {
+  console.log = originalConsoleLog;
+});
+
+beforeEach(() => {
+  mockConsoleLog.mockClear();
+});
+
 // Mock dependencies
 jest.mock("axios");
 jest.mock("react-hot-toast", () => ({
