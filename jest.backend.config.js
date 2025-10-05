@@ -21,8 +21,8 @@ export default {
     "config/**"],
   coverageThreshold: {
     global: {
-      lines: 65,
-      functions: 65,
+      lines: 89,
+      functions: 94,
     },
   },
 };
