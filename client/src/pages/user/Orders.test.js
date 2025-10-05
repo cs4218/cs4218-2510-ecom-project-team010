@@ -115,7 +115,7 @@ describe('Given the Orders page', () => {
   describe('When fetching orders results in an error', () => {
     it('Then it should log the error and display no orders', async () => {
         // Given
-        const consoleSpy = jest.spyOn(console, 'log');
+        const consoleSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
         axios.get.mockRejectedValue(new Error('Network Error'));
 
         // When
@@ -130,6 +130,8 @@ describe('Given the Orders page', () => {
 
         // No orders should be displayed
         expect(screen.queryByText('Status')).not.toBeInTheDocument();
+
+        consoleSpy.mockRestore();
     });
   });
 });
