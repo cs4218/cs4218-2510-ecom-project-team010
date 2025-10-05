@@ -47,6 +47,7 @@ export default {
     "client/src/pages/HomePage.js",
     "client/src/pages/user/Dashboard.js",
     "client/src/pages/user/Orders.js",
+    "client/src/pages/user/Profile.js",
     "client/src/pages/admin/**",
     "client/src/context/cart.js",
     "client/src/components/AdminMenu.js",
