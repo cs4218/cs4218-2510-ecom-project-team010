@@ -45,6 +45,7 @@ export default {
     "client/src/pages/Policy.js",
     "client/src/pages/Contact.js",
     "client/src/pages/About.js",
+    "client/src/pages/Pagenotfound.js",
     "client/src/pages/HomePage.js",
     "client/src/pages/user/Dashboard.js",
     "client/src/pages/user/Orders.js",
