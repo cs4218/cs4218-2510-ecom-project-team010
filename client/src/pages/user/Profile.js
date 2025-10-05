@@ -79,7 +79,6 @@ const Profile = () => {
                     className="form-control"
                     id="exampleInputEmail1"
                     placeholder="Enter Your Email "
-                    disabled
                   />
                 </div>
                 <div className="mb-3">
