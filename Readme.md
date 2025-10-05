@@ -205,6 +205,27 @@ Github Workflow Submission: [URL](https://github.com/cs4218/cs4218-2510-ecom-pro
 
 ### Althea Chua 
 
-### Yuan Jing
+### Yuan Jing (test cases were made with the aid of AI)
+
+1. Protected Routes
+- Client
+   - context/auth.js
+- Server
+   - helpers/authHelper.js
+   - middlewares/authMiddleware.js
+
+2. Registration and Login
+- Client
+   - pages/Auth/Register.js
+   - pages/Auth/Login.js
+- Server
+   - controllers/authController.js
+
+3. Order
+- Client
+   - pages/user/Orders.js
+- Server
+   - controllers/authController.js
+
 
 ### Miguel Foo 
