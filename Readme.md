@@ -203,7 +203,31 @@ Github Workflow Submission: [URL](https://github.com/cs4218/cs4218-2510-ecom-pro
 
 
 
-### Althea Chua 
+### Althea Chua (test cases were made with the aid of AI)
+1. Admin Dashboard
+
+- `components/AdminMenu.js`
+- `pages/admin/AdminDashboard.js`
+
+2. General
+
+- `components/Routes/Private.js`
+- `components/UserMenu.js`
+- `pages/user/Dashboard.js`
+- `models/userModel.js` 
+
+3. Admin View Users 
+
+- `pages/admin/Users.js`
+
+4. Contact
+
+- `pages/Contact.js`
+
+5. Home
+
+- `pages/Homepage.js`
+
 
 ### Yuan Jing
 
