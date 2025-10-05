@@ -358,6 +358,30 @@ describe('HomePage', () => {
                 expect(mockedAxios.get).toHaveBeenCalledWith('/api/v1/product/product-list/1');
             });
         });
+
+        it('should call filterProduct when both category and price are selected', async () => {
+            mockedAxios.post.mockResolvedValue({ data: { products: [mockProducts[0]] } });
+
+            renderHomePage();
+
+            await waitFor(() => {
+                const electronicsCheckbox = screen.getByLabelText('Electronics');
+                fireEvent.click(electronicsCheckbox);
+            });
+
+            await waitFor(() => {
+                const priceOption = screen.getByText('$0 to $19');
+                fireEvent.click(priceOption);
+            });
+
+            await waitFor(() => {
+                expect(mockedAxios.post).toHaveBeenCalledWith(
+                    '/api/v1/product/product-filters',
+                    { checked: ['cat1'], radio: [0, 19] }
+                );
+            });
+        });
+
     });
 
     describe('Load More Functionality', () => {
@@ -448,7 +472,7 @@ describe('HomePage', () => {
         let consoleSpy;
 
         beforeEach(() => {
-            consoleSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
+            consoleSpy = jest.spyOn(console, 'log').mockImplementation(() => { });
         });
 
         afterEach(() => {
