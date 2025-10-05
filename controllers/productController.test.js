@@ -17,6 +17,21 @@ import {
   productCategoryController,
 } from "./productController.js";
 
+const originalConsoleLog = console.log;
+const mockConsoleLog = jest.fn();
+
+beforeAll(() => {
+  console.log = mockConsoleLog;
+});
+
+afterAll(() => {
+  console.log = originalConsoleLog;
+});
+
+beforeEach(() => {
+  mockConsoleLog.mockClear();
+});
+
 
 jest.mock("../models/productModel.js", () => {
   const productModelMock = jest.fn(() => ({ photo: {}, save: jest.fn() }));

@@ -252,4 +252,26 @@ Github Workflow Submission: [URL](https://github.com/cs4218/cs4218-2510-ecom-pro
    - controllers/authController.js
 
 
-### Miguel Foo 
+### Miguel Foo (test cases were made with the aid of AI)
+
+1. Frontend Components
+   - `pages/About.js`
+   - `pages/Pagenotfound.js`
+   - `pages/user/Profile.js`
+   - `components/Footer.js`
+   - `components/Header.js`
+   - `components/Layout.js`
+   - `components/Spinner.js`
+
+2. Backend Configuration and APIs
+   - `config/db.js`
+   - `controllers/productController.js`
+     - `getProductController`
+     - `getSingleProductController`
+     - `productPhotoController`
+     - `productFiltersController`
+     - `productCountController`
+     - `productListController`
+     - `searchProductController`
+     - `realtedProductController`
+     - `productCategoryController`
