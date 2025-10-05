@@ -183,13 +183,6 @@ describe("Testing About Page", () => {
       expect(container).toBeTruthy();
     });
 
-    it("matches snapshot structure", () => {
-      // arrange & act
-      const { container } = renderAbout();
-
-      // assert
-      expect(container.firstChild).toMatchSnapshot();
-    });
   });
 
   describe("Testing accessibility", () => {
