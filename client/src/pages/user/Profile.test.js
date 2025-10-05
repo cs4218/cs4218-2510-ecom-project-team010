@@ -42,6 +42,7 @@ const { useAuth } = require("../../context/auth");
 
 describe("Testing Profile Page", () => {
   const mockUser = {
+    _id: "123",
     name: "John Doe",
     email: "john@example.com",
     phone: "1234567890",
