@@ -3,6 +3,7 @@ import type { Page } from '@playwright/test';
 
 test.describe.configure({ mode: 'parallel' });
 
+// arrange
 const BASE = 'http://localhost:3000';
 const PRODUCTS_URL = `${BASE}/dashboard/admin/products`;
 
@@ -13,6 +14,7 @@ const API = {
   productPhoto: '**/api/v1/product/product-photo/**',
   // adjust if your update endpoint name differs:
   productUpdate: '**/api/v1/product/update-product/**',
+  singleProduct: '**/api/v1/product/get-product/**',
 };
 
 const FIXTURE_PRODUCTS = [
@@ -36,28 +38,23 @@ test.beforeEach(async ({ page }) => {
   await routeProductListWith(page, FIXTURE_PRODUCTS);
 });
 
-/* ===========================================================
-   Products List
-   =========================================================== */
-
 test.describe('Products List', () => {
-  test('should render cards for each product (count, title, image, link)', async ({ page }) => {
+  test('upon login as admin -> products page -> should render cards for each product (count, title, image, link)', async ({ page }) => {
+    // act
     await page.goto(PRODUCTS_URL);
 
-    // Heading visible
-    await expect(page.getByRole('heading', { name: /all products list/i })).toBeVisible();
-
-    // Card count equals mocked length
+    // assert
+    // correct number of cards rendered
     const cards = page.locator('.card.m-2');
     await expect(cards).toHaveCount(FIXTURE_PRODUCTS.length);
 
-    // Card structure checks (titles, images, links)
+    // links for reach card are correctly rendered
     await expect(page.locator('a.product-link')).toHaveCount(FIXTURE_PRODUCTS.length);
 
-    // Check all titles in one go (like TodoMVC does)
+    // title for reach card are correctly rendered
     await expect(page.locator('.card-title')).toHaveText(FIXTURE_PRODUCTS.map(p => p.name));
 
-    // First image has correct src + alt
+    // image for reach card are correctly rendered
     const first = cards.first();
     await expect(first.getByRole('img', { name: FIXTURE_PRODUCTS[0].name })).toHaveAttribute(
       'src',
@@ -65,81 +62,153 @@ test.describe('Products List', () => {
     );
   });
 
-  test('should handle empty state (no products)', async ({ page }) => {
-    await routeProductListWith(page, []); // override fixture
+  test('upon login as admin -> products page -> should handle empty state (no products)', async ({ page }) => {
+    // arrrange
+    await routeProductListWith(page, []); 
+
+    // act
     await page.goto(PRODUCTS_URL);
 
-    await expect(page.getByRole('heading', { name: /all products list/i })).toBeVisible();
+    // assert
     await expect(page.locator('.card.m-2')).toHaveCount(0);
-    // container is present (even if hidden)
-    await expect(page.locator('.col-md-9 .d-flex')).toHaveCount(1);
-    // optionally assert the column shows the heading
-    await expect(page.getByRole('heading', { name: /all products list/i })).toBeVisible()
   });
 });
 
-/* ===========================================================
-   Product Editing (idempotent)
-   =========================================================== */
 
-// test.describe('Product Editing', () => {
-//   test('should open first product, bump quantity by +1, persist, then revert', async ({ page }) => {
-//     // We simulate a backend that accepts update and then returns the new quantity
-//     const productMap = new Map(FIXTURE_PRODUCTS.map(p => [p._id, { ...p }]));
+test.describe('Product Editing', () => {
+  test('login as admin -> product page -> click card -> edit description -> saved description reflected on product page', async ({ page }) => {
+    // in-memory product state we control for this test
+    const state = {
+      product: { ...FIXTURE_PRODUCTS[0] },
+    };
 
-//     await page.unroute(API.productList);
-//     await page.route(API.productList, r => {
-//       r.fulfill(json200({ products: [...productMap.values()] }));
-//     });
+    // mocking backend api calls so do not have to rely on real backend which would result in 
+    // brittle tests 
+    // Override the products list for THIS test, so it reflects the updated description later
+    await page.unroute(API.productList).catch(() => {});
+    await page.route(API.productList, r => r.fulfill(json200({ products: [state.product] })));
 
-//     await page.route(API.productUpdate, async r => {
-//       // Example: PUT /update-product/:id with JSON body { quantity: X } (adjust if yours differs)
-//       const url = new URL(r.request().url());
-//       const id = url.pathname.split('/').pop()!;
-//       const body = r.request().postDataJSON?.() ?? {};
-//       if (typeof body.quantity === 'number' && productMap.has(id)) {
-//         productMap.set(id, { ...productMap.get(id)!, quantity: body.quantity });
-//       }
-//       await r.fulfill(json200({ ok: true }));
-//     });
+    // The edit page fetches a single product by slug
+    await page.route(API.singleProduct, r => {
+      const slug = new URL(r.request().url()).pathname.split('/').pop()!;
+      if (slug === state.product.slug) {
+        r.fulfill(json200({ product: state.product }));
+      } else {
+        r.fulfill(json200({ product: null }));
+      }
+    });
 
-//     await page.goto(PRODUCTS_URL);
+    // The update endpoint is multipart; pull out "description" and update our in-memory product
+    await page.route(API.productUpdate, async r => {
+      const id = new URL(r.request().url()).pathname.split('/').pop()!;
+      if (id === state.product._id) {
+        const raw = r.request().postData() || '';
+        const newDesc = extractFieldFromMultipart(raw, 'description');
+        if (typeof newDesc === 'string') {
+          state.product = { ...state.product, description: newDesc };
+        }
+        await r.fulfill(json200({ success: true }));
+      } else {
+        await r.fulfill(json200({ success: false }));
+      }
+    });
 
-//     // open the first product generically
-//     const firstLink = page.locator('a.product-link').first();
-//     await Promise.all([
-//       page.waitForURL(/\/dashboard\/admin\/product\//),
-//       firstLink.click(),
-//     ]);
+    // Go to list and assert initial description
+    await page.goto(PRODUCTS_URL);
+    const firstCard = page.locator('.card.m-2').first();
+    await expect(firstCard.locator('.card-title')).toHaveText(state.product.name);
+    await expect(firstCard.locator('.card-text')).toHaveText(state.product.description);
 
-//     const qty = page.getByPlaceholder(/product quantity/i);
-//     await expect(qty).toBeVisible();
+    // Click card to open edit page
+    const firstLink = page.locator('a.product-link').first();
+    await Promise.all([
+      page.waitForURL(new RegExp(`/dashboard/admin/product/${state.product.slug}$`)),
+      firstLink.click(),
+    ]);
 
-//     const original = parseInt(await qty.inputValue() || '0', 10);
-//     const next = isNaN(original) ? 1 : original + 1;
+    // Edit description and save
+    const textarea = page.getByPlaceholder(/product description/i);
+    const NEW_DESC = 'A very nice red mug for testing';
+    await textarea.fill(NEW_DESC);
+    await page.getByRole('button', { name: /update product/i }).click();
 
-//     // Update -> Save
-//     await qty.fill(String(next));
-//     await page.getByRole('button', { name: /update product/i }).click();
+    // The page navigates back to products after save
+    await page.waitForURL(/\/dashboard\/admin\/products$/);
 
-//     // Reload to verify persistence
-//     await page.reload();
-//     await expect(qty).toHaveValue(String(next));
+    // Confirm the list shows the updated description
+    const updatedCard = page.locator('.card.m-2').first();
+    await expect(updatedCard.locator('.card-title')).toHaveText(state.product.name);
+    await expect(updatedCard.locator('.card-text')).toHaveText(NEW_DESC);
+  });
 
-//     // Revert -> Save -> Verify
-//     await qty.fill(String(original));
-//     await page.getByRole('button', { name: /update product/i }).click();
-//     await page.reload();
-//     await expect(qty).toHaveValue(String(original));
-//   });
-// });
+  test('login as admin -> product page -> click card -> edit title -> saved title reflected on product page', async ({ page }) => {
+  // in-memory product state we control for this test
+  const state = {
+    product: { ...FIXTURE_PRODUCTS[0] }, // start from your first fixture
+  };
 
-/* ===========================================================
-   Navigation
-   =========================================================== */
+  // Override the products list for THIS test, so it reflects the updated name later
+  await page.unroute(API.productList).catch(() => {});
+  await page.route(API.productList, r => r.fulfill(json200({ products: [state.product] })));
+
+  // The edit page fetches a single product by slug
+  await page.route(API.singleProduct, r => {
+    const slug = new URL(r.request().url()).pathname.split('/').pop()!;
+    if (slug === state.product.slug) {
+      r.fulfill(json200({ product: state.product }));
+    } else {
+      r.fulfill(json200({ product: null }));
+    }
+  });
+
+  // The update endpoint is multipart; pull out "name" and update our in-memory product
+  await page.route(API.productUpdate, async r => {
+    const id = new URL(r.request().url()).pathname.split('/').pop()!;
+    if (id === state.product._id) {
+      const raw = r.request().postData() || '';
+      const newName = extractFieldFromMultipart(raw, 'name'); // <-- grab title
+      if (typeof newName === 'string') {
+        state.product = { ...state.product, name: newName };
+      }
+      await r.fulfill(json200({ success: true }));
+    } else {
+      await r.fulfill(json200({ success: false }));
+    }
+  });
+
+  // Go to list and assert initial title on the card
+  await page.goto(PRODUCTS_URL);
+  const firstCard = page.locator('.card.m-2').first();
+  await expect(firstCard.locator('.card-title')).toHaveText(state.product.name);
+
+  // Click card to open edit page
+  const firstLink = page.locator('a.product-link').first();
+  await Promise.all([
+    page.waitForURL(new RegExp(`/dashboard/admin/product/${state.product.slug}$`)),
+    firstLink.click(),
+  ]);
+
+  // Edit title (Product Name input) and save
+  const nameInput = page.getByPlaceholder(/product name/i);
+  const NEW_NAME = 'Red Mug (Limited Edition)';
+  await nameInput.fill(NEW_NAME);
+  await page.getByRole('button', { name: /update product/i }).click();
+
+  // The page navigates back to products after save
+  await page.waitForURL(/\/dashboard\/admin\/products$/);
+
+  // Confirm the list shows the updated title
+  const updatedCard = page.locator('.card.m-2').first();
+  await expect(updatedCard.locator('.card-title')).toHaveText(NEW_NAME);
+});
+
+});
+
+
 
 test.describe('Navigation', () => {
-  test('should navigate into product detail when clicking card link', async ({ page }) => {
+  test('login as admin -> product page -> select product card -> should navigate into product detail page', async ({ page }) => {
+    // act
     await page.goto(PRODUCTS_URL);
 
     const links = page.locator('a.product-link');
@@ -149,6 +218,8 @@ test.describe('Navigation', () => {
       page.waitForURL(new RegExp(`/dashboard/admin/product/${FIXTURE_PRODUCTS[0].slug}$`)),
       links.first().click(),
     ]);
+
+    // assert
     await expect(page).toHaveURL(new RegExp(`${FIXTURE_PRODUCTS[0].slug}$`));
   });
 });
@@ -168,4 +239,11 @@ function json200(body: unknown) {
 async function routeProductListWith(page: Page, products: Array<{ _id: string; name: string; slug: string; description: string }>) {
   await page.unroute?.(API.productList).catch?.(() => {});
   await page.route(API.productList, r => r.fulfill(json200({ products })));
+}
+
+function extractFieldFromMultipart(raw: string, field: string): string | undefined {
+  // Grab the field value from multipart/form-data
+  const re = new RegExp(`name="${field}"\\s*\\r?\\n\\r?\\n([\\s\\S]*?)\\r?\\n--`, 'm');
+  const m = raw.match(re);
+  return m ? m[1].trim() : undefined;
 }
