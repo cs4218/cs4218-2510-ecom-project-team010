@@ -66,22 +66,7 @@ test.describe('Products List', () => {
     await expect(page.locator('div').filter({ hasText: /^Name: LaptopDescription: A powerful laptopPrice : 1499\.99$/ }).nth(2)).toBeVisible();
   });
 
-//   test('upon login as admin -> orders page -> change status of order -> order status is correctly updated and reflected', async ({ page }) => {
-//     await page.locator('div').filter({ hasText: /^Not Processed$/ }).nth(1).click();
-//   await page.getByText('Processing').nth(1).click();
-//     await expect(page.getByRole('cell', { name: 'Processing' })).toBeVisible();
-
-    
-//   //       await page.locator('div').filter({ hasText: /^Processing$/ }).nth(1).click();
-//   // await page.getByText('Not Processed').nth(1).click();
-//   //   await expect(page.getByRole('cell', { name: 'Not Processed' })).toBeVisible();
-
-// })
 
 })
 
-
-// login as admin -> orders page -> orders and card contents are visible'
-// status can be updated via Select and is reflected after refresh', a
-// non-admin cannot access Orders page (nothing renders)
 
