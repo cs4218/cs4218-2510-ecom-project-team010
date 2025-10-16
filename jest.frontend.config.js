@@ -29,6 +29,7 @@ export default {
     "<rootDir>/client/src/pages/user/*.test.js",
     "<rootDir>/client/src/pages/*.test.js",
     "<rootDir>/client/src/hooks/**/*.test.js",
+    "<rootDir>/client/src/pages/admin/Products_Integration_UI_test/*.test.js",
   ],
 
   // jest code coverage
