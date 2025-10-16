@@ -7,6 +7,7 @@ const BASE = 'http://localhost:3000';
 test.describe.configure({ mode: 'serial' });
 
 test.beforeEach(async ({ page }) => {
+    // act 
     //navigate to home page
     await page.goto('http://localhost:3000/');
 
@@ -23,18 +24,18 @@ test.beforeEach(async ({ page }) => {
     await page.getByRole('link', { name: 'Orders' }).click();
 });
 
-test.describe('Products List', () => {
+test.describe('UI testing admin orders page.', () => {
 
-  test('upon login as admin -> orders page -> heading is rendered', async ({ page }) => {
+  test('upon login as admin -> successfully navigate to orders page -> heading is rendered', async ({ page }) => {
     await expect(page.getByRole('heading', { name: 'All Orders' })).toBeVisible();
   });
 
-  test('upon login as admin -> orders page -> should render proper layout of page with navbar and footer', async ({ page }) => {
+  test('upon login as admin -> successfully navigate to orders page -> should render proper layout of page with navbar and footer', async ({ page }) => {
       await expect(page.getByRole('navigation')).toBeVisible();
       await expect(page.getByText('All Rights Reserved © TestingCompAbout|Contact|Privacy Policy')).toBeVisible();
   });
 
-  test('upon login as admin -> orders page -> status of orders are correctly rendered with proper headers', async ({ page }) => {
+  test('upon login as admin -> successfully navigate to orders page -> status of orders are correctly rendered with proper headers', async ({ page }) => {
     // index 
     await expect(page.getByRole('columnheader', { name: '#' })).toBeVisible();
     await expect(page.getByRole('cell', { name: '1', exact: true })).toBeVisible();
@@ -60,13 +61,11 @@ test.describe('Products List', () => {
     await expect(page.getByRole('cell', { name: '3' })).toBeVisible();
   });
 
-  test('upon login as admin -> orders page -> items ordered are correctly displated for each order', async ({ page }) => {
+  test('upon login as admin -> orders page -> items ordered are correctly displayed for each order', async ({ page }) => {
     await expect(page.locator('div').filter({ hasText: /^Name: NUS T-shirtDescription: Plain NUS T-shirt for salePrice : 4\.99$/ }).first()).toBeVisible();
     await expect(page.locator('div').filter({ hasText: /^Name: LaptopDescription: A powerful laptopPrice : 1499\.99$/ }).first()).toBeVisible();
     await expect(page.locator('div').filter({ hasText: /^Name: LaptopDescription: A powerful laptopPrice : 1499\.99$/ }).nth(2)).toBeVisible();
   });
-
-
 })
 
 

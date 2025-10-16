@@ -43,8 +43,6 @@ test.describe('Products List', () => {
   });
 
   test('product page -> click card -> update product page -> edit title -> changed title reflected on product page', async ({ page }) => {
-    // act
-
     // access update product page for item
     await page.getByRole('link', { name: 'Products' }).click();
     await page.getByRole('link', { name: 'Novel Novel A bestselling' }).click();
@@ -67,8 +65,6 @@ test.describe('Products List', () => {
   });
 
   test('product page -> click card -> update product page -> edit description -> changed description is reflected on product page', async ({ page }) => {
-    // act
-
     // access update product page for item
     await page.getByRole('link', { name: 'Products' }).click();
     await page.getByRole('link', { name: 'Novel Novel A bestselling' }).click();
@@ -91,8 +87,7 @@ test.describe('Products List', () => {
 
   });
 
-  test('create product product on create product page -> prpduct page -> new product card is rendered with correct contents', async ({ page }) => {
-    // act
+  test('create product on create product page -> product page -> new product card is rendered with correct contents', async ({ page }) => {
     // go to Create Product page
     await page.getByRole('link', { name: 'Create Product' }).click();
 
