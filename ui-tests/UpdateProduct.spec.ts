@@ -55,4 +55,19 @@ test.describe("Update Product Page", () => {
         await page.getByText('Book').nth(1).click();
         await page.getByRole('button', { name: 'UPDATE PRODUCT' }).click();
     });  
+
+    test("should update price", async ({page}) => {
+        // navigate to update product page 
+        await page.getByRole('link', { name: 'Products' }).click();
+        await page.getByRole('link', { name: 'Novel Novel A bestselling' }).click();
+
+        // update price
+        await page.getByPlaceholder('Product Price').click();
+        await page.getByPlaceholder('Product Price').fill('16');
+        await page.getByRole('button', { name: 'UPDATE PRODUCT' }).click();
+
+        // verify that price is updated on the home page 
+        await page.getByRole('link', { name: 'Home' }).click();
+        await expect(page.getByRole('heading', { name: '$16.00' })).toBeVisible(); 
+    });  
 });
