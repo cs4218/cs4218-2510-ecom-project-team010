@@ -32,7 +32,7 @@ test.describe("Create Category Page", () => {
         await expect(page.getByRole('cell', { name: 'Clothing' })).toBeVisible(); 
     });
 
-    test("should render newly added category successfully", async ({page}) => {
+    test("create category page -> fill in new field -> click update -> new category appears on the page", async ({page}) => {
         await page.getByRole('link', { name: 'Create Category' }).click();
         await page.getByRole('textbox', { name: 'Enter new category' }).click();
         await page.getByRole('textbox', { name: 'Enter new category' }).fill('hello');
@@ -45,7 +45,7 @@ test.describe("Create Category Page", () => {
         await page.getByRole('button', { name: 'Delete' }).nth(3).click();
     });
 
-    test("should edit category successfully", async ({page}) => {
+    test("create category page -> click edit -> update fields -> edited category appears on the page", async ({page}) => {
         await page.getByRole('link', { name: 'Create Category' }).click();
         await page.getByRole('textbox', { name: 'Enter new category' }).click();
         await page.getByRole('textbox', { name: 'Enter new category' }).fill('hello');

@@ -31,7 +31,7 @@ test.describe("Update Product Page", () => {
         expect(page.url()).toContain('/Novel');
     });  
 
-    test("should update category", async ({page}) => {
+    test("product page -> click card -> update product page -> update category -> updated product appears correctly on filtered categories", async ({page}) => {
         // navigate to update product page 
         await page.getByRole('link', { name: 'Products' }).click();
         await page.getByRole('link', { name: 'Novel Novel A bestselling' }).click();
@@ -56,7 +56,7 @@ test.describe("Update Product Page", () => {
         await page.getByRole('button', { name: 'UPDATE PRODUCT' }).click();
     });  
 
-    test("should update price", async ({page}) => {
+    test("product page -> click card -> update product page -> update price -> updated price is reflected on home page", async ({page}) => {
         // navigate to update product page 
         await page.getByRole('link', { name: 'Products' }).click();
         await page.getByRole('link', { name: 'Novel Novel A bestselling' }).click();
