@@ -25,13 +25,17 @@ test.describe("Search Bar", () => {
         await expect(page.getByRole('button', { name: 'Search' })).toBeVisible(); 
     });
 
-    test("should navigate to the correct page after search", async ({page}) => {
+    test("should render the correct page after search", async ({page}) => {
         await page.getByRole('searchbox', { name: 'Search' }).click();
         await page.getByRole('searchbox', { name: 'Search' }).fill('no');
-        await page.getByRole('button', { name: 'Search' }).click()
+        await page.getByRole('button', { name: 'Search' }).click();
 
+        // asserts that navigation to search happens 
         await page.waitForURL(/.*\/search.*/);
         expect(page.url()).toContain('/search');
+        
+        // asserts that result matches search 
+        await expect(page.getByRole('heading', { name: 'Novel' })).toBeVisible();
     });
 
     test("should render the correct metadata and base elements after search", async ({page}) => {
