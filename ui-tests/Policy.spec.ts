@@ -7,7 +7,6 @@ const COPY = /commited to selling you products of the highest quality for reason
 const IMG_ALT = /contactus/i;
 const IMG_SRC = '/images/contactus.jpeg';
 
-
 test.beforeEach(async ({ page }) => {
   await page.goto(POLICY_URL);
 });
