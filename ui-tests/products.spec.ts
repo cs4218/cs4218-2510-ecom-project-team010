@@ -1,8 +1,6 @@
 import { test, expect } from '@playwright/test';
 import type { Page } from '@playwright/test';
 
-const BASE = 'http://localhost:3000';
-
 // ensures that test run reliably with the database being updated one test at a time
 test.describe.configure({ mode: 'serial' });
 
