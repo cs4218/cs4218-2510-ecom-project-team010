@@ -39,11 +39,11 @@ test.describe("Update Product Page", () => {
         // update category 
         await page.getByTitle('Book').click();
         await page.getByText('Electronics').nth(1).click();
+        await page.getByRole('button', { name: 'UPDATE PRODUCT' }).click();
 
         // navigate to category filter page
         await page.getByRole('link', { name: 'Categories' }).click();
         await page.getByRole('link', { name: 'Electronics' }).click();
-        await page.getByRole('button', { name: 'UPDATE PRODUCT' }).click();
 
         // assert that the product can be found in a new category
         await expect(page.getByRole('heading', { name: 'Novel' })).toBeVisible();
