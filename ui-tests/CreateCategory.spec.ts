@@ -89,7 +89,7 @@ test.describe("Create Category Page", () => {
         await page.getByRole('button', { name: 'janna' }).click();
         await page.getByRole('link', { name: 'Dashboard' }).click();
         await page.getByRole('link', { name: 'Create Category' }).click();
-        await page.getByRole('button', { name: 'Edit' }).first().click();
+        await page.getByRole('button', { name: 'Edit' }).nth(1).click();
         await page.getByRole('dialog').getByRole('textbox', { name: 'Enter new category' }).click();
         await page.getByRole('dialog').getByRole('textbox', { name: 'Enter new category' }).fill('Book');
         await page.getByRole('dialog').getByRole('button', { name: 'Submit' }).click();
