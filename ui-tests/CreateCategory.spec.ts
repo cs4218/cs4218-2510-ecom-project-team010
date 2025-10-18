@@ -1,8 +1,5 @@
 import { test, expect } from "@playwright/test";
 
-// ensures that test run reliably with the database being updated one test at a time
-test.describe.configure({ mode: 'serial' });
-
 test.beforeEach(async ({ page }) => {
     // navigate to home page
     await page.goto('http://localhost:3000/');

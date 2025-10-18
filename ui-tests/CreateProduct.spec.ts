@@ -1,7 +1,7 @@
 import { test, expect } from "@playwright/test";
 
-// ensures that test run reliably with the database being updated one test at a time
-test.describe.configure({ mode: 'serial' });
+// // ensures that test run reliably with the database being updated one test at a time
+// test.describe.configure({ mode: 'serial' });
 
 test.beforeEach(async ({ page }) => {
     // navigate to home page
@@ -97,7 +97,7 @@ test.describe("Create Product Page", () => {
 
     test("create product page -> fill in only some product fields -> click submit -> no new product card is rendered on products page", async ({page}) => {
         await page.getByRole('link', { name: 'Create Product' }).click();
-        
+
         // create new product but skip on filling product price and quantity, which are required 
         const newProductName = `New Product`;
         await page.locator('#rc_select_0').click();               

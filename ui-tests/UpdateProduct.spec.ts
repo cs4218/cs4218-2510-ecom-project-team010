@@ -1,8 +1,5 @@
 import { test, expect } from "@playwright/test";
 
-// ensures that test run reliably with the database being updated one test at a time
-test.describe.configure({ mode: 'serial' });
-
 test.beforeEach(async ({ page }) => {
     // navigate to home page
     await page.goto('http://localhost:3000/');
@@ -40,6 +37,7 @@ test.describe("Update Product Page", () => {
         await page.getByTitle('Book').click();
         await page.getByTitle('Electronics').locator('div').click();
         await page.getByRole('button', { name: 'UPDATE PRODUCT' }).click();
+        await page.waitForResponse(response => response.url().includes('api/v1/product/update-product'));
 
         // navigate to category filter page
         await page.getByRole('link', { name: 'Categories' }).click();
@@ -56,6 +54,7 @@ test.describe("Update Product Page", () => {
         await page.getByTitle('Electronics').click();
         await page.getByTitle('Book').locator('div').click();
         await page.getByRole('button', { name: 'UPDATE PRODUCT' }).click();
+        await page.waitForResponse(response => response.url().includes('api/v1/product/update-product'));
     });  
 
     test("product page -> click card -> update product page -> update price -> updated price is reflected on home page", async ({page}) => {
@@ -67,6 +66,7 @@ test.describe("Update Product Page", () => {
         await page.getByPlaceholder('Product Price').click();
         await page.getByPlaceholder('Product Price').fill('16');
         await page.getByRole('button', { name: 'UPDATE PRODUCT' }).click();
+        await page.waitForResponse(response => response.url().includes('api/v1/product/update-product'));
 
         // verify that price is updated on the home page 
         await page.getByRole('link', { name: 'Home' }).click();
@@ -79,6 +79,8 @@ test.describe("Update Product Page", () => {
         await page.getByRole('link', { name: 'Novel Novel A bestselling' }).click();
         await page.getByPlaceholder('Product Price').click();
         await page.getByPlaceholder('Product Price').fill('14.99');
+        await page.getByRole('button', { name: 'UPDATE PRODUCT' }).click();
+        await page.waitForResponse(response => response.url().includes('api/v1/product/update-product'));
         await page.getByRole('link', { name: 'Home' }).click();
         await expect(page.getByRole('heading', { name: '$14.99' })).toBeVisible(); 
     });  
@@ -92,6 +94,7 @@ test.describe("Update Product Page", () => {
         await page.getByRole('textbox', { name: 'Product Name' }).click();
         await page.getByRole('textbox', { name: 'Product Name' }).fill('');
         await page.getByRole('button', { name: 'UPDATE PRODUCT' }).click();
+        await page.waitForResponse(response => response.url().includes('api/v1/product/update-product'));
 
         // verify that no update is done, i.e. full name is rendered on the home page 
         await page.getByRole('link', { name: 'Home' }).click();
@@ -107,6 +110,7 @@ test.describe("Update Product Page", () => {
         await page.getByRole('textbox', { name: 'Product Name' }).click();
         await page.getByRole('textbox', { name: 'Product Name' }).fill('');
         await page.getByRole('button', { name: 'UPDATE PRODUCT' }).click();
+        await page.waitForResponse(response => response.url().includes('api/v1/product/update-product'));
 
         // verify that no update is done on products page and the next load of update product still renders the full name
         await page.getByRole('link', { name: 'Products' }).click();
