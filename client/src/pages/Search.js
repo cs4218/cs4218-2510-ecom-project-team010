@@ -1,7 +1,9 @@
 import React from "react";
 import Layout from "./../components/Layout";
+import { useParams, useNavigate } from "react-router-dom";
 import { useSearch } from "../context/search";
 const Search = () => {
+  const navigate = useNavigate();
   const [values, setValues] = useSearch();
   return (
     <Layout title={"Search results"}>
@@ -27,7 +29,12 @@ const Search = () => {
                     {p.description.substring(0, 30)}...
                   </p>
                   <p className="card-text"> $ {p.price}</p>
-                  <button className="btn btn-primary ms-1">More Details</button>
+                  <button
+                        className="btn btn-primary ms-1"
+                        onClick={() => navigate(`/product/${p.slug}`)}
+                      >
+                        More Details
+                  </button>
                   <button className="btn btn-secondary ms-1">ADD TO CART</button>
                 </div>
               </div>
