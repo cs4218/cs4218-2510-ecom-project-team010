@@ -34,7 +34,7 @@ test.describe("Create Product Page", () => {
 
     test("create product page -> fill in product fields -> click submit -> new product card is rendered on products page", async ({page}) => {
         // create new product
-        const newProductName = `New Product`;
+        const newProductName = `New Froduct`;
         await page.locator('#rc_select_0').click();               
         await page.getByText('Book').nth(1).click();
         await page.getByRole('textbox', { name: 'Product Name' }).fill(newProductName);
@@ -47,24 +47,24 @@ test.describe("Create Product Page", () => {
 
         // assert that the new product is correctly rendered 
         await page.getByRole('link', { name: 'Products' }).click();
-        await expect(page.getByRole('link', { name: 'New Product New Product A new' })).toBeVisible();
+        await expect(page.getByRole('link', { name: 'New Froduct New Froduct A new' })).toBeVisible();
 
         // cleanup 
-        await page.getByRole('link', { name: 'New Product New Product A new' }).click();
+        await page.getByRole('link', { name: 'New Froduct New Froduct A new' }).click();
         page.once('dialog', async (dialog) => {
             await dialog.accept();
         });
         await page.getByRole('button', { name: 'DELETE PRODUCT' }).click();
-        await expect(page.getByRole('link', { name: 'New Product New Product A new' })).not.toBeVisible();
+        await expect(page.getByRole('link', { name: 'New Froduct New Froduct A new' })).not.toBeVisible();
     }); 
 
     test("create product page -> fill in product fields -> click submit -> new product card is rendered on home page", async ({page}) => {
         // create new product
-        const newProductName = `New Product`;
+        const newProductName = `New Produce`;
         await page.locator('#rc_select_0').click();               
         await page.getByText('Book').nth(1).click();
         await page.getByRole('textbox', { name: 'Product Name' }).fill(newProductName);
-        await page.getByRole('textbox', { name: 'Product Description' }).fill('A new book');
+        await page.getByRole('textbox', { name: 'Product Description' }).fill('A new produce');
         await page.getByPlaceholder('Product Price').fill('6');
         await page.getByPlaceholder('Product Quantity').fill('7');
         await page.locator('#rc_select_1').click();               
@@ -73,18 +73,18 @@ test.describe("Create Product Page", () => {
 
         // assert that the new product is correctly rendered 
         await page.getByRole('link', { name: 'Home' }).click();
-        await expect(page.getByRole('heading', { name: 'New Product' })).toBeVisible();
+        await expect(page.getByRole('heading', { name: 'New Produce' })).toBeVisible();
 
         // cleanup 
         await page.getByRole('button', { name: 'janna' }).click();
         await page.getByRole('link', { name: 'Dashboard' }).click();
         await page.getByRole('link', { name: 'Products' }).click();
-        await page.getByRole('link', { name: 'New Product New Product A new' }).click();
+        await page.getByRole('link', { name: 'New Produce New Produce A new' }).click();
         page.once('dialog', async (dialog) => {
             await dialog.accept();
         });
         await page.getByRole('button', { name: 'DELETE PRODUCT' }).click();
-        await expect(page.getByRole('link', { name: 'New Product New Product A new' })).not.toBeVisible();
+        await expect(page.getByRole('link', { name: 'New Produce New Produce A new' })).not.toBeVisible();
     }); 
 
     test("create product page -> fill in only some product fields -> click submit -> no new product card is rendered on products page", async ({page}) => {
