@@ -38,7 +38,7 @@ test.describe("Update Product Page", () => {
 
         // update category 
         await page.getByTitle('Book').click();
-        await page.getByText('Electronics').nth(1).click();
+        await page.getByTitle('Electronics').locator('div').click();
         await page.getByRole('button', { name: 'UPDATE PRODUCT' }).click();
 
         // navigate to category filter page
@@ -49,10 +49,12 @@ test.describe("Update Product Page", () => {
         await expect(page.getByRole('heading', { name: 'Novel' })).toBeVisible();
 
         // cleanup 
+        await page.getByRole('button', { name: 'janna' }).click();
+        await page.getByRole('link', { name: 'Dashboard' }).click();
         await page.getByRole('link', { name: 'Products' }).click();
         await page.getByRole('link', { name: 'Novel Novel A bestselling' }).click();
         await page.getByTitle('Electronics').click();
-        await page.getByText('Book').nth(1).click();
+        await page.getByTitle('Book').locator('div').click();
         await page.getByRole('button', { name: 'UPDATE PRODUCT' }).click();
     });  
 

@@ -33,6 +33,7 @@ test.describe("Create Product Page", () => {
     });
 
     test("create product page -> fill in product fields -> click submit -> new product card is rendered on products page", async ({page}) => {
+        await page.getByRole('link', { name: 'Create Product' }).click();
         // create new product
         const newProductName = `New Froduct`;
         await page.locator('#rc_select_0').click();               
