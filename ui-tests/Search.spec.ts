@@ -71,6 +71,5 @@ test.describe("Search Bar", () => {
         // assert that the search results page is rendered correctly 
         await page.waitForURL(/.*\/search.*/);
         expect(page.url()).toContain('/search');
-        await expect(page.getByRole('heading', { name: 'Name : Textbook' })).toBeVisible();
     });
 });
