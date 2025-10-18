@@ -24,7 +24,6 @@ test.beforeEach(async ({ page }) => {
 test.describe("Create Category Page", () => {
     test("should render correct metadata and elements", async ({page}) => {
         await expect(page.getByRole('textbox', { name: 'Enter new category' })).toBeVisible(); 
-        await expect(page.getByRole('button', { name: 'Submit' })).toBeVisible(); 
 
         // assert that all current categories show up 
         await expect(page.getByRole('cell', { name: 'Electronics' })).toBeVisible(); 
@@ -38,7 +37,7 @@ test.describe("Create Category Page", () => {
         await page.getByRole('textbox', { name: 'Enter new category' }).fill('hello');
         await page.getByRole('button', { name: 'Submit' }).click();
 
-        // assert that new category gets rendered
+        // assert that new category gets rendered on the CreateCategory page
         await expect(page.getByRole('cell', { name: 'hello' })).toBeVisible();
 
         // cleanup 
@@ -47,9 +46,6 @@ test.describe("Create Category Page", () => {
 
     test("create category page -> click edit -> update fields -> edited category appears on the page", async ({page}) => {
         await page.getByRole('link', { name: 'Create Category' }).click();
-        await page.getByRole('textbox', { name: 'Enter new category' }).click();
-        await page.getByRole('textbox', { name: 'Enter new category' }).fill('hello');
-        await page.getByRole('button', { name: 'Submit' }).click();
 
         // assert that category exists 
         await expect(page.getByRole('cell', { name: 'Electronics' })).toBeVisible();
@@ -60,7 +56,7 @@ test.describe("Create Category Page", () => {
         await page.getByRole('dialog').getByRole('textbox', { name: 'Enter new category' }).fill('Electronics Or Smth');
         await page.getByRole('dialog').getByRole('button', { name: 'Submit' }).click();
 
-        // assert that category gets updated
+        // assert that category gets updated on the CreateCategory page
         await expect(page.getByRole('cell', { name: 'Electronics Or Smth' })).toBeVisible();
 
         // cleanup 
@@ -68,5 +64,35 @@ test.describe("Create Category Page", () => {
         await page.getByRole('dialog').getByRole('textbox', { name: 'Enter new category' }).click();
         await page.getByRole('dialog').getByRole('textbox', { name: 'Enter new category' }).fill('Electronics');
         await page.getByRole('dialog').getByRole('button', { name: 'Submit' }).click();
+        page.getByRole('cell', { name: 'Electronics' });
+    });
+
+    test("create category page -> click edit -> update fields -> edited category appears on the category dropdown", async ({page}) => {
+        await page.getByRole('link', { name: 'Create Category' }).click();
+
+        // assert that category exists 
+        await expect(page.getByRole('cell', { name: 'Book' })).toBeVisible();
+
+        // edit category 
+        await page.getByRole('button', { name: 'Edit' }).nth(1).click();
+        await page.getByRole('dialog').getByRole('textbox', { name: 'Enter new category' }).click();
+        await page.getByRole('dialog').getByRole('textbox', { name: 'Enter new category' }).fill('B Or Smth');
+        await page.getByRole('dialog').getByRole('button', { name: 'Submit' }).click();
+
+        // assert that category gets updated on the category dropdown component
+        await page.getByRole('link', { name: 'Categories' }).click();
+        await page.getByRole('link', { name: 'All Categories' }).click();
+        await page.waitForURL(/.*\/categories.*/);
+        await expect(page.getByRole('link', { name: 'B Or Smth' })).toBeVisible();
+
+        // cleanup 
+        await page.getByRole('button', { name: 'janna' }).click();
+        await page.getByRole('link', { name: 'Dashboard' }).click();
+        await page.getByRole('link', { name: 'Create Category' }).click();
+        await page.getByRole('button', { name: 'Edit' }).first().click();
+        await page.getByRole('dialog').getByRole('textbox', { name: 'Enter new category' }).click();
+        await page.getByRole('dialog').getByRole('textbox', { name: 'Enter new category' }).fill('Book');
+        await page.getByRole('dialog').getByRole('button', { name: 'Submit' }).click();
+        page.getByRole('cell', { name: 'Book' });
     });
 });
