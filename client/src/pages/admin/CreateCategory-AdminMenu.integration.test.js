@@ -52,7 +52,7 @@ function UsersPageStub() {
   return <h2 data-testid="users-page">Users Index</h2>;
 }
 
-describe("Integration between CreateCategory and AdminMenu", () => {
+describe("Test integration between CreateCategory and AdminMenu", () => {
     const mockCategories = [
         { _id: "1", name: "Electronics" },
         { _id: "2", name: "Clothing" },
