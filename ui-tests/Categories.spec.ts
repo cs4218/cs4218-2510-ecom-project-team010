@@ -29,7 +29,7 @@ test.describe("Categories Dropdown", () => {
         expect(page.getByRole('link', { name: 'Clothing' }));
     });
 
-    test("should navigate to the correct page after clicking on a category", async ({page}) => {
+    test("home page -> select category in category dropdown -> navigates to the correct page after clicking on a category", async ({page}) => {
         await page.getByRole('link', { name: 'Categories' }).click();
         await page.getByRole('link', { name: 'Electronics' }).click();
 
@@ -39,5 +39,33 @@ test.describe("Categories Dropdown", () => {
 
         // asserts that result matches category selection 
         await expect(page.getByRole('heading', { name: 'Laptop' })).toBeVisible();
+    });
+
+    test("home page -> select all categories in category dropdown -> navigates to page displaying all categories", async ({page}) => {
+        await page.getByRole('link', { name: 'Categories' }).click();
+        await page.getByRole('link', { name: 'All Categories' }).click();
+
+        // asserts that navigation to navigation to electronics category happens  
+        await page.waitForURL(/.*\/categories.*/);
+        expect(page.url()).toContain('/categories');
+
+        // asserts that result displays all categories 
+        await expect(page.getByRole('link', { name: 'Electronics' })).toBeVisible();
+        await expect(page.getByRole('link', { name: 'Book' })).toBeVisible();
+        await expect(page.getByRole('link', { name: 'Clothing' })).toBeVisible();
+    });
+
+    test("home page -> select all categories in category dropdown -> navigates to page displaying all categories -> click on category card -> navigates to chosen category", async ({page}) => {
+        await page.getByRole('link', { name: 'Categories' }).click();
+        await page.getByRole('link', { name: 'All Categories' }).click();
+        await page.waitForURL(/.*\/categories.*/);
+
+        // click on category card 
+        await page.getByRole('link', { name: 'Book' }).click();
+
+        // asserts that we successfully navigated to chosen category 
+        await page.waitForURL(/.*\/category.*/);
+        expect(page.url()).toContain('/book');
+        await expect(page.getByRole('heading', { name: 'Novel' })).toBeVisible();
     });
 });
