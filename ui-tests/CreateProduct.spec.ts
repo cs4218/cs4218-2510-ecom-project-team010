@@ -51,9 +51,8 @@ test.describe("Create Product Page", () => {
 
         // cleanup 
         await page.getByRole('link', { name: 'New Product New Product A new' }).click();
-        page.once('dialog', dialog => {
-            console.log(`Dialog message: ${dialog.message()}`);
-            dialog.dismiss().catch(() => {});
+        page.once('dialog', async (dialog) => {
+            await dialog.accept();
         });
         await page.getByRole('button', { name: 'DELETE PRODUCT' }).click();
         await expect(page.getByRole('link', { name: 'New Product New Product A new' })).not.toBeVisible();
@@ -81,9 +80,8 @@ test.describe("Create Product Page", () => {
         await page.getByRole('link', { name: 'Dashboard' }).click();
         await page.getByRole('link', { name: 'Products' }).click();
         await page.getByRole('link', { name: 'New Product New Product A new' }).click();
-        page.once('dialog', dialog => {
-            console.log(`Dialog message: ${dialog.message()}`);
-            dialog.dismiss().catch(() => {});
+        page.once('dialog', async (dialog) => {
+            await dialog.accept();
         });
         await page.getByRole('button', { name: 'DELETE PRODUCT' }).click();
         await expect(page.getByRole('link', { name: 'New Product New Product A new' })).not.toBeVisible();
