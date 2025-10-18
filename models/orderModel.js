@@ -12,6 +12,7 @@ const orderSchema = new mongoose.Schema(
     buyer: {
       type: mongoose.ObjectId,
       ref: "users",
+      required: true
     },
     status: {
       type: String,
