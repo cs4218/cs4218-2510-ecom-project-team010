@@ -63,6 +63,8 @@ test.describe("Create Product Page", () => {
     }); 
 
     test("create product page -> fill in product fields -> click submit -> new product card is rendered on home page", async ({page}) => {
+        await page.getByRole('link', { name: 'Create Product' }).click();
+
         // create new product
         const newProductName = `New Produce`;
         await page.locator('#rc_select_0').click();               
@@ -94,6 +96,8 @@ test.describe("Create Product Page", () => {
     }); 
 
     test("create product page -> fill in only some product fields -> click submit -> no new product card is rendered on products page", async ({page}) => {
+        await page.getByRole('link', { name: 'Create Product' }).click();
+        
         // create new product but skip on filling product price and quantity, which are required 
         const newProductName = `New Product`;
         await page.locator('#rc_select_0').click();               

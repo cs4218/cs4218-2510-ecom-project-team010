@@ -79,6 +79,8 @@ test.describe("Update Product Page", () => {
         await page.getByRole('link', { name: 'Novel Novel A bestselling' }).click();
         await page.getByPlaceholder('Product Price').click();
         await page.getByPlaceholder('Product Price').fill('14.99');
+        await page.getByRole('link', { name: 'Home' }).click();
+        await expect(page.getByRole('heading', { name: '$14.99' })).toBeVisible(); 
     });  
 
     test("product page -> click card -> update product page -> update to empty name -> product is not updated on home page", async ({page}) => {
