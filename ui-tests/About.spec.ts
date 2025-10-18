@@ -9,11 +9,11 @@ test.beforeEach(async ({ page }) => {
 });
 
 test.describe('About page', () => {
-  test('upon loading product page -> should render image', async ({ page }) => {
+  test('upon loading about page -> should render image', async ({ page }) => {
     await expect(page.getByRole('img', { name: 'contactus' })).toBeVisible();
   });
 
-  test('upon loading product page -> should render text.', async ({ page }) => {
+  test('upon loading about page -> should render text.', async ({ page }) => {
       await expect(page.getByText('Add text')).toBeVisible();
   });
 
