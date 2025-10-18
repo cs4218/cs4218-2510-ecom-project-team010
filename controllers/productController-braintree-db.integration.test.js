@@ -57,7 +57,7 @@ const hasBraintreeEnv =
       await mongo?.stop();
     });
 
-    it('success: fake-valid-nonce → creates Order and returns { ok: true }', async () => {
+    it('brainTreePaymentController interacts with the braintree module to successfully charge customer upon receiving valid nonce.', async () => {
       // seed two products
       const p1 = await productModel.create({
         name: 'P1',
@@ -97,6 +97,44 @@ const hasBraintreeEnv =
       // success path: controller calls res.json({ ok: true })
       expect(res.json).toHaveBeenCalledWith({ ok: true });
       expect(res.status).not.toHaveBeenCalled();
+    });
+
+    it('brainTreePaymentController interacts with the orderModel module to successfully create an order with the correct content upon receiving valid nonce.', async () => {
+      // seed two products
+      const p1 = await productModel.create({
+        name: 'P1',
+        slug: 'p1',
+        description: 'd1',
+        price: 3,
+        category: new mongoose.Types.ObjectId(),
+        quantity: 1,
+        shipping: false,
+      });
+      const p2 = await productModel.create({
+        name: 'P2',
+        slug: 'p2',
+        description: 'd2',
+        price: 4,
+        category: new mongoose.Types.ObjectId(),
+        quantity: 1,
+        shipping: false,
+      });
+
+      // build cart the way your controller expects
+      const cart = [
+        { _id: p1._id, price: p1.price },
+        { _id: p2._id, price: p2.price },
+      ];
+
+      const req = {
+        body: { nonce: 'fake-valid-nonce', cart },
+        user: { _id: new mongoose.Types.ObjectId() },
+      };
+      const { res, done } = mockResWithSignal();
+
+      // call controller and wait for the async callback to respond
+      await brainTreePaymentController(req, res);
+      await done;
 
       // verify an Order was saved
       const orders = await orderModel.find({});
@@ -104,12 +142,14 @@ const hasBraintreeEnv =
       expect(orders[0].products).toHaveLength(2);
       expect(orders[0].buyer?.toString()).toBe(req.user._id.toString());
 
-      // payment blob should have content from Braintree
+      // payment blob in order object should have content from Braintree
       const payment = orders[0].payment;
       expect(payment).toBeDefined();
     });
 
     // NOTE: test case is intentionally commented out as its failure reveals a real bug in the system
+    // upon failure to charge customer, order is still processed successfully and saved which should 
+    // not be intended behaviour. 
 
     // it('failure: fake-processor-declined-visa-nonce processed by braintree module→ 500 and no Order saved', async () => {
     //   // No need to seed real products for failure; just pass objectIds with prices
