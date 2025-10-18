@@ -2,6 +2,7 @@ import React from "react";
 import { render, screen } from "@testing-library/react";
 import { BrowserRouter } from "react-router-dom";
 import Search from "../pages/Search";
+import { useCart } from "../context/cart";
 import { useSearch } from "../context/search";
 
 jest.mock("../components/Layout", () => {
