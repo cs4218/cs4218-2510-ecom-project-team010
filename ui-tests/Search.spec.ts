@@ -51,7 +51,7 @@ test.describe("Search Bar", () => {
         await page.waitForURL(/.*\/search.*/);
 
         // click on more details 
-        await page.getByRole('button', { name: 'More Details' }).click();
+        await page.getByRole('button', { name: 'More Details' }).first().click();
 
         // assert that the chosen product is correctly rendered on the category product page 
         await expect(page.getByRole('heading', { name: 'Product Details' })).toBeVisible();
