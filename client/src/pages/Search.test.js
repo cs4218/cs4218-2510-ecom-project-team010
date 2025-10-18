@@ -15,6 +15,10 @@ jest.mock("../context/search", () => ({
     useSearch: jest.fn(),
 }));
 
+jest.mock("../context/cart", () => ({
+    useCart: jest.fn(),
+}));
+
 jest.mock("react-router-dom", () => ({
     ...jest.requireActual("react-router-dom"),
     useNavigate: jest.fn(),
@@ -25,6 +29,10 @@ const renderWithRouter = (component) => {
 };
 
 describe("Given that multiple products are available in the Home Page", () => {
+    beforeEach(() => {
+        useCart.mockReturnValue([[], jest.fn()]);
+    });
+
     afterEach(() => {
         jest.clearAllMocks();
     });
