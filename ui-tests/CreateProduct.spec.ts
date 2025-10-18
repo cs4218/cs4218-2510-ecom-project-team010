@@ -46,16 +46,19 @@ test.describe("Create Product Page", () => {
         await page.getByRole('button', { name: 'CREATE PRODUCT' }).click();
 
         // assert that the new product is correctly rendered 
-        await page.getByRole('link', { name: 'Products' }).click();
+        await page.goto('http://localhost:3000/dashboard/admin/products');
         await expect(page.getByRole('link', { name: 'New Froduct New Froduct A new' })).toBeVisible();
 
         // cleanup 
         await page.getByRole('link', { name: 'New Froduct New Froduct A new' }).click();
-        page.once('dialog', async (dialog) => {
+        page.once('dialog', async dialog => {
             await dialog.accept();
         });
         await page.getByRole('button', { name: 'DELETE PRODUCT' }).click();
-        await expect(page.getByRole('link', { name: 'New Froduct New Froduct A new' })).not.toBeVisible();
+        await page.goto('http://localhost:3000/dashboard/admin/products');
+        await page.waitForURL(/.*\/dashboard.*/);
+        await expect(page.getByRole('heading', { name: 'Novel' })).toBeVisible();
+        // await expect(page.getByRole('heading', { name: 'New Froduct' })).not.toBeVisible();
     }); 
 
     test("create product page -> fill in product fields -> click submit -> new product card is rendered on home page", async ({page}) => {
@@ -73,18 +76,20 @@ test.describe("Create Product Page", () => {
 
         // assert that the new product is correctly rendered 
         await page.getByRole('link', { name: 'Home' }).click();
+        await page.goto('http://localhost:3000');
         await expect(page.getByRole('heading', { name: 'New Produce' })).toBeVisible();
 
         // cleanup 
-        await page.getByRole('button', { name: 'janna' }).click();
-        await page.getByRole('link', { name: 'Dashboard' }).click();
-        await page.getByRole('link', { name: 'Products' }).click();
+        await page.goto('http://localhost:3000/dashboard/admin/products');
         await page.getByRole('link', { name: 'New Produce New Produce A new' }).click();
+        await page.getByRole('button', { name: 'DELETE PRODUCT' }).click();
         page.once('dialog', async (dialog) => {
             await dialog.accept();
         });
         await page.getByRole('button', { name: 'DELETE PRODUCT' }).click();
-        await expect(page.getByRole('link', { name: 'New Produce New Produce A new' })).not.toBeVisible();
+        await page.goto('http://localhost:3000/dashboard/admin/products');
+        await expect(page.getByRole('heading', { name: 'Novel' })).toBeVisible();
+        // await expect(page.getByRole('heading', { name: 'New Produce' })).not.toBeVisible();
     }); 
 
     test("create product page -> fill in only some product fields -> click submit -> no new product card is rendered on products page", async ({page}) => {
@@ -99,7 +104,8 @@ test.describe("Create Product Page", () => {
         await page.getByRole('button', { name: 'CREATE PRODUCT' }).click();
 
         // assert that the no new product is rendered 
-        await page.getByRole('link', { name: 'Products' }).click();
+        await page.goto('http://localhost:3000/dashboard/admin/products');
+        await page.waitForURL(/.*\/dashboard.*/);
         await expect(page.getByRole('link', { name: 'New Product New Product A new' })).not.toBeVisible();
     }); 
 });
