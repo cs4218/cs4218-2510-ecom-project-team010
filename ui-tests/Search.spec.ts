@@ -2,8 +2,7 @@ import { test, expect } from "@playwright/test";
 
 const BASE = 'http://localhost:3000';
 
-// ensures that test run reliably with the database being updated one test at a time
-test.describe.configure({ mode: 'serial' });
+test.describe.configure({ mode: 'parallel' });
 
 test.beforeEach(async ({ page }) => {
     // navigate to home page
@@ -43,5 +42,35 @@ test.describe("Search Bar", () => {
     
         await expect(page).toHaveTitle(/Search results/i);        
         await expect(page.getByRole('heading', { name: 'Search Results', level: 1 })).toBeVisible();
+    });
+
+    test("submit search -> click more details -> chosen product should render correctly on category product page", async ({page}) => {
+        await page.getByRole('searchbox', { name: 'Search' }).click();
+        await page.getByRole('searchbox', { name: 'Search' }).fill('te');
+        await page.getByRole('button', { name: 'Search' }).click();
+        await page.waitForURL(/.*\/search.*/);
+
+        // click on more details 
+        await page.getByRole('button', { name: 'More Details' }).click();
+
+        // assert that the chosen product is correctly rendered on the category product page 
+        await expect(page.getByRole('heading', { name: 'Product Details' })).toBeVisible();
+        await expect(page.getByRole('heading', { name: 'Name : Textbook' })).toBeVisible();
+    });
+
+    test("submit search -> click more details -> click back search -> renders search results page correctly", async ({page}) => {
+        await page.getByRole('searchbox', { name: 'Search' }).click();
+        await page.getByRole('searchbox', { name: 'Search' }).fill('te');
+        await page.getByRole('button', { name: 'Search' }).click();
+        await page.waitForURL(/.*\/search.*/);
+
+        // click on more detail, then search
+        await page.getByRole('button', { name: 'More Details' }).click();
+        await page.getByRole('button', { name: 'Search' }).click();
+
+        // assert that the search results page is rendered correctly 
+        await page.waitForURL(/.*\/search.*/);
+        expect(page.url()).toContain('/search');
+        await expect(page.getByRole('heading', { name: 'Name : Textbook' })).toBeVisible();
     });
 });
