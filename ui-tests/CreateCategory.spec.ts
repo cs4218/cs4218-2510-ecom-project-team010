@@ -31,7 +31,7 @@ test.describe("Create Category Page", () => {
         await expect(page.getByRole('cell', { name: 'Clothing' })).toBeVisible(); 
     });
 
-    test("create category page -> fill in new field -> click update -> new category appears on the page", async ({page}) => {
+    test("create category page -> fill in new field -> click update -> new category appears on the page -> delete category -> category is not on the page and dropdown", async ({page}) => {
         await page.getByRole('link', { name: 'Create Category' }).click();
         await page.getByRole('textbox', { name: 'Enter new category' }).click();
         await page.getByRole('textbox', { name: 'Enter new category' }).fill('hello');
@@ -42,6 +42,15 @@ test.describe("Create Category Page", () => {
 
         // cleanup 
         await page.getByRole('button', { name: 'Delete' }).nth(3).click();
+
+        // expect that it is no longer rendered on the CreateCategory page
+        await expect(page.getByRole('cell', { name: 'hello' })).not.toBeVisible();
+        
+        // expect that it is no longer rendered on the category dropdown component
+        await page.getByRole('link', { name: 'Categories' }).click();
+        await page.getByRole('link', { name: 'All Categories' }).click();
+        await page.waitForURL(/.*\/categories.*/);
+        await expect(page.getByRole('link', { name: 'hello' })).not.toBeVisible();
     });
 
     test("create category page -> click edit -> update fields -> edited category appears on the page", async ({page}) => {
