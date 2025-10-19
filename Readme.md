@@ -203,6 +203,9 @@ Github Workflow Submission: [URL](https://github.com/cs4218/cs4218-2510-ecom-pro
 
 
 ### Althea Chua (test cases were made with the aid of AI)
+
+#### Unit tests
+
 1. Admin Dashboard
 
 - `components/AdminMenu.js`
@@ -227,6 +230,22 @@ Github Workflow Submission: [URL](https://github.com/cs4218/cs4218-2510-ecom-pro
 
 - `pages/Homepage.js`
 
+#### Integration tests
+
+1. Integration between App - AdminRoute - AdminDashboard - AdminMenu
+
+- `components/Routes/App-AdminRoute.integration.test.js`
+- `pages/admin/AdminRoute-AdminDashboard.integration.test.js`
+- `components/AdminDashboard-AdminMenu.integration.test.js`
+
+2. Integration between authRoute - authController - orderModel 
+
+- `routes/authRoute-authMiddleware-authController.integration.test.js`
+- `controllers/authController-orderModel.integration.test.js`
+
+3. Integration between userModel - mongoose
+
+- `models/userModel-mongoose.integration.test.js`
 
 ### Yuan Jing (test cases were made with the aid of AI)
 
