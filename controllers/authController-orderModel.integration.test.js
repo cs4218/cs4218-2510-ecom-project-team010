@@ -11,7 +11,7 @@ import {
     getOrdersController,
     getAllOrdersController,
     orderStatusController,
-} from "../controllers/authController.js";
+} from "./authController.js";
 
 import { requireSignIn, isAdmin } from "../middlewares/authMiddleware.js";
 import userModel from "../models/userModel.js";
@@ -87,10 +87,6 @@ async function registerUser(override = {}) {
     return res;
 }
 
-async function loginUser({ email, password }) {
-    return request(app).post("/api/v1/auth/login").send({ email, password });
-}
-
 async function elevateToAdmin(email) {
     await userModel.updateOne({ email }, { $set: { role: 1 } });
 }
@@ -115,139 +111,7 @@ async function createOrder({ buyerId, productsIds, status = "Not Process" }) {
     });
 }
 
-describe("authController with userModel & orderModel integration test", () => {
-    // UserModel interaction (Registration and Login)
-    describe("Registration & Login", () => {
-        it("registers a new user (persists via userModel) and returns 201", async () => {
-            const res = await registerUser();
-            expect(res.status).toBe(201);
-            expect(res.body.success).toBe(true);
-            expect(res.body.user).toBeDefined();
-
-            // verify DB
-            const inDb = await userModel.findOne({ email: res.body.user.email });
-            expect(inDb).not.toBeNull();
-            expect(inDb.name).toBe(res.body.user.name);
-        });
-
-        it("rejects duplicate email (unique index on userModel.email)", async () => {
-            const email = "dupe@example.com";
-            const res = await registerUser({ email: email })
-            expect(res.status).toBe(201);
-            const dupe = await registerUser({ email: email });
-            expect(dupe.status).toBe(409);
-            expect(dupe.body.success).toBe(false);
-            expect(dupe.body.message).toMatch(/already exists/i);
-        });
-
-        it("logs in an existing user and returns a JWT", async () => {
-            const email = "loginok@example.com";
-            const password = "password123";
-            const registerRes = await registerUser({ email, password })
-            expect(registerRes.status).toBe(201);
-
-            const res = await loginUser({ email, password });
-            expect(res.status).toBe(200);
-            expect(res.body.success).toBe(true);
-            expect(res.body.token).toBeDefined();
-            expect(res.body.user.email).toBe(email);
-        });
-
-        it("fails login with wrong password", async () => {
-            const email = "wrongpw@example.com";
-            const registerRes = await registerUser({ email, password: "correct" })
-            expect(registerRes.status).toBe(201);
-
-            const res = await loginUser({ email, password: "incorrect" });
-            expect(res.status).toBe(401);
-            expect(res.body.success).toBe(false);
-            expect(res.body.message).toMatch(/invalid password/i);
-        });
-
-        it("fails login when user not found", async () => {
-            const res = await loginUser({ email: "nouser@example.com", password: "x" });
-            expect(res.status).toBe(404);
-            expect(res.body.success).toBe(false);
-            expect(res.body.message).toMatch(/not register/i);
-        });
-    });
-
-    // UserModel interaction (Forgot Password)
-    describe("Forgot Password", () => {
-        it("resets password when email and answer match (updates via userModel)", async () => {
-            const email = "reset@example.com";
-            const registerRes = await registerUser({ email, answer: "red", password: "old" })
-            expect(registerRes.status).toBe(201);
-
-            const res = await request(app)
-                .post("/api/v1/auth/forgot-password")
-                .send({ email, answer: "red", newPassword: "newpass" });
-
-            expect(res.status).toBe(200);
-            expect(res.body.success).toBe(true);
-
-            // New password should work for login now
-            const loginRes = await loginUser({ email, password: "newpass" });
-            expect(loginRes.status).toBe(200);
-            expect(loginRes.body.success).toBe(true);
-        });
-
-        it("returns 404 when email/answer combo does not match", async () => {
-            const email = "reset2@example.com";
-            const registerRes = await registerUser({ email, answer: "green" })
-            expect(registerRes.status).toBe(201);
-
-            const res = await request(app)
-                .post("/api/v1/auth/forgot-password")
-                .send({ email, answer: "wrong", newPassword: "new" });
-
-            expect(res.status).toBe(404);
-            expect(res.body.success).toBe(false);
-            expect(res.body.message).toMatch(/wrong email or answer/i);
-        });
-    });
-
-    // UserModel interaction (Update Profile)
-    describe("Update Profile", () => {
-        it("updates user fields (via userModel.findById + findByIdAndUpdate)", async () => {
-            const email = "upd@example.com";
-            const registerRes = await registerUser({ email })
-            expect(registerRes.status).toBe(201);
-            
-            const inDbUser = await userModel.findOne({ email }).lean();
-
-            const res = await request(app)
-                .put("/api/v1/auth/profile")
-                .set("x-user-id", inDbUser._id.toString()) // requireSignIn mock
-                .send({ name: "Updated Name", phone: "99999999" });
-
-            expect(res.status).toBe(200);
-            expect(res.body.success).toBe(true);
-            expect(res.body.updatedUser.name).toBe("Updated Name");
-            expect(res.body.updatedUser.phone).toBe("99999999");
-
-            const inDb = await userModel.findOne({ email });
-            expect(inDb.name).toBe("Updated Name");
-        });
-
-        it("rejects short new password (<6) with 400", async () => {
-            const email = "shortpw@example.com";
-            const registerRes = await registerUser({ email })
-            expect(registerRes.status).toBe(201);
-            const login = await loginUser({ email, password: "password123" });
-            const token = login.body.token;
-
-            const res = await request(app)
-                .put("/api/v1/auth/profile")
-                .set("Authorization", token)
-                .send({ password: "123" });
-
-            expect(res.status).toBe(400);
-            expect(res.body.success).toBe(false);
-            expect(res.body.message).toMatch(/at least 6/i);
-        });
-    });
-
+describe("authController with orderModel integration test", () => {
     // OrderModel interaction (Orders)
     describe("Orders (buyer & admin flows)", () => {
         it("GET /orders returns only the authenticated buyer's orders (populated)", async () => {
