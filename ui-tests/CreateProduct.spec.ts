@@ -76,6 +76,9 @@ test.describe("Create Product Page", () => {
         await page.locator('#rc_select_1').click();               
         await page.getByText('Yes', { exact: true }).click();
         await page.getByRole('button', { name: 'CREATE PRODUCT' }).click();
+        await page.waitForResponse(response => 
+            response.url().includes('/api/v1/category') && response.status() === 200
+        );
 
         // assert that the new product is correctly rendered 
         await page.getByRole('link', { name: 'Home' }).click();
@@ -85,7 +88,6 @@ test.describe("Create Product Page", () => {
         // cleanup 
         await page.goto('http://localhost:3000/dashboard/admin/products');
         await page.getByRole('link', { name: 'New Produce New Produce A new' }).click();
-        await page.getByRole('button', { name: 'DELETE PRODUCT' }).click();
         page.once('dialog', async (dialog) => {
             await dialog.accept();
         });
