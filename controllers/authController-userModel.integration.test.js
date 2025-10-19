@@ -74,8 +74,8 @@ describe("Auth Controller", () => {
         .post("/api/v1/auth/register")
         .send(existingUser);
 
-      // Then: The API should return a 200 status and an error message indicating the user exists.
-      expect(response.status).toBe(200);
+      // Then: The API should return a 409 status and an error message indicating the user exists.
+      expect(response.status).toBe(409);
       expect(response.body.success).toBe(false);
       expect(response.body.message).toBe("User with that email already exists, please login"); //
     });
@@ -125,8 +125,8 @@ describe("Auth Controller", () => {
             .post("/api/v1/auth/login")
             .send({ email: "test@example.com", password: "wrongpassword" });
 
-        // Then: The API should return a 200 status and an "Invalid Password" error message.
-        expect(response.status).toBe(200);
+        // Then: The API should return a 401 status and an "Invalid Password" error message.
+        expect(response.status).toBe(401);
         expect(response.body.success).toBe(false);
         expect(response.body.message).toBe("Invalid Password"); //
     });

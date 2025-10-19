@@ -135,7 +135,7 @@ describe("authController with userModel & orderModel integration test", () => {
             const res = await registerUser({ email: email })
             expect(res.status).toBe(201);
             const dupe = await registerUser({ email: email });
-            expect(dupe.status).toBe(200);
+            expect(dupe.status).toBe(409);
             expect(dupe.body.success).toBe(false);
             expect(dupe.body.message).toMatch(/already exists/i);
         });
@@ -159,7 +159,7 @@ describe("authController with userModel & orderModel integration test", () => {
             expect(registerRes.status).toBe(201);
 
             const res = await loginUser({ email, password: "incorrect" });
-            expect(res.status).toBe(200);
+            expect(res.status).toBe(401);
             expect(res.body.success).toBe(false);
             expect(res.body.message).toMatch(/invalid password/i);
         });

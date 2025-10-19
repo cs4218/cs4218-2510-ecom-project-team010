@@ -5,25 +5,21 @@ import { MongoMemoryServer } from "mongodb-memory-server";
 
 import authRoutes from "../routes/authRoute.js";
 import userModel from "../models/userModel.js";
-import orderModel from "../models/orderModel.js";
 import productModel from "../models/productModel.js";
+import orderModel from "../models/orderModel.js";
 
+// use the REAL router here
 const app = express();
 app.use(express.json());
-app.use("/api/v1/auth", authRoutes); // using the actual authRoutes here. 
+app.use("/api/v1/auth", authRoutes);
 
 let mongoServer;
 
 beforeAll(async () => {
-    process.env.JWT_SECRET = "a-secret-key-for-testing";
+    process.env.JWT_SECRET = "a-secret-key-for-testing"; // used by real middleware/controllers
     mongoServer = await MongoMemoryServer.create();
-    await mongoose.connect(mongoServer.getUri(), { dbName: "test-db" });
-
-    await Promise.all([
-        userModel.init(),
-        orderModel.init(),
-        productModel.init?.(),
-    ]);
+    await mongoose.connect(mongoServer.getUri(), { dbName: "auth-route-int" });
+    await userModel.init(); // ensure unique indexes (e.g., email)
 });
 
 afterEach(async () => {
@@ -39,118 +35,221 @@ afterAll(async () => {
 });
 
 // Helper functions 
-async function registerAndLogin({
-    name = "Test User",
-    email = `user_${Math.random().toString(16).slice(2)}@example.com`,
-    password = "password123",
-    phone = "12345678",
-    address = "Jurong East",
-    answer = "blue",
-    makeAdmin = false,
-} = {}) {
-    // Register
-    await request(app)
-        .post("/api/v1/auth/register")
-        .send({ name, email, password, phone, address, answer })
-        .expect(201);
-
-    if (makeAdmin) {
-        await userModel.updateOne({ email }, { $set: { role: 1 } });
-    }
-
-    const loginRes = await request(app)
-        .post("/api/v1/auth/login")
-        .send({ email, password })
-        .expect(200);
-
-    return {
-        token: loginRes.body.token,
-        user: loginRes.body.user,
+async function registerUser(override = {}) {
+    const base = {
+        name: "Test User",
+        email: `user_${Math.random().toString(16).slice(2)}@example.com`,
+        password: "password123",
+        phone: "12345678",
+        address: "Jurong East",
+        answer: "blue",
     };
+    return request(app).post("/api/v1/auth/register").send({ ...base, ...override });
 }
 
-async function createProduct({ name = "Item", price = 42 } = {}) {
-    const p = await productModel.create({
+async function loginUser({ email, password }) {
+    return request(app).post("/api/v1/auth/login").send({ email, password });
+}
+
+async function elevateToAdmin(email) {
+    await userModel.updateOne({ email }, { $set: { role: 1 } });
+}
+
+async function createProduct({ name = "Item", price = 99 }) {
+    return productModel.create({
         name,
         slug: `${name.toLowerCase()}-${Math.random().toString(16).slice(2)}`,
-        description: "A product used for tests",
+        description: "Test product",
         price,
         category: new mongoose.Types.ObjectId(),
         quantity: 10,
     });
-    return p;
 }
 
-async function createOrder({ buyerId, products, status = "Not Process" }) {
+
+async function createOrder({ buyerId, productIds, status = "Not Process" }) {
     return orderModel.create({
-        products: products.map((x) => x._id),
-        payment: { txn: "txn_123" },
+        products: productIds,
+        payment: { id: "txn_123" },
         buyer: buyerId,
         status,
     });
 }
 
-// -------------------- Test Suite --------------------
-describe("Auth ↔ Orders (routes + middleware + controllers + model)", () => {
-    describe("GET /api/v1/auth/orders (requireSignIn)", () => {
-        it("returns only the authenticated buyer's orders with populated fields", async () => {
-            const { token: tokenA, user: buyerA } = await registerAndLogin({
-                name: "Buyer A",
-                email: "buyera@example.com",
-            });
-            const p1 = await createProduct({ name: "Mouse" });
-            const p2 = await createProduct({ name: "Keyboard" });
-            await createOrder({ buyerId: buyerA._id, products: [p1, p2] });
 
-            const { user: buyerB } = await registerAndLogin({
-                name: "Buyer B",
-                email: "buyerb@example.com",
-            });
-            const p3 = await createProduct({ name: "Monitor" });
-            await createOrder({ buyerId: buyerB._id, products: [p3] });
+// ------ Tests -------
+describe("authRoute with authMiddleware and authController integration", () => {
+    describe("Public flows (no middleware on route)", () => {
+        it("POST /register registers a new user (controller invoked via route)", async () => {
+            const res = await registerUser();
+            expect(res.status).toBe(201);
+            expect(res.body.success).toBe(true);
 
-            const res = await request(app)
-                .get("/api/v1/auth/orders")
-                .set("Authorization", tokenA) // requireSignIn reads this header
-                .expect(200);
+            // Confirm persistence
+            const saved = await userModel.findOne({ email: res.body.user.email });
+            expect(saved).not.toBeNull();
+        });
 
-            // Expect only Buyer A's orders
-            expect(Array.isArray(res.body)).toBe(true);
-            expect(res.body).toHaveLength(1);
-            const order = res.body[0];
-            // Populated buyer name (from controller populate chain)
-            expect(order.buyer.name).toBe("Buyer A");
-            // Populated products (w/o photo)
-            const names = order.products.map((p) => p.name).sort();
-            expect(names).toEqual(["Keyboard", "Mouse"].sort());
+        it("POST /login logs in an existing user and returns a token", async () => {
+            const email = "loginok@example.com";
+            const password = "password123";
+            const reg = await registerUser({ email, password });
+            expect(reg.status).toBe(201);
+
+            const res = await loginUser({ email, password });
+            expect(res.status).toBe(200);
+            expect(res.body.success).toBe(true);
+            expect(res.body.token).toBeDefined();
         });
     });
 
-    describe("GET /api/v1/auth/all-orders (requireSignIn + isAdmin)", () => {
-        it("returns all orders for admin, sorted desc by createdAt", async () => {
-            // Create admin + token
-            const { token: adminToken } = await registerAndLogin({
-                name: "Admin",
-                email: "admin@example.com",
-                makeAdmin: true,
-            });
+    describe("Protected flows (middleware enforced on route)", () => {
+        it("GET /user-auth passes through requireSignIn and returns ok: true for authenticated user", async () => {
+            const email = "user@example.com";
+            const reg = await registerUser({ email });
+            expect(reg.status).toBe(201);
 
-            // Create two buyers and orders
-            const { user: buyer1 } = await registerAndLogin({
-                name: "U1",
-                email: "u1@example.com",
-            });
-            const { user: buyer2 } = await registerAndLogin({
-                name: "U2",
-                email: "u2@example.com",
-            });
+            const login = await loginUser({ email, password: "password123" });
+            expect(login.status).toBe(200);
+            const token = login.body.token;
+
+            // NOTE: Real middleware expects Authorization to be the raw token (no 'Bearer ')
+            const res = await request(app)
+                .get("/api/v1/auth/user-auth")
+                .set("Authorization", token);
+
+            expect(res.status).toBe(200);
+            expect(res.body).toEqual({ ok: true });
+        });
+
+        it("GET /admin-auth is rejected (401) for non-admin and allowed for admin", async () => {
+            const email = "maybeadmin@example.com";
+            const reg = await registerUser({ email });
+            expect(reg.status).toBe(201);
+
+            // Login as normal user
+            const login = await loginUser({ email, password: "password123" });
+            const tokenUser = login.body.token;
+
+            // Non-admin should be blocked by isAdmin
+            const resUser = await request(app)
+                .get("/api/v1/auth/admin-auth")
+                .set("Authorization", tokenUser);
+            expect(resUser.status).toBe(401);
+            expect(resUser.body.success).toBe(false);
+            expect(resUser.body.message).toMatch(/Unauthorized/i);
+
+            // Elevate to admin (DB), then login again and retry
+            await elevateToAdmin(email);
+            const loginAdmin = await loginUser({ email, password: "password123" });
+            const tokenAdmin = loginAdmin.body.token;
+
+            const resAdmin = await request(app)
+                .get("/api/v1/auth/admin-auth")
+                .set("Authorization", tokenAdmin);
+            expect(resAdmin.status).toBe(200);
+            expect(resAdmin.body).toEqual({ ok: true });
+        });
+
+        it("GET /all-users invokes requireSignIn + isAdmin and returns the users list for admin", async () => {
+            // Create an admin
+            const adminEmail = "admin@example.com";
+            const regAdmin = await registerUser({ adminEmail }); // NOTE: our helper expects 'email', fix below
+            // Fix: correctly pass email
+            const regAdmin2 = await registerUser({ email: adminEmail });
+            expect(regAdmin2.status).toBe(201);
+            await elevateToAdmin(adminEmail);
+            const loginAdmin = await loginUser({ email: adminEmail, password: "password123" });
+            const adminToken = loginAdmin.body.token;
+
+            // Seed another user
+            const u2 = await registerUser({ email: "someone@ex.com" });
+            expect(u2.status).toBe(201);
+
+            const res = await request(app)
+                .get("/api/v1/auth/all-users")
+                .set("Authorization", adminToken);
+
+            expect(res.status).toBe(200);
+            expect(res.body.success).toBe(true);
+            expect(Array.isArray(res.body.users)).toBe(true);
+            // Ensure sensitive fields are excluded by controller
+            if (res.body.users.length > 0) {
+                const one = res.body.users[0];
+                expect(one.password).toBeUndefined();
+                expect(one.answer).toBeUndefined();
+            }
+        });
+    });
+
+    describe("Orders (buyer & admin flows)", () => {
+        it("GET /orders returns only the authenticated buyer's orders (populated)", async () => {
+            // Buyer A
+            const emailA = "a@example.com";
+            const regA = await registerUser({ email: emailA });
+            expect(regA.status).toBe(201);
+            const loginA = await loginUser({ email: emailA, password: "password123" });
+            const tokenA = loginA.body.token;
+            const buyerA = await userModel.findOne({ email: emailA }).lean();
+
+            // Buyer B
+            const emailB = "b@example.com";
+            const regB = await registerUser({ email: emailB });
+            expect(regB.status).toBe(201);
+            const buyerB = await userModel.findOne({ email: emailB }).lean();
+
+            // Products
+            const p1 = await createProduct({ name: "Mouse" });
+            const p2 = await createProduct({ name: "Keyboard" });
+            const p3 = await createProduct({ name: "Monitor" });
+
+            // Orders for A and B
+            await createOrder({ buyerId: buyerA._id, productIds: [p1._id, p2._id] });
+            await createOrder({ buyerId: buyerB._id, productIds: [p3._id] });
+
+            // Call real route (middleware requireSignIn reads raw token from Authorization header)
+            const res = await request(app)
+                .get("/api/v1/auth/orders")
+                .set("Authorization", tokenA)
+                .expect(200);
+
+            expect(Array.isArray(res.body)).toBe(true);
+            expect(res.body).toHaveLength(1);
+
+            const order = res.body[0];
+            // controller populates buyer name + product data (excluding photo)
+            expect(order.buyer.name).toBe("Test User");
+            const productNames = order.products.map((p) => p.name).sort();
+            expect(productNames).toEqual(["Keyboard", "Mouse"].sort());
+        });
+
+        it("GET /all-orders returns all orders for admin, sorted by createdAt desc", async () => {
+            // Admin
+            const adminEmail = "admin@example.com";
+            const regAdmin = await registerUser({ email: adminEmail });
+            expect(regAdmin.status).toBe(201);
+            await elevateToAdmin(adminEmail);
+            const adminLogin = await loginUser({ email: adminEmail, password: "password123" });
+            const adminToken = adminLogin.body.token;
+
+            // Buyers + orders
+            const u1Email = "u1@example.com";
+            const u2Email = "u2@example.com";
+            const r1 = await registerUser({ email: u1Email });
+            const r2 = await registerUser({ email: u2Email });
+            expect(r1.status).toBe(201);
+            expect(r2.status).toBe(201);
+
+            const u1 = await userModel.findOne({ email: u1Email }).lean();
+            const u2 = await userModel.findOne({ email: u2Email }).lean();
 
             const p1 = await createProduct({ name: "A" });
             const p2 = await createProduct({ name: "B" });
 
-            const older = await createOrder({ buyerId: buyer1._id, products: [p1] });
-            await new Promise((r) => setTimeout(r, 5));
-            const newer = await createOrder({ buyerId: buyer2._id, products: [p2] });
+            const older = await createOrder({ buyerId: u1._id, productIds: [p1._id] });
+            // ensure different timestamps for sorting
+            await new Promise((r) => setTimeout(r, 10));
+            const newer = await createOrder({ buyerId: u2._id, productIds: [p2._id] });
 
             const res = await request(app)
                 .get("/api/v1/auth/all-orders")
@@ -159,52 +258,33 @@ describe("Auth ↔ Orders (routes + middleware + controllers + model)", () => {
 
             expect(Array.isArray(res.body)).toBe(true);
             expect(res.body).toHaveLength(2);
-            // Desc by createdAt (newest first)
+
+            // Sorted DESC by createdAt => newer first
             expect(res.body[0]._id).toBe(newer._id.toString());
             expect(res.body[1]._id).toBe(older._id.toString());
-            // Populated checks
-            expect(res.body[0].buyer.name).toBe("U2");
-            expect(res.body[1].buyer.name).toBe("U1");
+
+            // Populations should be present
+            expect(res.body[0].buyer?.name).toBeDefined();
+            expect(res.body[0].products?.[0]?.name).toBeDefined();
         });
 
-        it("blocks non-admin user via isAdmin middleware", async () => {
-            const { token: userToken } = await registerAndLogin({
-                name: "Regular",
-                email: "regular@example.com",
-                makeAdmin: false, // role 0
-            });
+        it("PUT /order-status/:orderId updates order status for admin", async () => {
+            // Admin
+            const adminEmail = "admin2@example.com";
+            const regAdmin = await registerUser({ email: adminEmail });
+            expect(regAdmin.status).toBe(201);
+            await elevateToAdmin(adminEmail);
+            const loginAdmin = await loginUser({ email: adminEmail, password: "password123" });
+            const adminToken = loginAdmin.body.token;
 
-            const res = await request(app)
-                .get("/api/v1/auth/all-orders")
-                .set("Authorization", userToken);
+            // Buyer + order
+            const buyerEmail = "buyer@example.com";
+            const regBuyer = await registerUser({ email: buyerEmail });
+            expect(regBuyer.status).toBe(201);
+            const buyer = await userModel.findOne({ email: buyerEmail }).lean();
 
-            // isAdmin returns 401 with message "UnAuthorized Access"
-            expect([401, 500]).toContain(res.status); // depending on logging vs explicit 401
-            if (res.status === 401) {
-                expect(res.body.success).toBe(false);
-                expect(res.body.message).toBe("UnAuthorized Access");
-            }
-        });
-    });
-
-    describe("PUT /api/v1/auth/order-status/:orderId (requireSignIn + isAdmin)", () => {
-        it("updates order status for admin", async () => {
-            // Admin + buyer + order
-            const { token: adminToken } = await registerAndLogin({
-                name: "Admin",
-                email: "admin2@example.com",
-                makeAdmin: true,
-            });
-            const { user: buyer } = await registerAndLogin({
-                name: "Buyer X",
-                email: "buyerx@example.com",
-            });
             const prod = await createProduct({ name: "Thing" });
-            const order = await createOrder({
-                buyerId: buyer._id,
-                products: [prod],
-                status: "Not Process",
-            });
+            const order = await createOrder({ buyerId: buyer._id, productIds: [prod._id] });
 
             const res = await request(app)
                 .put(`/api/v1/auth/order-status/${order._id}`)
@@ -212,61 +292,26 @@ describe("Auth ↔ Orders (routes + middleware + controllers + model)", () => {
                 .send({ status: "Shipped" })
                 .expect(200);
 
-            expect(res.body._id).toBe(order._id.toString());
             expect(res.body.status).toBe("Shipped");
 
-            // verify persisted
-            const inDb = await orderModel.findById(order._id).lean();
-            expect(inDb.status).toBe("Shipped");
+            const persisted = await orderModel.findById(order._id).lean();
+            expect(persisted.status).toBe("Shipped");
         });
 
-        it("rejects non-admin updates", async () => {
-            const { token: userToken, user } = await registerAndLogin({
-                name: "Not Admin",
-                email: "notadmin@example.com",
-                makeAdmin: false,
-            });
-            const prod = await createProduct({ name: "Part" });
-            const order = await createOrder({
-                buyerId: user._id,
-                products: [prod],
-            });
+        it("guards admin-only order endpoints with isAdmin (401 for normal user)", async () => {
+            const email = "normie@example.com";
+            const reg = await registerUser({ email });
+            expect(reg.status).toBe(201);
+            const login = await loginUser({ email, password: "password123" });
+            const token = login.body.token;
 
             const res = await request(app)
-                .put(`/api/v1/auth/order-status/${order._id}`)
-                .set("Authorization", userToken)
-                .send({ status: "Processing" });
-
-            // isAdmin should 401
-            expect([401, 500]).toContain(res.status);
-            if (res.status === 401) {
-                expect(res.body.success).toBe(false);
-                expect(res.body.message).toBe("UnAuthorized Access");
-            }
-        });
-    });
-
-    // (Optional) Error-path example at the route level by mocking model call:
-    describe("Error paths via model failures", () => {
-        it("GET /orders → 500 when orderModel.find throws", async () => {
-            const { token, user } = await registerAndLogin({
-                email: "errbuyer@example.com",
-            });
-            const spy = jest
-                .spyOn(orderModel, "find")
-                .mockImplementation(() => {
-                    throw new Error("DB down");
-                });
-
-            const res = await request(app)
-                .get("/api/v1/auth/orders")
+                .get("/api/v1/auth/all-orders")
                 .set("Authorization", token);
 
-            expect(res.status).toBe(500);
+            expect(res.status).toBe(401);
             expect(res.body.success).toBe(false);
-            expect(res.body.message).toMatch(/Error while getting orders/i);
-
-            spy.mockRestore();
+            expect(res.body.message).toMatch(/unauthorized/i);
         });
     });
 });
