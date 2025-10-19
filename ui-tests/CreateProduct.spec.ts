@@ -1,8 +1,5 @@
 import { test, expect } from "@playwright/test";
 
-// // ensures that test run reliably with the database being updated one test at a time
-// test.describe.configure({ mode: 'serial' });
-
 test.beforeEach(async ({ page }) => {
     // navigate to home page
     await page.goto('http://localhost:3000/');
@@ -59,7 +56,7 @@ test.describe("Create Product Page", () => {
         await page.goto('http://localhost:3000/dashboard/admin/products');
         await page.waitForURL(/.*\/dashboard.*/);
         await expect(page.getByRole('heading', { name: 'Novel' })).toBeVisible();
-        // await expect(page.getByRole('heading', { name: 'New Froduct' })).not.toBeVisible();
+        await expect(page.getByRole('heading', { name: 'New Froduct' })).not.toBeVisible();
     }); 
 
     test("create product page -> fill in product fields -> click submit -> new product card is rendered on home page", async ({page}) => {
@@ -94,7 +91,7 @@ test.describe("Create Product Page", () => {
         await page.getByRole('button', { name: 'DELETE PRODUCT' }).click();
         await page.goto('http://localhost:3000/dashboard/admin/products');
         await expect(page.getByRole('heading', { name: 'Novel' })).toBeVisible();
-        // await expect(page.getByRole('heading', { name: 'New Produce' })).not.toBeVisible();
+        await expect(page.getByRole('heading', { name: 'New Produce' })).not.toBeVisible();
     }); 
 
     test("create product page -> fill in only some product fields -> click submit -> no new product card is rendered on products page", async ({page}) => {
