@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 import { MongoMemoryServer } from "mongodb-memory-server";
-import userModel from "../models/userModel.js"; 
+import userModel from "./userModel.js"; 
 
 let mongoServer;
 
@@ -26,7 +26,7 @@ afterAll(async () => {
     await mongoServer.stop();
 });
 
-describe("User Model Integration Test", () => {
+describe("User Model and Mongoose Integration Test", () => {
     it("should create and save a user successfully", async () => {
         // Given: A valid user payload
         const userData = {
