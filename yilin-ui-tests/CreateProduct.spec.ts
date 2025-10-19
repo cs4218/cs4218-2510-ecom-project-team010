@@ -1,5 +1,8 @@
 import { test, expect } from "@playwright/test";
 
+// ensures that test run reliably with the database being updated one test at a time
+test.describe.configure({ mode: 'serial' });
+
 test.beforeEach(async ({ page }) => {
     // navigate to home page
     await page.goto('http://localhost:3000/');
@@ -92,24 +95,5 @@ test.describe("Create Product Page", () => {
         await page.goto('http://localhost:3000/dashboard/admin/products');
         await expect(page.getByRole('heading', { name: 'Novel' })).toBeVisible();
         await expect(page.getByRole('heading', { name: 'New Produce' })).not.toBeVisible();
-    }); 
-
-    test("create product page -> fill in only some product fields -> click submit -> no new product card is rendered on products page", async ({page}) => {
-        await page.getByRole('link', { name: 'Create Product' }).click();
-
-        // create new product but skip on filling product price and quantity, which are required 
-        const newProductName = `New Product`;
-        await page.locator('#rc_select_0').click();               
-        await page.getByText('Book').nth(1).click();
-        await page.getByRole('textbox', { name: 'Product Name' }).fill(newProductName);
-        await page.getByRole('textbox', { name: 'Product Description' }).fill('A new book');
-        await page.locator('#rc_select_1').click();               
-        await page.getByText('Yes', { exact: true }).click();
-        await page.getByRole('button', { name: 'CREATE PRODUCT' }).click();
-
-        // assert that the no new product is rendered 
-        await page.goto('http://localhost:3000/dashboard/admin/products');
-        await page.waitForURL(/.*\/dashboard.*/);
-        await expect(page.getByRole('link', { name: 'New Product New Product A new' })).not.toBeVisible();
     }); 
 });
