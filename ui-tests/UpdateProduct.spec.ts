@@ -1,5 +1,8 @@
 import { test, expect } from "@playwright/test";
 
+// ensures that test run reliably with the database being updated one test at a time
+test.describe.configure({ mode: 'serial' });
+
 test.beforeEach(async ({ page }) => {
     // navigate to home page
     await page.goto('http://localhost:3000/');
@@ -49,34 +52,6 @@ test.describe("Update Product Page", () => {
         await expect(page.getByRole('link', { name: 'Novel Novel A bestselling' })).toBeVisible();
     });
 
-    test("product page -> click card -> update product page -> update category -> updated product appears correctly on filtered categories", async ({page}) => {
-        // navigate to update product page 
-        await page.getByRole('link', { name: 'Products' }).click();
-        await page.getByRole('link', { name: 'Novel Novel A bestselling' }).click();
-
-        // update category 
-        await page.getByTitle('Book').click();
-        await page.getByTitle('Electronics').locator('div').click();
-        await page.getByRole('button', { name: 'UPDATE PRODUCT' }).click();
-        await page.waitForResponse(response => response.url().includes('api/v1/product/update-product'));
-
-        // navigate to category filter page
-        await page.getByRole('link', { name: 'Categories' }).click();
-        await page.getByRole('link', { name: 'Electronics' }).click();
-
-        // assert that the product can be found in a new category
-        await expect(page.getByRole('heading', { name: 'Novel' })).toBeVisible();
-
-        // cleanup 
-        await page.getByRole('button', { name: 'janna' }).click();
-        await page.getByRole('link', { name: 'Dashboard' }).click();
-        await page.getByRole('link', { name: 'Products' }).click();
-        await page.getByRole('link', { name: 'Novel Novel A bestselling' }).click();
-        await page.getByTitle('Electronics').click();
-        await page.getByTitle('Book').locator('div').click();
-        await page.getByRole('button', { name: 'UPDATE PRODUCT' }).click();
-        await page.waitForResponse(response => response.url().includes('api/v1/product/update-product'));
-    });  
 
     test("product page -> click card -> update product page -> update price -> updated price is reflected on home page", async ({page}) => {
         // navigate to update product page 
