@@ -5,7 +5,7 @@ import { defineConfig, devices } from '@playwright/test';
  */
 export default defineConfig({
 
-  testDir: './ui-tests-althea',
+  testDir: './ui-tests',
 
   /* Maximum time one test can run for. */
   timeout: 60_000,
