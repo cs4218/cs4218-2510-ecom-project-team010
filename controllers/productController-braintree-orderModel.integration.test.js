@@ -139,6 +139,9 @@ const hasBraintreeEnv =
       await brainTreePaymentController(req, res);
       await done;
 
+      // brief delay to let the Order write commit
+      await new Promise(r => setTimeout(r, 300)); 
+
       // verify an Order was saved
       const orders = await orderModel.find({});
       expect(orders).toHaveLength(1);
