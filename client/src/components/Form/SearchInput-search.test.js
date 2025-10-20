@@ -7,13 +7,16 @@ import SearchInput from "../../components/Form/SearchInput";
 
 jest.mock("axios");
 
-const mockNavigate = jest.fn();
 jest.mock("react-router-dom", () => ({
   ...jest.requireActual("react-router-dom"),
-  useNavigate: () => mockNavigate,
+  useNavigate: jest.fn(),
 }));
 
+import { useNavigate } from "react-router-dom";
+
 describe("Test integration between SearchContext and SearchInput", () => {
+  let mockNavigate;
+
   const renderSearchInput = () => {
     return render(
       <BrowserRouter>
@@ -27,6 +30,8 @@ describe("Test integration between SearchContext and SearchInput", () => {
   beforeEach(() => {
     jest.clearAllMocks();
     console.log = jest.fn();
+    mockNavigate = jest.fn();
+    useNavigate.mockReturnValue(mockNavigate);
   });
 
   describe("SearchInput Integration with Context", () => {
@@ -61,6 +66,7 @@ describe("Test integration between SearchContext and SearchInput", () => {
         { _id: "2", name: "Product 2", price: 200 },
       ];
 
+      // Fix: Mock axios.get specifically
       axios.get.mockResolvedValueOnce({ data: mockData });
 
       renderSearchInput();
@@ -91,6 +97,25 @@ describe("Test integration between SearchContext and SearchInput", () => {
       fireEvent.click(button);
 
       await waitFor(() => {
+        expect(mockNavigate).toHaveBeenCalledWith("/search");
+      });
+    });
+
+    test("Should handle form submission with Enter key", async () => {
+      const mockData = [{ _id: "1", name: "Product 1" }];
+      // Fix: Mock axios.get specifically
+      axios.get.mockResolvedValueOnce({ data: mockData });
+
+      renderSearchInput();
+
+      const input = screen.getByPlaceholderText("Search");
+      fireEvent.change(input, { target: { value: "phone" } });
+      fireEvent.submit(screen.getByRole("search"));
+
+      await waitFor(() => {
+        expect(axios.get).toHaveBeenCalledWith(
+          "/api/v1/product/search/phone"
+        );
         expect(mockNavigate).toHaveBeenCalledWith("/search");
       });
     });
@@ -157,6 +182,79 @@ describe("Test integration between SearchContext and SearchInput", () => {
       await waitFor(() => {
         expect(capturedValues[0].keyword).toBe("persistent");
         expect(mockNavigate).toHaveBeenCalledWith("/search");
+      });
+    });
+  });
+
+  describe("Error Handling", () => {
+    test("Should log error when API call fails", async () => {
+      const mockError = new Error("Network error");
+      axios.get.mockRejectedValueOnce(mockError);
+
+      renderSearchInput();
+
+      const input = screen.getByPlaceholderText("Search");
+      const button = screen.getByRole("button", { name: /search/i });
+
+      fireEvent.change(input, { target: { value: "test" } });
+      fireEvent.click(button);
+
+      await waitFor(() => {
+        expect(console.log).toHaveBeenCalledWith(mockError);
+        expect(mockNavigate).not.toHaveBeenCalled();
+      });
+    });
+
+    test("Should not navigate on API failure", async () => {
+      axios.get.mockRejectedValueOnce(new Error("API Error"));
+
+      renderSearchInput();
+
+      const input = screen.getByPlaceholderText("Search");
+      const button = screen.getByRole("button", { name: /search/i });
+
+      fireEvent.change(input, { target: { value: "fail" } });
+      fireEvent.click(button);
+
+      await waitFor(() => {
+        expect(mockNavigate).not.toHaveBeenCalled();
+      });
+    });
+  });
+
+  describe("Multiple Search Operations", () => {
+    test("Should handle multiple consecutive searches", async () => {
+      const firstResults = [{ _id: "1", name: "Laptop" }];
+      const secondResults = [{ _id: "2", name: "Phone" }];
+
+      axios.get
+        .mockResolvedValueOnce({ data: firstResults })
+        .mockResolvedValueOnce({ data: secondResults });
+
+      renderSearchInput();
+
+      const input = screen.getByPlaceholderText("Search");
+      const button = screen.getByRole("button", { name: /search/i });
+
+      // first search
+      fireEvent.change(input, { target: { value: "laptop" } });
+      fireEvent.click(button);
+
+      await waitFor(() => {
+        expect(axios.get).toHaveBeenCalledWith(
+          "/api/v1/product/search/laptop"
+        );
+      });
+
+      // second search
+      fireEvent.change(input, { target: { value: "phone" } });
+      fireEvent.click(button);
+
+      await waitFor(() => {
+        expect(axios.get).toHaveBeenCalledWith(
+          "/api/v1/product/search/phone"
+        );
+        expect(mockNavigate).toHaveBeenCalledTimes(2);
       });
     });
   });
