@@ -19,7 +19,7 @@ test.beforeEach(async ({ page }) => {
     await page.getByRole('button', { name: 'LOGIN' }).click();
     await page.getByRole('button', { name: 'janna' }).click();
 
-    // navigate to admin product page
+    // navigate to admin orders page
     await page.getByRole('link', { name: 'Dashboard' }).click();
     await page.getByRole('link', { name: 'Orders' }).click();
 });

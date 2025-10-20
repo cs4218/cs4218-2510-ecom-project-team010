@@ -7,6 +7,8 @@ import orderModel from '../models/orderModel.js';
 
 jest.setTimeout(30000); // allow time for real network + DB
 
+// these series of test cases focus on the interaction between productController
+// and only the real orderModel and braintree modules.
 // tiny Express-like res with "signal" so we can await the first response 
 function baseRes() {
   const res = {};
@@ -34,7 +36,7 @@ const hasBraintreeEnv =
 
 // if braintree env not found, skip tests quickly
 (hasBraintreeEnv ? describe : describe.skip)(
-  'brainTreePaymentController function and real Braintree and orderModel',
+  'integration test between brainTreePaymentController function and real Braintree and orderModel',
   () => {
     let mongo;
     let brainTreePaymentController;

@@ -6,6 +6,8 @@ import { describe, it, expect, beforeAll, jest } from '@jest/globals';
 
 jest.setTimeout(20000); // give real network call some time
 
+// these series of test cases focus on the interaction between productController
+// and only the real orderModel and braintree modules.
 // tiny Express-like res with "signal" so we can await the first response 
 function baseRes() {
   const res = {};
@@ -35,7 +37,7 @@ const hasBraintreeEnv =
   !!process.env.BRAINTREE_PRIVATE_KEY;
 
 // if braintree env not found, skip tests quickly
-(hasBraintreeEnv ? describe : describe.skip)('braintreeTokenController and real Braintree module',() => {
+(hasBraintreeEnv ? describe : describe.skip)('integration test between braintreeTokenController and real Braintree module',() => {
     let braintreeTokenController;
 
     beforeAll(async () => {
