@@ -87,4 +87,12 @@ test.describe('UI testing user dashboard page', () => {
         await expect(page.getByRole('link', { name: 'Orders' })).toBeVisible();
         await expect(page.getByRole('main')).toContainText('Orders');
     });
+
+    test('user not logged in -> manually navigate to dashboard -> goes back to home page', async ({ page }) => {
+        await page.goto('http://localhost:3000/dashboard');
+
+        // Assert: redirected to home page
+        await expect(page).toHaveURL(/\/$/);
+        await expect(page.locator('h1')).toContainText('All Products');
+    });
 })
