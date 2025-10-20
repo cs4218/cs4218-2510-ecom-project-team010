@@ -32,8 +32,9 @@ const hasBraintreeEnv =
   !!process.env.BRAINTREE_PUBLIC_KEY &&
   !!process.env.BRAINTREE_PRIVATE_KEY;
 
+// if braintree env not found, skip tests quickly
 (hasBraintreeEnv ? describe : describe.skip)(
-  'brainTreePaymentController ↔ real Braintree ↔ orderModel (DB)',
+  'brainTreePaymentController function and real Braintree and orderModel',
   () => {
     let mongo;
     let brainTreePaymentController;

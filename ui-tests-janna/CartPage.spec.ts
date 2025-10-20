@@ -63,6 +63,7 @@ test.describe('Guest accessing cart page', () => {
         // navigate to cart page
         await page.getByRole('link', { name: 'Cart' }).click();
         
+        // correct summary
         await expect(page.getByRole('heading', { name: 'Cart Summary' })).toBeVisible();
         await expect(page.getByText('Total | Checkout | Payment')).toBeVisible();
         await expect(page.getByRole('heading', { name: 'Total : $' })).toBeVisible();
@@ -77,6 +78,7 @@ test.describe('Guest accessing cart page', () => {
         // navigate to cart page
         await page.getByRole('link', { name: 'Cart' }).click();
 
+        // correct items
         await expect(page.getByText('Name : The Law of Contract in')).toBeVisible();
         await expect(page.getByText('Name : Novel')).toBeVisible();
 
