@@ -6,7 +6,7 @@ import userEvent from "@testing-library/user-event";
 import Products from "./Products";
 
 // arrange
-// mock modules on the same level as AdminMenu
+// mock modules on the same level as AdminMenu.
 // allows us to focus on the interaction between the 
 // products page and the AdminMenu component
 import axios from "axios";
@@ -46,7 +46,7 @@ function UsersPageStub() {
   return <h2 data-testid="users-page">Users Index</h2>;
 }
 
-describe("Integration: Products ↔ AdminMenu", () => {
+describe("Integration: Products page and AdminMenu", () => {
   beforeEach(() => {
     jest.spyOn(console, "log").mockImplementation(() => {});
 

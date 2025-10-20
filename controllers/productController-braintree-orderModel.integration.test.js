@@ -7,6 +7,8 @@ import orderModel from '../models/orderModel.js';
 
 jest.setTimeout(30000); // allow time for real network + DB
 
+// these series of test cases focus on the interaction between productController
+// and only the real orderModel and braintree modules.
 // tiny Express-like res with "signal" so we can await the first response 
 function baseRes() {
   const res = {};
@@ -32,8 +34,9 @@ const hasBraintreeEnv =
   !!process.env.BRAINTREE_PUBLIC_KEY &&
   !!process.env.BRAINTREE_PRIVATE_KEY;
 
+// if braintree env not found, skip tests quickly
 (hasBraintreeEnv ? describe : describe.skip)(
-  'brainTreePaymentController ↔ real Braintree ↔ orderModel (DB)',
+  'integration test between brainTreePaymentController function and real Braintree and orderModel',
   () => {
     let mongo;
     let brainTreePaymentController;
@@ -135,6 +138,9 @@ const hasBraintreeEnv =
       // call controller and wait for the async callback to respond
       await brainTreePaymentController(req, res);
       await done;
+
+      // brief delay to let the Order write commit
+      await new Promise(r => setTimeout(r, 300)); 
 
       // verify an Order was saved
       const orders = await orderModel.find({});
