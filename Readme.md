@@ -448,6 +448,8 @@ As these are end to end test cases that are dependent on a real database, please
 ---
 ### Miguel Foo (test cases were made with the aid of AI)
 
+#### Unit Tests
+
 1. Frontend Components
    - `pages/About.js`
    - `pages/Pagenotfound.js`
@@ -469,3 +471,35 @@ As these are end to end test cases that are dependent on a real database, please
      - `searchProductController`
      - `realtedProductController`
      - `productCategoryController`
+
+#### Integration Tests
+
+1. Layout Component Integration
+   - `client/src/components/Layout-Header-Footer.integration.test.js`
+     - Tests integration between Layout, Header, and Footer components
+     - Validates component communication and authentication state integration
+     - Tests cart functionality and responsive behavior
+     - Covers error handling and performance integration
+
+2. Backend Product Operations Integration
+   - `controllers/productController-readOperations.integration.test.js`
+     - Comprehensive testing of all product read operations
+     - Tests product retrieval, filtering, search, and pagination
+     - Validates database integration using MongoDB Memory Server
+     - Covers error handling and edge cases
+
+#### UI Tests (E2E Testing with Playwright)
+
+##### Test Instructions
+
+##### Testing Scope for UI Tests
+
+1. **Layout and Navigation Components**
+   - `components/Header.js` - Navigation links, authentication states, responsive behavior
+   - `components/Footer.js` - Footer links, copyright information, navigation functionality
+   - `components/Layout.js` - Consistent layout across pages, meta tag management, responsive design
+
+2. **User Interface Components**
+   - `pages/user/Profile.js` - User profile management, form interactions, API integration
+   - `components/Spinner.js` - Loading states, countdown functionality, redirection behavior
+   - `pages/Pagenotfound.js` - 404 error handling, navigation recovery, error page structure
