@@ -38,6 +38,7 @@ export default {
     "client/src/pages/Auth/**",
     "client/src/pages/Search.js",
     "client/src/pages/Categories.js",
+    "client/src/pages/CategoryProduct.js",
     "client/src/context/**",
     "client/src/hooks/**",
     "client/src/components/Form/**",
