@@ -1,5 +1,6 @@
 import React from "react";
 import { render, screen } from "@testing-library/react";
+import { MemoryRouter } from "react-router-dom";
 import Search from "../pages/Search";
 import { useSearch } from "../context/search";
 
@@ -22,7 +23,11 @@ describe("Given that multiple products are available in the Home Page", () => {
     test("When search results is empty", () => {
         useSearch.mockReturnValue([{ results: [] }, jest.fn()]);
 
-        render(<Search />);
+        render(
+            <MemoryRouter>
+                <Search />
+            </MemoryRouter>
+        );
 
         expect(screen.getByText("Search Results")).toBeInTheDocument();
         expect(screen.getByText("No Products Found")).toBeInTheDocument();
@@ -32,7 +37,11 @@ describe("Given that multiple products are available in the Home Page", () => {
         const mockProduct = [{ _id: "1", name: "Product A", description: "Mock description of product A", price: 10 }];
         useSearch.mockReturnValue([{ results: mockProduct }, jest.fn()]);
 
-        render(<Search />);
+        render(
+            <MemoryRouter>
+                <Search />
+            </MemoryRouter>
+        );
 
         expect(screen.getByText("Found 1")).toBeInTheDocument();
         expect(screen.getByText("Product A")).toBeInTheDocument();
@@ -45,7 +54,11 @@ describe("Given that multiple products are available in the Home Page", () => {
         ];
         useSearch.mockReturnValue([{ results: mockProducts }, jest.fn()]);
 
-        render(<Search />);
+        render(
+            <MemoryRouter>
+                <Search />
+            </MemoryRouter>
+        );
 
         expect(screen.getByText("Found 2")).toBeInTheDocument();
         expect(screen.getByText("Product A")).toBeInTheDocument();
