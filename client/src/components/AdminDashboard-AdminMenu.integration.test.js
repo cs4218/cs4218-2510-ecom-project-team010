@@ -1,5 +1,5 @@
 import React from "react";
-import { render, screen } from "@testing-library/react";
+import { render, screen, act } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter, Routes, Route } from "react-router-dom";
 
@@ -104,8 +104,9 @@ describe("AdminDashboard and AdminMenu integration", () => {
         render(<AppUnderTest initialPath="/dashboard/admin" />);
 
         // Click the Orders link inside AdminMenu
-        await userEvent.click(screen.getByRole("link", { name: "Orders" }));
-
+        await act(async () => {
+            userEvent.click(screen.getByRole("link", { name: "Orders" }));
+        });
         // We should now be on the Admin Orders page
         expect(screen.getByLabelText("admin-orders-page")).toBeInTheDocument();
     });
