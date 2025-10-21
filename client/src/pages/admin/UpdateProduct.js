@@ -32,7 +32,7 @@ const UpdateProduct = () => {
       setDescription(data.product.description);
       setPrice(data.product.price);
       setQuantity(data.product.quantity);
-      setShipping(data.product.shipping);
+      setShipping(data.product.shipping ? "1" : "0");
       setCategory(data.product.category._id);
     } catch (error) {
       console.log(error);
@@ -90,7 +90,8 @@ const UpdateProduct = () => {
   //delete a product
   const handleDelete = async () => {
     try {
-      if (!window.confirm("Are you sure you want to delete this product?")) return;
+      if (!window.confirm("Are you sure you want to delete this product?"))
+        return;
       const { data } = await axios.delete(
         `/api/v1/product/delete-product/${id}`
       );
@@ -102,7 +103,7 @@ const UpdateProduct = () => {
     }
   };
   return (
-    <Layout title={"Dashboard - Create Product"}>
+    <Layout title={"Dashboard - Update Product"}>
       <div className="container-fluid m-3 p-3">
         <div className="row">
           <div className="col-md-3">
@@ -112,11 +113,12 @@ const UpdateProduct = () => {
             <h1>Update Product</h1>
             <div className="m-1 w-75">
               <Select
-                variant="borderless"
+                variant={false}
                 placeholder="Select a category"
                 size="large"
                 showSearch
-                className="form-select mb-3"
+                className="mb-3"
+                style={{ width: "100%" }}
                 onChange={(value) => {
                   setCategory(value);
                 }}
@@ -199,11 +201,11 @@ const UpdateProduct = () => {
               </div>
               <div className="mb-3">
                 <Select
-                  variant="borderless"
-                  placeholder="Select Shipping "
+                  variant={false}
+                  placeholder="Select Shipping"
                   size="large"
-                  showSearch
-                  className="form-select mb-3"
+                  className="mb-3"
+                  style={{ width: "100%" }}
                   onChange={(value) => {
                     setShipping(value);
                   }}

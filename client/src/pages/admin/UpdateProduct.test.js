@@ -81,7 +81,7 @@ describe('When updating products', () => {
         await waitFor(() => {
             expect(screen.getByTestId('layout')).toHaveAttribute(
                 'title',
-                'Dashboard - Create Product'
+                'Dashboard - Update Product'
             );
         });
         expect(screen.getByTestId('admin-menu')).toBeInTheDocument();
