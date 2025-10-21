@@ -385,6 +385,43 @@ As these are end to end test cases that are dependent on a real database, please
 
 - `models/userModel-mongoose.integration.test.js`
 
+#### UI tests 
+
+##### Test instructions
+
+As these are end to end test cases that are dependent on a real database, please kindly follow the below testing instructions to test the following pages in my scope. 
+
+1. Ensure the database is reset to the original state given to students at the beginning of the project. These json files to load the original data can be found on canvas in the project section.
+2. Load the website on local host using `npm run dev` and create a user called with
+   - name: althea
+   - email: althea@gmail.com
+   - phone: 91234567
+   - address: 111
+   - password: althea
+   - answer: aa
+3. On mongoDB Atlas, make this user an admin by editing this role to be 1.
+4. Edit the playwright.config.ts file such that testDir: './ui-tests-althea' to test solely my UI testcases.
+5. Run `npx playwright test` on a separate terminal.
+
+##### Testing scope for UI tests
+
+1. Admin Dashboard
+
+- `components/AdminMenu.js`
+- `pages/admin/AdminDashboard.js`
+
+2. General
+
+- `pages/user/Dashboard.js`
+
+3. Admin View Users 
+
+- `pages/admin/Users.js`
+
+4. Home
+
+- `pages/Homepage.js`
+
 ---
 ### Yuan Jing (test cases were made with the aid of AI)
 
