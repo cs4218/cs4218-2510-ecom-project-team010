@@ -437,6 +437,10 @@ describe("Test integration between Layout, Header, and Footer", () => {
     });
 
     test("Should render Layout even when context providers fail", async () => {
+      // Suppress console errors for this test since we're intentionally throwing an error
+      const originalConsoleError = console.error;
+      console.error = jest.fn();
+      
       // Mock context error
       mockUseAuth.mockImplementation(() => {
         throw new Error("Auth context error");
@@ -452,6 +456,9 @@ describe("Test integration between Layout, Header, and Footer", () => {
           </MemoryRouter>
         );
       }).toThrow(); // This is expected behavior when context fails
+      
+      // Restore console.error
+      console.error = originalConsoleError;
     });
   });
 
