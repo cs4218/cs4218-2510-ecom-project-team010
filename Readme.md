@@ -177,6 +177,26 @@ Github Workflow Submission: [URL](https://github.com/cs4218/cs4218-2510-ecom-pro
 
 #### Integration Tests
 
+1. Create Category Page 
+- `CreateCategory-AdminMenu.integration.test.js`
+- `CreateCategory-CategoryForm.integration.test.js`
+
+2. Category Controller 
+- `categoryController-categoryModel.integration.test.js`
+
+3. Routes 
+- `categoryRoutes-authMiddleware.integration.test.js`
+- `categoryRoutes-categoryController.integration.test.js`
+
+4. Search Input Form 
+- `SearchInput-search.integration.test.js`
+
+5. Search page 
+- `Search-search.integration.test.js`
+
+6. Products
+- `CreateProduct-AdminMenu.integration.test.js`
+- `UpdateProduct-AdminMenu.integration.test.js`
 
 #### UI Tests 
 
