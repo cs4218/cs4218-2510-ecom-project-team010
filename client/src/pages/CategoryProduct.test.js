@@ -1,7 +1,7 @@
 // Note: these test cases are generated with the help of AI
 
 import React from "react";
-import { render, screen, waitFor, fireEvent } from "@testing-library/react";
+import { render, screen, waitFor, fireEvent, act } from "@testing-library/react";
 import { MemoryRouter, Routes, Route } from "react-router-dom";
 import "@testing-library/jest-dom/extend-expect";
 import axios from "axios";
@@ -45,18 +45,22 @@ describe("CategoryProduct Component", () => {
     mockUseParams.mockReturnValue({ slug: "electronics" });
   });
 
-  const renderWithRouter = (initialEntries = ["/category/electronics"]) => {
-    return render(
-      <MemoryRouter initialEntries={initialEntries}>
-        <Routes>
-          <Route path="/category/:slug" element={<CategoryProduct />} />
-        </Routes>
-      </MemoryRouter>
-    );
+  const renderWithRouter = async (initialEntries = ["/category/electronics"]) => {
+    let result;
+    await act(async () => {
+      result = render(
+        <MemoryRouter initialEntries={initialEntries}>
+          <Routes>
+            <Route path="/category/:slug" element={<CategoryProduct />} />
+          </Routes>
+        </MemoryRouter>
+      );
+    });
+    return result;
   };
 
   describe("Component Rendering", () => {
-    it("renders Layout component", () => {
+    it("renders Layout component", async () => {
       axios.get.mockResolvedValueOnce({
         data: {
           products: [],
@@ -64,7 +68,7 @@ describe("CategoryProduct Component", () => {
         }
       });
 
-      renderWithRouter();
+      await renderWithRouter();
       
       expect(screen.getByTestId("layout")).toBeInTheDocument();
     });
@@ -80,7 +84,7 @@ describe("CategoryProduct Component", () => {
 
       axios.get.mockResolvedValueOnce({ data: mockData });
 
-      renderWithRouter();
+      await renderWithRouter();
 
       await waitFor(() => {
         expect(screen.getByText("Category - Electronics")).toBeInTheDocument();
@@ -96,7 +100,7 @@ describe("CategoryProduct Component", () => {
         }
       });
 
-      renderWithRouter();
+      await renderWithRouter();
 
       await waitFor(() => {
         expect(screen.getByText("0 result found")).toBeInTheDocument();
@@ -113,7 +117,7 @@ describe("CategoryProduct Component", () => {
         }
       });
 
-      renderWithRouter();
+      await renderWithRouter();
 
       await waitFor(() => {
         expect(axios.get).toHaveBeenCalledWith("/api/v1/product/product-category/electronics");
@@ -130,7 +134,7 @@ describe("CategoryProduct Component", () => {
 
       axios.get.mockResolvedValueOnce({ data: mockData });
 
-      renderWithRouter();
+      await renderWithRouter();
 
       await waitFor(() => {
         expect(screen.getByText("Category - Electronics")).toBeInTheDocument();
@@ -145,7 +149,7 @@ describe("CategoryProduct Component", () => {
       
       axios.get.mockRejectedValueOnce(error);
 
-      renderWithRouter();
+      await renderWithRouter();
 
       await waitFor(() => {
         expect(consoleSpy).toHaveBeenCalledWith(error);
@@ -182,7 +186,7 @@ describe("CategoryProduct Component", () => {
         }
       });
 
-      renderWithRouter();
+      await renderWithRouter();
 
       await waitFor(() => {
         // Check product names
@@ -208,7 +212,7 @@ describe("CategoryProduct Component", () => {
         }
       });
 
-      renderWithRouter();
+      await renderWithRouter();
 
       await waitFor(() => {
         const laptopImage = screen.getByAltText("Laptop");
@@ -228,7 +232,7 @@ describe("CategoryProduct Component", () => {
         }
       });
 
-      renderWithRouter();
+      await renderWithRouter();
 
       await waitFor(() => {
         const moreDetailsButtons = screen.getAllByText("More Details");
@@ -245,7 +249,7 @@ describe("CategoryProduct Component", () => {
         }
       });
 
-      renderWithRouter();
+      await renderWithRouter();
 
       await waitFor(() => {
         const moreDetailsButton = screen.getAllByText("More Details")[0];
@@ -272,7 +276,7 @@ describe("CategoryProduct Component", () => {
         }
       });
 
-      renderWithRouter();
+      await renderWithRouter();
 
       await waitFor(() => {
         expect(screen.getByText(/This is a very long description that should be truncated whe/)).toBeInTheDocument();
@@ -290,7 +294,7 @@ describe("CategoryProduct Component", () => {
         }
       });
 
-      renderWithRouter();
+      await renderWithRouter();
 
       await waitFor(() => {
         expect(screen.getByText("Category -")).toBeInTheDocument();
@@ -306,7 +310,7 @@ describe("CategoryProduct Component", () => {
         }
       });
 
-      renderWithRouter();
+      await renderWithRouter();
 
       await waitFor(() => {
         expect(screen.getByText("Category - Electronics")).toBeInTheDocument();
@@ -331,18 +335,18 @@ describe("CategoryProduct Component", () => {
         }
       });
 
-      renderWithRouter();
+      await renderWithRouter();
 
       await waitFor(() => {
         expect(screen.getByText("Incomplete Product")).toBeInTheDocument();
       });
     });
 
-    it("does not call API when slug is not provided", () => {
+    it("does not call API when slug is not provided", async () => {
       // Mock useParams to return undefined slug
       mockUseParams.mockReturnValue({ slug: undefined });
 
-      renderWithRouter();
+      await renderWithRouter();
 
       expect(axios.get).not.toHaveBeenCalled();
     });
@@ -364,7 +368,7 @@ describe("CategoryProduct Component", () => {
         }
       });
 
-      renderWithRouter();
+      await renderWithRouter();
 
       await waitFor(() => {
         expect(screen.getByText("$9.99")).toBeInTheDocument();
