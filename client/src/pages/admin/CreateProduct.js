@@ -78,7 +78,8 @@ const CreateProduct = () => {
                 placeholder="Select a category"
                 size="large"
                 showSearch
-                className="form-select mb-3"
+                className="mb-3"
+                style={{ width: "100%" }}
                 onChange={(value) => {
                   setCategory(value);
                 }}
@@ -153,10 +154,11 @@ const CreateProduct = () => {
               <div className="mb-3">
                 <Select
                   variant={false}
-                  placeholder="Select Shipping "
+                  placeholder="Select Shipping"
                   size="large"
                   showSearch
-                  className="form-select mb-3"
+                  className="mb-3"
+                  style={{ width: "100%" }}
                   onChange={(value) => {
                     setShipping(value);
                   }}

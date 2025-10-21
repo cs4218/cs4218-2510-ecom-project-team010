@@ -58,6 +58,32 @@ test.describe("Search Bar", () => {
         await expect(page.getByRole('heading', { name: 'Name : Textbook' })).toBeVisible();
     });
 
+    test("submit search in CAPS -> click more details -> same chosen product should render correctly on category product page", async ({page}) => {
+        await page.getByRole('searchbox', { name: 'Search' }).click();
+        await page.getByRole('searchbox', { name: 'Search' }).fill('TEX');
+        await page.getByRole('button', { name: 'Search' }).click();
+        await page.waitForURL(/.*\/search.*/);
+
+        // click on more details 
+        await page.getByRole('button', { name: 'More Details' }).first().click();
+
+        // assert that the chosen product is correctly rendered on the category product page 
+        await expect(page.getByRole('heading', { name: 'Product Details' })).toBeVisible();
+        await expect(page.getByRole('heading', { name: 'Name : Textbook' })).toBeVisible();
+    });
+
+    test("submit search for a product that does not exist ->  no results should render on the resultspage", async ({page}) => {
+        await page.getByRole('searchbox', { name: 'Search' }).click();
+        await page.getByRole('searchbox', { name: 'Search' }).fill('test iphone');
+        await page.getByRole('button', { name: 'Search' }).click();
+        await page.waitForURL(/.*\/search.*/);
+
+        // assert that no results are found
+        await expect(page).toHaveTitle(/Search results/i);        
+        await expect(page.getByRole('heading', { name: 'Search Results', level: 1 })).toBeVisible();
+        await expect(page.getByRole('heading', { name: 'No Products Found' })).toBeVisible(); 
+    });
+    
     test("submit search -> click more details -> click back search -> renders search results page correctly", async ({page}) => {
         await page.getByRole('searchbox', { name: 'Search' }).click();
         await page.getByRole('searchbox', { name: 'Search' }).fill('te');
@@ -71,5 +97,29 @@ test.describe("Search Bar", () => {
         // assert that the search results page is rendered correctly 
         await page.waitForURL(/.*\/search.*/);
         expect(page.url()).toContain('/search');
+    });
+
+    test("submit search for a product that does not exist ->  no results -> click back search -> renders search results page correctly", async ({page}) => {
+        await page.getByRole('searchbox', { name: 'Search' }).click();
+        await page.getByRole('searchbox', { name: 'Search' }).fill('test iphone');
+        await page.getByRole('button', { name: 'Search' }).click();
+        await page.waitForURL(/.*\/search.*/);
+
+        // assert that no results are found
+        await expect(page).toHaveTitle(/Search results/i);        
+        await expect(page.getByRole('heading', { name: 'Search Results', level: 1 })).toBeVisible();
+        await expect(page.getByRole('heading', { name: 'No Products Found' })).toBeVisible(); 
+
+        await page.getByRole('button', { name: 'Search' }).click();
+        await page.getByRole('searchbox', { name: 'Search' }).fill('tex');
+        await page.getByRole('button', { name: 'Search' }).click();
+        await page.waitForURL(/.*\/search.*/);
+
+        // click on more details 
+        await page.getByRole('button', { name: 'More Details' }).first().click();
+
+        // assert that the chosen product is correctly rendered on the category product page 
+        await expect(page.getByRole('heading', { name: 'Product Details' })).toBeVisible();
+        await expect(page.getByRole('heading', { name: 'Name : Textbook' })).toBeVisible();
     });
 });
