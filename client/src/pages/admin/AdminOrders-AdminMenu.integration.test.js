@@ -46,7 +46,7 @@ function UsersPageStub() {
   return <h2 data-testid="users-page">Users Index</h2>;
 }
 
-describe("Integration: AdminOrders ↔ AdminMenu", () => {
+describe("Integration: AdminOrders page and AdminMenu", () => {
   beforeEach(() => {
     jest.spyOn(console, "log").mockImplementation(() => {});
     mockedAxios.get.mockImplementation((url) => {

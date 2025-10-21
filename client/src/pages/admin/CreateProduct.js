@@ -74,11 +74,12 @@ const CreateProduct = () => {
             <h1>Create Product</h1>
             <div className="m-1 w-75">
               <Select
-                bordered={false}
+                variant={false}
                 placeholder="Select a category"
                 size="large"
                 showSearch
-                className="form-select mb-3"
+                className="mb-3"
+                style={{ width: "100%" }}
                 onChange={(value) => {
                   setCategory(value);
                 }}
@@ -152,11 +153,12 @@ const CreateProduct = () => {
               </div>
               <div className="mb-3">
                 <Select
-                  bordered={false}
-                  placeholder="Select Shipping "
+                  variant={false}
+                  placeholder="Select Shipping"
                   size="large"
                   showSearch
-                  className="form-select mb-3"
+                  className="mb-3"
+                  style={{ width: "100%" }}
                   onChange={(value) => {
                     setShipping(value);
                   }}

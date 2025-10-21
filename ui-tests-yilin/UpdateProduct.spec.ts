@@ -1,0 +1,83 @@
+import { test, expect } from "@playwright/test";
+
+// ensures that test run reliably with the database being updated one test at a time
+test.describe.configure({ mode: 'serial' });
+
+test.beforeEach(async ({ page }) => {
+    // navigate to home page
+    await page.goto('http://localhost:3000/');
+
+    // login into test admin account
+    await page.getByRole('link', { name: 'Login' }).click();
+    await page.getByRole('textbox', { name: 'Enter Your Email' }).click();
+    await page.getByRole('textbox', { name: 'Enter Your Email' }).fill('jannaleong7@gmail.com');
+    await page.getByRole('textbox', { name: 'Enter Your Password' }).click();
+    await page.getByRole('textbox', { name: 'Enter Your Password' }).fill('123');
+    await page.getByRole('button', { name: 'LOGIN' }).click();
+    await page.getByRole('button', { name: 'janna' }).click();
+
+    // navigate to admin products page 
+    await page.getByRole('link', { name: 'Dashboard' }).click();
+    await page.getByRole('link', { name: 'Products' }).click();
+}); 
+
+test.describe("Update Product Page", () => {
+    test("should navigate to update product page", async ({page}) => {
+        await page.getByRole('link', { name: 'Products' }).click();
+        await page.getByRole('link', { name: 'Novel Novel A bestselling' }).click();
+
+        // asserts that we are in the update product page
+        await page.waitForURL(/.*\/product.*/);
+        expect(page.url()).toContain('/Novel');
+    });  
+
+    test("product page -> click card -> update product page -> update name -> updated product appears correctly on products", async ({ page }) => {
+        // navigate to update product page 
+        await page.getByRole('link', { name: 'Products' }).click();
+        await page.getByRole('link', { name: 'Novel Novel A bestselling' }).click();
+
+        // update title
+        await page.getByRole('textbox', { name: 'Product Name' }).click();
+        await page.getByRole('textbox', { name: 'Product Name' }).fill('SomeNovel');
+        await page.getByRole('button', { name: 'UPDATE PRODUCT' }).click();
+
+        // assert updated title on product page
+        await expect(page.getByRole('link', { name: 'SomeNovel SomeNovel A' })).toBeVisible();
+        
+        // cleanup
+        await page.getByRole('link', { name: 'SomeNovel SomeNovel A' }).click();
+        await page.getByRole('textbox', { name: 'Product Name' }).click();
+        await page.getByRole('textbox', { name: 'Product Name' }).fill('Novel');
+        await page.getByRole('button', { name: 'UPDATE PRODUCT' }).click();
+        await expect(page.getByRole('link', { name: 'Novel Novel A bestselling' })).toBeVisible();
+    });
+
+
+    test("product page -> click card -> update product page -> update price -> updated price is reflected on home page", async ({page}) => {
+        // navigate to update product page 
+        await page.getByRole('link', { name: 'Products' }).click();
+        await page.getByRole('link', { name: 'Novel Novel A bestselling' }).click();
+
+        // update price
+        await page.getByPlaceholder('Product Price').click();
+        await page.getByPlaceholder('Product Price').fill('16');
+        await page.getByRole('button', { name: 'UPDATE PRODUCT' }).click();
+        await page.waitForResponse(response => response.url().includes('api/v1/product/update-product'));
+
+        // verify that price is updated on the home page 
+        await page.getByRole('link', { name: 'Home' }).click();
+        await expect(page.getByRole('heading', { name: '$16.00' })).toBeVisible(); 
+
+        // cleanup
+        await page.getByRole('button', { name: 'janna' }).click();
+        await page.getByRole('link', { name: 'Dashboard' }).click();
+        await page.getByRole('link', { name: 'Products' }).click();
+        await page.getByRole('link', { name: 'Novel Novel A bestselling' }).click();
+        await page.getByPlaceholder('Product Price').click();
+        await page.getByPlaceholder('Product Price').fill('14.99');
+        await page.getByRole('button', { name: 'UPDATE PRODUCT' }).click();
+        await page.waitForResponse(response => response.url().includes('api/v1/product/update-product'));
+        await page.getByRole('link', { name: 'Home' }).click();
+        await expect(page.getByRole('heading', { name: '$14.99' })).toBeVisible(); 
+    });  
+});

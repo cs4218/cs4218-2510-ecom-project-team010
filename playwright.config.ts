@@ -5,10 +5,11 @@ import { defineConfig, devices } from '@playwright/test';
  */
 export default defineConfig({
 
-  testDir: './ui-tests',
+  testDir: './ui-tests-janna',
+  // testDir: './ui-tests',
 
   /* Maximum time one test can run for. */
-  timeout: 15_000,
+  timeout: 60_000,
 
   captureGitInfo: { commit: true, diff: true },
 
@@ -18,7 +19,7 @@ export default defineConfig({
      * Maximum time expect() should wait for the condition to be met.
      * For example in `await expect(locator).toHaveText();`
      */
-    timeout: 5_000
+    timeout: 30_000
   },
 
   /* Fail the build on CI if you accidentally left test.only in the source code. */

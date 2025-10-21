@@ -1,8 +1,14 @@
+// these test cases focus on the interaction between braintreeTokenController function
+// within the productController file and the real Braintree module. 
+
 import 'dotenv/config';
 import { describe, it, expect, beforeAll, jest } from '@jest/globals';
 
 jest.setTimeout(20000); // give real network call some time
 
+// these series of test cases focus on the interaction between productController
+// and only the real orderModel and braintree modules.
+// tiny Express-like res with "signal" so we can await the first response 
 function baseRes() {
   const res = {};
   res.statusCode = 200;
@@ -10,8 +16,6 @@ function baseRes() {
   res.send   = jest.fn((payload) => payload);
   return res;
 }
-
-// wrap res so we can await the first call to either res.send or res.status
 function mockResWithSignal() {
   const res = baseRes();
   let resolve;
@@ -32,8 +36,8 @@ const hasBraintreeEnv =
   !!process.env.BRAINTREE_PUBLIC_KEY &&
   !!process.env.BRAINTREE_PRIVATE_KEY;
 
-  // if braintree env not found, skip tests quickly
-(hasBraintreeEnv ? describe : describe.skip)('braintreeTokenController ↔ real Braintree (no DB)',() => {
+// if braintree env not found, skip tests quickly
+(hasBraintreeEnv ? describe : describe.skip)('integration test between braintreeTokenController and real Braintree module',() => {
     let braintreeTokenController;
 
     beforeAll(async () => {
@@ -64,8 +68,9 @@ const hasBraintreeEnv =
     });
 
     it('when braintreeTokenController interacts with braintree module to generate token, handles gateway errors with 500 (if they occur)', async () => {
-      // This is hard to force deterministically with real SDK,
-      // but we keep a defensive test that at least waits for a response.
+      // This is hard to force an error deterministically with real SDK,
+      // but we keep a defensive test that at least waits for a response
+      // and responds gracefully if an error does occur.
       const req = {};
       const { res, done } = mockResWithSignal();
 

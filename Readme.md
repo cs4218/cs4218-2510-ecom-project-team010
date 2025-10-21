@@ -152,6 +152,8 @@ Github Workflow Submission: [URL](https://github.com/cs4218/cs4218-2510-ecom-pro
 ## Members Contributions
 
 ### Lee Yi Lin (test cases were made with the aid of AI)
+
+#### Unit Tests
 1. Admin Actions
 
 - `components/Form/CategoryForm.js`
@@ -173,7 +175,72 @@ Github Workflow Submission: [URL](https://github.com/cs4218/cs4218-2510-ecom-pro
 - `controllers/categoryController.js`
 - `models/categoryModel.js`
 
+#### Integration Tests
+
+1. Create Category Page 
+- `CreateCategory-AdminMenu.integration.test.js`
+- `CreateCategory-CategoryForm.integration.test.js`
+
+2. Category Controller 
+- `categoryController-categoryModel.integration.test.js`
+
+3. Routes 
+- `categoryRoutes-authMiddleware.integration.test.js`
+- `categoryRoutes-categoryController.integration.test.js`
+
+4. Search Input Form 
+- `SearchInput-search.integration.test.js`
+
+5. Search page 
+- `Search-search.integration.test.js`
+
+6. Products
+- `CreateProduct-AdminMenu.integration.test.js`
+- `UpdateProduct-AdminMenu.integration.test.js`
+
+#### UI Tests 
+
+##### Test Instructions
+
+As these are end to end test cases that are dependent on a real database, please kindly follow the below testing instructions to test the following pages in my scope. 
+
+1. Ensure the database is reset to the original state given to students at the beginning of the project. These json files to load the original data can be found on canvas in the project section.
+2. Load the website on local host using `npm run dev` and create a user called with
+   - name: janna
+   - email: jannaleong7@gmail.com
+   - phone: 99999999
+   - address: 123
+   - password: 123
+3. On mongoDB Atlas, make this user an admin by editing this role to be 1.
+4. Edit the `playwright.config.ts` file such that testDir: './ui-tests-yilin' to test solely my UI testcases.
+5. Run `npx playwright test` on a seperate terminal.
+
+#### Testing scope for UI tests
+
+1. Categories Dropdown 
+
+- `pages/Categories.js`
+
+2. Create Category Page
+
+- `pages/admin/CreateCategory.js`
+
+3. Create Product Page 
+
+- `pages/admin/CreateProduct.js`
+
+4. Update Product Page
+
+- `pages/admin/UpdateProduct.js`
+
+5. Search
+
+- `pages/Search.js`
+
+---
 ### Janna Leong (test cases were made with the aid of AI)
+
+### Unit Tests
 1. Admin View Orders
 
 - `pages/admin/AdminOrders.js`
@@ -201,8 +268,82 @@ Github Workflow Submission: [URL](https://github.com/cs4218/cs4218-2510-ecom-pro
    - `braintreeTokenController`
    - `brainTreePaymentController`
 
+### Integration tests
+
+1. Admin View Orders
+
+- `pages/admin/AdminOrders.js`
+   - related test files : `pages/admin/AdminOrders-AdminMenu.integration.test.js`, `pages/admin/AdminOrders-useAuth.integration.test.js`
+
+2. Admin View Products
+
+- `pages/admin/Products.js `
+   - related test files : `pages/admin/products-adminmenu.integration.test.js`
+- `controllers/productController.js`
+   - `createProductController`
+   - `deleteProductController`
+   - `updateProductController` 
+   - related test files : `controllers/productController-productModel-fs.integration.test.js`
+
+3. Policy 
+
+- `pages/Policy.js`
+   - related test files : `pages/policy-layout.integration.test.js`
+
+4. Payment
+
+- `controllers/productController.js`
+   - `braintreeTokenController` 
+      - related test files : `controllers/productController-braintree.integration.test.js`
+   - `brainTreePaymentController`
+      - related test files : `controllers/productController-braintree-orderModel.integration.test.js`
+
+
+### UI test cases 
+
+#### Test instructions
+
+As these are end to end test cases that are dependent on a real database, please kindly follow the below testing instructions to test the following pages in my scope. 
+
+1. Ensure the database is reset to the original state given to students at the beginning of the project. These json files to load the original data can be found on canvas in the project section.
+2. Load the website on local host using `npm run dev` and create a user called with
+   - name: janna
+   - email: jannaleong7@gmail.com
+   - phone: 99999999
+   - address: 123
+   - password: 123
+3. On mongoDB Atlas, make this user an admin by editing this role to be 1.
+4. Edit the `playwright.config.ts` file such that testDir: './ui-tests-janna' to test solely my UI testcases.
+5. Run `npx playwright test` on a seperate terminal.
+
+
+#### Testing scope for UI tests
+
+1. Admin View Orders
+
+- `pages/admin/AdminOrders.js`
+
+2. Admin View Products
+
+- `pages/admin/Products.js `
+
+3. Policy 
+
+- `pages/Policy.js`
+
+4. About page
+
+- `pages/About.js`
+
+5. Cart
+
+- `pages/CartPage.js` (only tested for test scenarios for a guest user. Remaining test scenarios for a logged in user completed by yuanjing)
+---
 
 ### Althea Chua (test cases were made with the aid of AI)
+
+#### Unit tests
+
 1. Admin Dashboard
 
 - `components/AdminMenu.js`
@@ -227,7 +368,24 @@ Github Workflow Submission: [URL](https://github.com/cs4218/cs4218-2510-ecom-pro
 
 - `pages/Homepage.js`
 
+#### Integration tests
 
+1. Integration between App - AdminRoute - AdminDashboard - AdminMenu
+
+- `components/Routes/App-AdminRoute.integration.test.js`
+- `pages/admin/AdminRoute-AdminDashboard.integration.test.js`
+- `components/AdminDashboard-AdminMenu.integration.test.js`
+
+2. Integration between authRoute - authController - orderModel 
+
+- `routes/authRoute-authMiddleware-authController.integration.test.js`
+- `controllers/authController-orderModel.integration.test.js`
+
+3. Integration between userModel - mongoose
+
+- `models/userModel-mongoose.integration.test.js`
+
+---
 ### Yuan Jing (test cases were made with the aid of AI)
 
 1. Protected Routes
@@ -250,7 +408,7 @@ Github Workflow Submission: [URL](https://github.com/cs4218/cs4218-2510-ecom-pro
 - Server
    - controllers/authController.js
 
-
+---
 ### Miguel Foo (test cases were made with the aid of AI)
 
 1. Frontend Components

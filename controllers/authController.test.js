@@ -95,7 +95,7 @@ describe("Auth Controllers", () => {
                 await registerController(req, res);
 
                 // Then
-                expect(res.status).toHaveBeenCalledWith(200);
+                expect(res.status).toHaveBeenCalledWith(409);
                 expect(res.send).toHaveBeenCalledWith({
                     success: false,
                     message: "User with that email already exists, please login",
@@ -153,7 +153,7 @@ describe("Auth Controllers", () => {
 
                 // Then
                 expect(res.status).toHaveBeenCalledWith(404);
-                expect(res.send).toHaveBeenCalledWith({ success: false, message: "Email is not registerd" });
+                expect(res.send).toHaveBeenCalledWith({ success: false, message: "Email is not registered" });
             });
         });
 
@@ -169,7 +169,7 @@ describe("Auth Controllers", () => {
                 await loginController(req, res);
 
                 // Then
-                expect(res.status).toHaveBeenCalledWith(200);
+                expect(res.status).toHaveBeenCalledWith(401);
                 expect(res.send).toHaveBeenCalledWith({ success: false, message: "Invalid Password" });
             });
         });

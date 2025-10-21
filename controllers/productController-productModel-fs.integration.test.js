@@ -39,7 +39,7 @@ function mockRes() {
   return res;
 }
 
-describe('createProductController ↔ productModel (integration)', () => {
+describe('integration test between createProductController function and productModel and fs.', () => {
   let mongo;
 
   beforeAll(async () => {
@@ -177,7 +177,7 @@ describe('createProductController ↔ productModel (integration)', () => {
 });
 
 
-describe('deleteProductController ↔ productModel (integration)', () => {
+describe('integration test between deleteProductController function and productModel.', () => {
     let mongo;
     let deleteProductController;
 
@@ -242,7 +242,7 @@ describe('deleteProductController ↔ productModel (integration)', () => {
 });
 
 
-describe('updateProductController ↔ productModel (integration)', () => {
+describe('integration test between updateProductController function and productModel and fs.', () => {
   let mongo;
   let updateProductController;
 
