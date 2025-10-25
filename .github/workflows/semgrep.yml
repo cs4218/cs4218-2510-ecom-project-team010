@@ -1,0 +1,29 @@
+name: Semgrep CE scan
+
+on:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  semgrep:
+    name: semgrep-oss/scan
+    if: github.event.pull_request.draft == false
+    runs-on: ubuntu-latest
+
+    container:
+      image: semgrep/semgrep
+
+
+    steps:
+      - uses: actions/checkout@v4
+      - run: semgrep scan --sarif --config auto > semgrep.sarif
+      - name: "Upload scan results"
+        id: "upload_artifact"
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: Semgrep scan results file
+          path: semgrep.sarif
+          retention-days: 5
