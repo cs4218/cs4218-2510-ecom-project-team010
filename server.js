@@ -7,6 +7,7 @@ import authRoutes from './routes/authRoute.js'
 import categoryRoutes from './routes/categoryRoutes.js'
 import productRoutes from './routes/productRoutes.js'
 import cors from "cors";
+import helmet from "helmet";
 
 // configure env
 dotenv.config();
@@ -17,7 +18,44 @@ connectDB();
 const app = express();
 
 //middlewares
-app.use(cors());
+app.use(
+  helmet({
+    contentSecurityPolicy: {
+      directives: {
+        "script-src": ["'self'"], // Only allow scripts from your own domain
+        "style-src": ["'self'", "'unsafe-inline'"], // Allow 'self' and inline styles
+        "img-src": ["'self'", "data:"], // Allow 'self' and data: images
+        // Add other sources if needed (e.g., Google Fonts, payment gateways)
+      },
+    },
+    frameguard: { action: "deny" }, // Prevents clickjacking
+    hsts: { maxAge: 31536000, includeSubDomains: true, preload: true }, // Enforce HTTPS
+    noSniff: true, // Sets X-Content-Type-Options
+  })
+);
+
+// 3. CONFIGURE CORS
+// This fixes the "Cross-Domain Misconfiguration"
+// It restricts requests to only your frontend application
+const allowedOrigins = [
+  'http://localhost:3000', // Default React dev port
+  // Add your *production* frontend URL here when you deploy
+  // e.g., 'https://your-app-domain.com'
+];
+
+const corsOptions = {
+  origin: function (origin, callback) {
+    // Allow requests with no origin (like mobile apps or Postman)
+    if (!origin) return callback(null, true);
+    
+    if (allowedOrigins.indexOf(origin) === -1) {
+      const msg = 'The CORS policy for this site does not allow access from the specified Origin.';
+      return callback(new Error(msg), false);
+    }
+    return callback(null, true);
+  }
+};
+app.use(cors(corsOptions));
 app.use(express.json());
 app.use(morgan('dev'));
 
