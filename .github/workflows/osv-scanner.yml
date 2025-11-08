@@ -4,10 +4,8 @@ name: OSV-Scanner PR Scan
 on:
   pull_request:
     branches: [main]
-    paths:
-        - package.json
   schedule:
-    - cron: '0 6 * * MON'
+    - cron: "0 6 * * MON"
 
 permissions:
   # Required to upload SARIF file to CodeQL. See: https://github.com/github/codeql-action/issues/2117

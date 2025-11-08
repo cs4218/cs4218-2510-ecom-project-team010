@@ -22,10 +22,18 @@ app.use(
   helmet({
     contentSecurityPolicy: {
       directives: {
-        "script-src": ["'self'"], // Only allow scripts from your own domain
+        "script-src": [
+          "'self'",
+          "https://*.braintreegateway.com",
+          "https://*.paypal.com",
+        ],
         "style-src": ["'self'", "'unsafe-inline'"], // Allow 'self' and inline styles
         "img-src": ["'self'", "data:"], // Allow 'self' and data: images
-        // Add other sources if needed (e.g., Google Fonts, payment gateways)
+        "connect-src": [
+          "'self'",
+          "https://*.braintreegateway.com",
+          "https://*.paypal.com",
+        ],
       },
     },
     frameguard: { action: "deny" }, // Prevents clickjacking
