@@ -26,8 +26,8 @@ app.use(
         "https://*.braintreegateway.com",
         "https://*.paypal.com",
       ],
-      "style-src": ["'self'", "'unsafe-inline'"], // Allow 'self' and inline styles
-      "img-src": ["'self'", "data:"], // Allow 'self' and data: images
+      "style-src": ["'self'", "'unsafe-inline'"],
+      "img-src": ["'self'", "data:"],
       "connect-src": [
         "'self'",
         "https://*.braintreegateway.com",
@@ -36,24 +36,27 @@ app.use(
     },
   })
 );
-app.use(helmet.frameguard({ action: "deny" })); // Prevents clickjacking
-app.use(helmet.hsts({ maxAge: 31536000, includeSubDomains: true, preload: true })); // Enforce HTTPS
-app.use(helmet.noSniff()); // Sets X-Content-Type-Options
+app.use(helmet.frameguard({ action: "deny" }));
+app.use(helmet.hsts({ maxAge: 31536000, includeSubDomains: true, preload: true }));
+app.use(helmet.noSniff());
 
 // 3. CONFIGURE CORS
-// This fixes the "Cross-Domain Misconfiguration"
-// It restricts requests to only your frontend application
+// Restrict in production, relax for local/dev/test (Playwright etc.)
 const allowedOrigins = [
-  'http://localhost:3000', // Default React dev port
-  // Add your *production* frontend URL here when you deploy
-  // e.g., 'https://your-app-domain.com'
+  process.env.FRONTEND_URL || 'http://your-production-domain.com',
+  'http://localhost:3000',
+  'http://127.0.0.1:3000'
 ];
 
 const corsOptions = {
   origin: function (origin, callback) {
-    // Allow requests with no origin (like mobile apps or Postman)
-    if (!origin) return callback(null, true);
-    
+    // Allow requests with no origin (server-side, Postman, Playwright runner) or with origin "null"
+    if (!origin || origin === 'null') return callback(null, true);
+
+    // Allow any localhost / 127.0.0.1 on any port (useful for dev and testing)
+    const localhostRegex = /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/;
+    if (localhostRegex.test(origin)) return callback(null, true);
+
     if (allowedOrigins.indexOf(origin) === -1) {
       const msg = 'The CORS policy for this site does not allow access from the specified Origin.';
       return callback(new Error(msg), false);
@@ -61,7 +64,22 @@ const corsOptions = {
     return callback(null, true);
   }
 };
-app.use(cors(corsOptions));
+
+// decide environment: treat DEV_MODE or NODE_ENV === 'development' as local
+const isLocal =
+  process.env.NODE_ENV === 'development' ||
+  process.env.DEV_MODE === 'development' ||
+  !process.env.NODE_ENV; // fallback to local if NODE_ENV unset
+
+
+if (isLocal) {
+  // relaxed for local/dev/testing (including Playwright)
+  app.use(cors()); // allow all origins locally
+} else {
+  // strict CORS in production
+  app.use(cors(corsOptions));
+}
+
 app.use(express.json());
 app.use(morgan('dev'));
 
@@ -71,7 +89,6 @@ app.use("/api/v1/category", categoryRoutes);
 app.use("/api/v1/product", productRoutes);
 
 // rest api
-
 app.get('/', (req,res) => {
     res.send("<h1>Welcome to ecommerce app</h1>");
 });
