@@ -19,28 +19,26 @@ const app = express();
 
 //middlewares
 app.use(
-  helmet({
-    contentSecurityPolicy: {
-      directives: {
-        "script-src": [
-          "'self'",
-          "https://*.braintreegateway.com",
-          "https://*.paypal.com",
-        ],
-        "style-src": ["'self'", "'unsafe-inline'"], // Allow 'self' and inline styles
-        "img-src": ["'self'", "data:"], // Allow 'self' and data: images
-        "connect-src": [
-          "'self'",
-          "https://*.braintreegateway.com",
-          "https://*.paypal.com",
-        ],
-      },
+  helmet.contentSecurityPolicy({
+    directives: {
+      "script-src": [
+        "'self'",
+        "https://*.braintreegateway.com",
+        "https://*.paypal.com",
+      ],
+      "style-src": ["'self'", "'unsafe-inline'"], // Allow 'self' and inline styles
+      "img-src": ["'self'", "data:"], // Allow 'self' and data: images
+      "connect-src": [
+        "'self'",
+        "https://*.braintreegateway.com",
+        "https://*.paypal.com",
+      ],
     },
-    frameguard: { action: "deny" }, // Prevents clickjacking
-    hsts: { maxAge: 31536000, includeSubDomains: true, preload: true }, // Enforce HTTPS
-    noSniff: true, // Sets X-Content-Type-Options
   })
 );
+app.use(helmet.frameguard({ action: "deny" })); // Prevents clickjacking
+app.use(helmet.hsts({ maxAge: 31536000, includeSubDomains: true, preload: true })); // Enforce HTTPS
+app.use(helmet.noSniff()); // Sets X-Content-Type-Options
 
 // 3. CONFIGURE CORS
 // This fixes the "Cross-Domain Misconfiguration"
